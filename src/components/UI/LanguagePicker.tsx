@@ -32,7 +32,7 @@ function LanguagePicker() {
     <div className="relative font-sans" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition-colors group"
+        className="flex items-center cursor-pointer gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition-colors group"
       >
         <Languages
           size={18}

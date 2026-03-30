@@ -35,21 +35,20 @@ function Header() {
           </Link>
 
         </div>
-          <div className="mobile-nav-hidden flex transform translate-y-[3px]  items-center  gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-[16px] bg-amber-100 p-2 rounded-2xl font-medium gap-3 transition-colors ${
-                  isLinkActive(link.href)
-                    ? "text-blue-600"
-                    : "text-gray-700 hover:text-blue-600"
+        <div className="mobile-nav-hidden flex transform translate-y-[3px]  items-center  gap-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`text-[16px] bg-slate-400/10 p-2 rounded-[8px] font-medium gap-3 transition-colors ${isLinkActive(link.href)
+                  ? "text-blue-600"
+                  : "text-gray-700 hover:text-blue-600"
                 }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
 
         <div className="flex items-center gap-5">
           <LanguagePicker />
@@ -95,11 +94,10 @@ function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={`block text-lg font-medium ${
-                isLinkActive(link.href)
+              className={`block text-lg font-medium ${isLinkActive(link.href)
                   ? "text-blue-600"
                   : "text-gray-700 hover:text-blue-600"
-              }`}
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               {link.name}
