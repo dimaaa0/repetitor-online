@@ -29,10 +29,10 @@ function LanguagePicker() {
   }, []);
 
   return (
-    <div className="relative font-sans" ref={dropdownRef}>
+    <div className="relative font-sans " ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center cursor-pointer gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition-colors group"
+        className="flex items-center cursor-pointer gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors group"
       >
         <Languages
           size={18}
@@ -48,7 +48,6 @@ function LanguagePicker() {
         />
       </button>
 
-      {/* Выпадающий список */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-xl shadow-lg py-1 z-50 animate-in fade-in zoom-in duration-150">
           {languages.map((lang) => (

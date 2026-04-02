@@ -5,7 +5,6 @@ import Home from "../components/Sections/Home";
 const page = () => {
   return (
     <>
-      <Header />
       <main>
         <Home />
         <a href="/SupabaseData">Supabase</a>

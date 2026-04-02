@@ -1,20 +1,23 @@
+'use client'
+
 import { UserPlus, Calendar, Search, BookOpen } from "lucide-react";
+import Registration from "../UI/RegistrationModal"
+import { useModal } from "../../context/ModalContext";
 
 export default function HomePage() {
-  const clickedTheButton = () => {
-    console.log("Вы нажали на кнопку 'Начать поиск'!");
-  };
+
+  const { openModal } = useModal();
 
   const user =
-    // null
-    { name: "Dmitriy Pisarenko" };
+    null
+  // { name: "Dmitriy Pisarenko" };
   // Пример пользователя, замените на реальную логику авторизации!!!!!!!!
 
   return (
     <div className="font-sans">
       <section className="py-20 px-4 text-center bg-white">
         <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
-          Найдите идеального учителя для вас
+          Найдите идеального репетитора для вас
         </h1>
         <p className="max-w-2xl mx-auto text-lg text-gray-500 mb-10 leading-relaxed">
           Платформа для поиска репетиторов и учеников во всем Узбекистане.
@@ -23,13 +26,13 @@ export default function HomePage() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href="#"
-            className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-md"
+            className="px-2 py-3 w-[200px] bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-md"
           >
             Найти учителя
           </a>
           <a
             href="#"
-            className="px-8 py-3 border-2 border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-all"
+            className="px-2 py-3 w-[200px] border-1 border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-all"
           >
             Смотреть объявления
           </a>
@@ -37,7 +40,7 @@ export default function HomePage() {
       </section>
       {!user && (
         <>
-          <section className="py-24 px-4 bg-blue-50/50">
+          <section className="py-24 px-4 bg-blue-50/100">
             <div className="max-w-7xl mx-auto">
               <h2 className="text-3xl font-bold text-center text-slate-900 mb-16">
                 Как это работает
@@ -94,10 +97,10 @@ export default function HomePage() {
               учеников уже сегодня
             </p>
             <a
-              href="/sign-up"
-              className="inline-block px-10 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200"
+              className="inline-block px-10 py-4 bg-blue-600 cursor-pointer text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200"
+              onClick={openModal} //* открытие панели регистрации
             >
-              Зарегестрироваться
+              Войти в аккаунт
             </a>
           </section>
         </>

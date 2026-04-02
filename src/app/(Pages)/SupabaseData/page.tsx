@@ -1,4 +1,4 @@
-import { createClient } from "../../utils/supabase/server";
+import { createClient } from "../../../utils/supabase/server";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
@@ -35,7 +35,7 @@ export default async function SupabasePage() {
           type="text"
           placeholder="Что нужно сделать?"
           required
-          style={{ padding: "8px", marginRight: "10px", color: "black" , border: "1px solid #ccc", borderRadius: "4px" }}
+          style={{ padding: "8px", marginRight: "10px", color: "black", border: "1px solid #ccc", borderRadius: "4px" }}
         />
         <button type="submit" className="p-[8px_10px] cursor-pointer bg-blue-500 text-white rounded">
           Добавить
@@ -48,7 +48,6 @@ export default async function SupabasePage() {
             key={todo.id}
             className="border-b py-2 flex justify-between items-center"
           >
-            {/* Вот здесь мы выводим конкретное поле title */}
             <span className="text-lg">{todo.title}</span>
 
             <span className="text-xs text-gray-500">
