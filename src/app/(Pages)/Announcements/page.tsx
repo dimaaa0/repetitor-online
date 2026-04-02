@@ -1,129 +1,151 @@
-import { describe } from 'node:test';
-import React from 'react';
+"use client";
+
+import React from "react";
+import {
+  Search,
+  Clock,
+  Wallet,
+  BookOpen,
+  ChevronRight,
+  MessageCircle,
+  Filter,
+} from "lucide-react";
 
 const ads = [
   {
     id: 1,
     studentName: "Артем, 11 класс",
     title: "Ищу репетитора по профильной математике",
-    description: "Нужна помощь в подготовке к ЕГЭ. Западают задачи с параметрами и геометрия.",
-    budget: "до 1500 ₽",
+    description:
+      "Нужна помощь в подготовке к ЕГЭ. Западают задачи с параметрами и геометрия. Хотелось бы заниматься 2 раза в неделю вечером.",
+    budget: "до 150,000 UZS",
     subject: "Математика",
-    postedAt: "2 часа назад"
+    postedAt: "2 часа назад",
+    goal: "ЕГЭ / ОГЭ",
   },
   {
     id: 2,
     studentName: "Елена",
     title: "Разговорный английский для переезда",
-    description: "Уровень сейчас Intermediate. Нужно подтянуть говорение и убрать страх общения.",
-    budget: "1000 - 1200 ₽",
+    description:
+      "Уровень сейчас Intermediate. Нужно подтянуть говорение и убрать страх общения. Рассматриваю занятия только с носителем или профи.",
+    budget: "100,000 - 120,000 UZS",
     subject: "Английский",
-    postedAt: "Сегодня"
-  }
-];
-
-const goalTags = [
-  {
-    title: "ЕГЭ / ОГЭ",
-    description: "Подготовка к государственным экзаменам: разбор ловушек, критериев оценивания и заполнения бланков."
+    postedAt: "Сегодня",
+    goal: "Релокация",
   },
-  {
-    title: "Сертификат",
-    description: "Подготовка к финальному экзамену по данной сфере."
-  },
-  {
-    title: "SAT",
-    description: "Подготовка к SAT"
-  },
-  {
-    title: "ДТМ",
-    description: "Специализированная подготовка к тестированию Государственного центра тестирования (Узбекистан)."
-  },
-  {
-    title: "Начальные классы",
-    description: "Помощь ученикам младших классов."
-  },
-  {
-    title: "Школьная программа",
-    description: "Устранение пробелов в знаниях, повышение успеваемости и помощь с домашними заданиями."
-  },
-  {
-    title: "Олимпиады",
-    description: "Разбор задач повышенной сложности и подготовка к интеллектуальным соревнованиям."
-  },
-  {
-    title: "Поступление в лицеи",
-    description: "Подготовка к внутренним экзаменам в топовые гимназии, лицеи и специализированные школы."
-  },
-  {
-    title: "Вузовская программа",
-    description: "Помощь студентам: подготовка к зачетам, сессиям и разбор сложных тем высшей школы."
-  },
-  {
-    title: "Релокация",
-    description: "Быстрое освоение базы, необходимой для адаптации и жизни в другой стране."
-  }
 ];
 
 const AnnouncementsPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
-
-        <div className="flex justify-between items-end mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Объявления учеников</h1>
-            <p className='text-sm text-gray-500'>Найдено: {ads.length}</p>
+    <div className="min-h-screen bg-[#FBFDFF] pb-20">
+      {/* Декоративный фон шапки */}
+      <div className="bg-white border-b border-slate-100 py-12 mb-8">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                Лента <span className="text-blue-600">объявлений</span>
+              </h1>
+              <p className="text-slate-500 mt-2 font-medium">
+                Свежие запросы от учеников, которым нужна ваша помощь
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+                <Filter size={18} className="text-blue-600" />
+                Фильтры
+              </button>
+            </div>
           </div>
-          <button className="bg-white border  border-gray-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
-            Фильтры
-          </button>
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6">
+        <div className="flex items-center justify-between mb-6">
+          <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
+            Актуальные заявки: {ads.length}
+          </span>
+          <div className="flex items-center gap-2 text-sm text-slate-400">
+            <Clock size={14} />
+            <span>Обновлено только что</span>
+          </div>
         </div>
 
         {/* Список объявлений */}
-        <div className="flex flex-col gap-5">
+        <div className="grid gap-6">
           {ads.map((ad) => (
             <div
               key={ad.id}
-              className="bg-white cursor-default rounded-2xl border border-gray-100 p-6 
-                         shadow-sm transition-all duration-300 
-                         hover:shadow-md hover:border-blue-200 group
-                         shadow-sm 
-                         transition-all duration-300 ease-in-out
-                         hover:shadow-xl hover:-translate-y-2 hover:border-blue-100
-                         "
+              className="relative bg-white rounded-3xl border border-slate-100 p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.05)] hover:-translate-y-1 group"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div>
-                    <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                      {ad.title}
-                    </h3>
-                    <p className="text-sm text-gray-500">{ad.studentName} • {ad.postedAt}</p>
-                  </div>
-                </div>
+              {/* Бейдж цели обучения */}
+              <div className="absolute top-6 right-6 hidden sm:block">
+                <span className="px-3 py-1 bg-slate-900 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">
+                  {ad.goal}
+                </span>
               </div>
 
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">
-                {ad.description}
-              </p>
-
-              <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-                <div className="flex gap-4">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-gray-400 uppercase font-bold">Предмет</span>
-                    <span className="text-sm font-medium text-gray-700">{ad.subject}</span>
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">
+                      {ad.studentName[0]}
+                    </div>
+                    <span className="text-sm font-bold text-slate-500">
+                      {ad.studentName}
+                    </span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-xs text-slate-400 font-medium">
+                      {ad.postedAt}
+                    </span>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-gray-400 uppercase font-bold">Бюджет</span>
-                    <span className="text-sm font-bold text-blue-600">{ad.budget}</span>
+
+                  <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
+                    {ad.title}
+                  </h3>
+
+                  <p className="text-slate-600 leading-relaxed mb-6 max-w-3xl">
+                    {ad.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-6 items-center pt-6 border-t border-slate-50">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                        <BookOpen size={18} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase leading-none mb-1">
+                          Предмет
+                        </p>
+                        <p className="text-sm font-bold text-slate-700">
+                          {ad.subject}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                        <Wallet size={18} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase leading-none mb-1">
+                          Бюджет
+                        </p>
+                        <p className="text-sm font-black text-slate-900">
+                          {ad.budget}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <button className="bg-gray-900 cursor-pointer text-white px-6 py-2 rounded-xl text-sm font-semibold 
-                                   hover:bg-blue-600 transition-all active:scale-95">
-                  Связаться
-                </button>
+                <div className="flex flex-row md:flex-col justify-end md:justify-center items-center gap-3">
+                  <button className="flex-1 md:flex-none w-full md:w-auto px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                    <MessageCircle size={18} />
+                    Откликнуться
+                  </button>
+                </div>
               </div>
             </div>
           ))}
