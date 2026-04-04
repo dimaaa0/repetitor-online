@@ -40,7 +40,6 @@ const tutors = [
 const TutorsPageWithAnimation = () => {
   const [showNotify, setShowNotify] = useState(false);
 
-  // Имитация проверки роли (замените на вашу логику из контекста/supabase)
   const userRole = "Tutor";
 
   useEffect(() => {
@@ -132,7 +131,7 @@ const TutorsPageWithAnimation = () => {
               <div className="mt-auto pt-5 border-t border-slate-50 flex justify-between items-center">
                 <div>
                   <span className="text-2xl font-black text-slate-900">
-                    {tutor.price} 
+                    {tutor.price}
                   </span>
                   <span className="text-xs font-bold text-slate-400 block uppercase tracking-tighter">
                     за 60 минут

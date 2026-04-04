@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ModalProvider } from "../context/ModalContext";
 import "./globals.css";
 import Header from '../components/Layout/Header'
+import { UserProvider } from "../context/UserContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +33,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ModalProvider>
-          <Header />
-          {children}
+          <UserProvider>
+            <Header />
+            {children}
+          </UserProvider>
         </ModalProvider>
       </body>
     </html>

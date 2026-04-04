@@ -100,7 +100,6 @@ export default function SignInForm() {
   return (
     <div
       className="fixed min-h-screen inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300"
-      onClick={closeModal}
     >
       <div
         className="w-full max-w-[440px] bg-white rounded-[2rem] shadow-2xl border border-slate-100 relative overflow-hidden flex flex-col transition-all"
@@ -166,7 +165,7 @@ export default function SignInForm() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Александр Иванов"
+                      placeholder="Ваше имя"
                       className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-sm font-medium"
                     />
                   </div>

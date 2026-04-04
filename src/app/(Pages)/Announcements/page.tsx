@@ -66,10 +66,6 @@ const AnnouncementsPage = () => {
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
             Актуальные заявки: {ads.length}
           </span>
-          <div className="flex items-center gap-2 text-sm text-slate-400">
-            <Clock size={14} />
-            <span>Обновлено только что</span>
-          </div>
         </div>
 
         {/* Список объявлений */}
