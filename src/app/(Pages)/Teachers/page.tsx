@@ -51,7 +51,7 @@ const TutorsPageWithAnimation = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-4 pb-24">
-      <div className="max-w-7xl px-4 mx-auto">
+      <div className="max-w-[1250] px-6 mx-auto">
         {/* Header Section */}
         <div className="flex justify-between items-end mb-10 pt-8">
           <div>

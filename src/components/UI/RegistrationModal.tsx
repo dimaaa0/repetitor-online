@@ -15,6 +15,54 @@ import { useModal } from "../../context/ModalContext";
 import { createClient } from "../../utils/supabase/client";
 import { Session, AuthChangeEvent } from "@supabase/supabase-js";
 
+const getFriendlyError = (message: string) => {
+  // 1. Ошибки входа и регистрации
+  if (message.includes("Invalid login credentials"))
+    return "Неверная почта или пароль";
+  if (message.includes("User already registered"))
+    return "Этот email уже занят";
+  if (message.includes("Password should be at least 6 characters"))
+    return "Пароль должен быть не менее 6 символов";
+  if (message.includes("Email not confirmed"))
+    return "Пожалуйста, подтвердите вашу почту";
+  
+  if (message.includes("Error sending confirmation email")) {
+    return "Не удалось отправить письмо подтверждения. Повторите попытку позже";
+  }
+
+  // 2. Ошибки при сбросе пароля
+  if (message.includes("User not found"))
+    return "Пользователь с такой почтой не найден";
+  if (
+    message.includes("New password should be different from the old password")
+  )
+    return "Новый пароль должен отличаться от старого";
+
+  // 3. Лимиты и безопасность (очень важно!)
+  if (message.includes("Rate limit exceeded"))
+    return "Слишком много попыток. Подождите пару минут";
+  if (message.includes("Email rate limit exceeded"))
+    return "Мы уже отправили письмо. Подождите немного перед повторной попыткой";
+  if (message.includes("Captcha check failed"))
+    return "Ошибка проверки капчи. Попробуйте еще раз";
+
+  // 4. Проблемы с данными
+  if (message.includes("Invalid email address"))
+    return "Некорректный адрес почты";
+  if (message.includes("Anonymous sign-ins are disabled"))
+    return "Вход без регистрации отключен";
+
+  // 5. Сетевые проблемы
+  if (
+    message.includes("Failed to fetch") ||
+    message.includes("Network request failed")
+  ) {
+    return "Проблема с интернет-соединением";
+  }
+
+  return "Произошла ошибка. Попробуйте еще раз";
+};
+
 export default function SignInForm() {
   const supabase = createClient();
   const { isOpen, closeModal } = useModal();
@@ -26,6 +74,16 @@ export default function SignInForm() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("Student");
   const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  const [alert, setAlert] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+
+  const showAlert = (type: "success" | "error" | "info", message: string) => {
+    setAlert({ type, message });
+    setTimeout(() => setAlert(null), 3000);
+  };
 
   useEffect(() => {
     const getInitialSession = async () => {
@@ -47,6 +105,7 @@ export default function SignInForm() {
     return () => subscription.unsubscribe();
   }, [supabase]);
 
+  // Пример для Входа
   const handleSignIn = async () => {
     setLoading(true);
     try {
@@ -55,9 +114,13 @@ export default function SignInForm() {
         password,
       });
       if (error) throw error;
+
+      showAlert("success", "С возвращением!");
       closeModal();
     } catch (error: any) {
-      alert("Ошибка входа: " + error.message);
+      // Вот тут магия перевода
+      const errorMessage = getFriendlyError(error.message);
+      showAlert("error", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -66,16 +129,31 @@ export default function SignInForm() {
   const handleSignUp = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { name, role } },
       });
       if (error) throw error;
-      alert("Проверьте почту для подтверждения!");
-      closeModal();
+
+      // Если identities пустой — email уже занят
+      if (data.user && data.user.identities?.length === 0) {
+        showAlert(
+          "error",
+          "Этот email уже зарегистрирован. Войдите в аккаунт.",
+        );
+
+        setIsLogin(true);
+        return;
+      }
+
+      showAlert(
+        "success",
+        "Проверьте почту для подтверждения! После подтверждения войдите в аккаунт.",
+      );
+      setIsLogin(true);
     } catch (error: any) {
-      alert("Ошибка регистрации: " + error.message);
+      showAlert("error", error.message);
     } finally {
       setLoading(false);
     }
@@ -95,12 +173,50 @@ export default function SignInForm() {
     isLogin ? handleSignIn() : handleSignUp();
   };
 
+  const handleResetPassword = async () => {
+    if (!email) {
+      showAlert("error", "Пожалуйста, введите email");
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://localhost:3000/reset-password",
+    });
+
+    if (error) {
+      showAlert("error", error.message);
+    } else {
+      showAlert("success", "Ссылка для сброса отправлена на почту!");
+    }
+    setLoading(false);
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed min-h-screen inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300"
-    >
+    <div className="fixed min-h-screen inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+      {/* Кастомное уведомление */}
+      {alert && (
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[10000] animate-in fade-in slide-in-from-top-4 duration-300">
+          <div
+            className={`px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 font-bold text-sm
+      ${
+        alert.type === "error"
+          ? "bg-red-50 border-red-100 text-red-600"
+          : alert.type === "success"
+            ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+            : "bg-blue-50 border-blue-100 text-blue-600"
+      }`}
+          >
+            {alert.type === "error" && <X size={18} />}
+            {alert.type === "success" && (
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            )}
+            {alert.message}
+          </div>
+        </div>
+      )}
       <div
         className="w-full max-w-[440px] bg-white rounded-[2rem] shadow-2xl border border-slate-100 relative overflow-hidden flex flex-col transition-all"
         onClick={(e) => e.stopPropagation()}
@@ -201,7 +317,8 @@ export default function SignInForm() {
                 {isLogin && (
                   <button
                     type="button"
-                    className="text-[10px] font-bold text-blue-600 uppercase"
+                    onClick={handleResetPassword}
+                    className="text-[10px] font-bold text-blue-600 uppercase cursor-pointer"
                   >
                     Забыли?
                   </button>
@@ -254,7 +371,6 @@ export default function SignInForm() {
             </p>
           </div>
         </div>
-
       </div>
     </div>
   );

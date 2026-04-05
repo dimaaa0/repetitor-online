@@ -1,16 +1,12 @@
 "use client";
 
 import { UserPlus, Calendar, Search, BookOpen } from "lucide-react";
-import Registration from "../UI/RegistrationModal";
 import { useModal } from "../../context/ModalContext";
+import { useUser } from "../../context/UserContext";
 
 export default function HomePage() {
   const { openModal } = useModal();
-
-  const user = 
-  null;
-  // { name: "Dmitriy Pisarenko" }
-  ;
+  const { user } = useUser();
 
   return (
     <div className="font-sans overflow-hidden">
@@ -33,13 +29,13 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="#"
+              href="/teachers"
               className="px-8 py-4 w-[250px] bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700  shadow-lg shadow-blue-200"
             >
               Найти учителя
             </a>
             <a
-              href="#"
+              href="/announcements"
               className="px-4 py-4 border-2 w-[250px] border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all"
             >
               Смотреть объявления

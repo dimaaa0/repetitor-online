@@ -38,13 +38,13 @@ const ads = [
 
 const AnnouncementsPage = () => {
   return (
-    <div className="min-h-screen bg-[#FBFDFF] pb-20">
+    <div className="min-h-screen   bg-[#FBFDFF] pb-20">
       {/* Декоративный фон шапки */}
-      <div className="bg-white border-b border-slate-100 py-12 mb-8">
-        <div className="max-w-5xl mx-auto px-6">
+      <div className="bg-white border-b  border-slate-100 py-12 mb-8">
+        <div className="max-w-[1250] mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-3xl  md:text-4xl font-black text-slate-900 tracking-tight">
                 Лента <span className="text-blue-600">объявлений</span>
               </h1>
               <p className="text-slate-500 mt-2 font-medium">
@@ -61,7 +61,7 @@ const AnnouncementsPage = () => {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="max-w-[1250] mx-auto px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
             Актуальные заявки: {ads.length}

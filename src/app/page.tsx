@@ -7,7 +7,6 @@ const page = () => {
     <>
       <main>
         <Home />
-        <a href="/SupabaseData">Supabase</a>
       </main>
     </>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation"; // Добавили useRouter
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { User, LogOut, Menu, X, Book } from "lucide-react";
 import LanguagePicker from "../UI/LanguagePicker";
@@ -9,6 +9,7 @@ import Registration from "../UI/RegistrationModal";
 import { useModal } from "../../context/ModalContext";
 import { useUser } from "../../context/UserContext";
 import { createClient } from "../../utils/supabase/client";
+import link from "next/link";
 
 function Header() {
   const pathname = usePathname();
@@ -21,8 +22,8 @@ function Header() {
   const supabase = createClient();
 
   const navLinks = [
-    { name: "Учителя", href: "/Teachers" },
-    { name: "Объявления", href: "/Announcements" },
+    { name: "Учителя", href: "/teachers" },
+    { name: "Объявления", href: "/announcements" },
   ];
 
   // 3. Функция для выхода из системы
@@ -57,10 +58,11 @@ function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={`relative px-4 py-2 text-[15px] font-semibold transition-all duration-300 rounded-lg ${isLinkActive(link.href)
+              className={`relative px-4 py-2 text-[15px] font-semibold transition-all duration-300 rounded-lg ${
+                isLinkActive(link.href)
                   ? "text-blue-600 bg-blue-50"
                   : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
-                }`}
+              }`}
             >
               {link.name}
             </Link>
@@ -92,21 +94,16 @@ function Header() {
                 <div className="w-9 h-9 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full flex items-center justify-center group-hover:shadow-md transition-all">
                   {/* Иконка или первая буква имени */}
                   <span className="text-white text-xs font-bold">
-                    {user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}
+                    {user.name
+                      ? user.name[0].toUpperCase()
+                      : user.email[0].toUpperCase()}
                   </span>
                 </div>
                 <span className="text-[15px] font-semibold text-slate-700 group-hover:text-blue-600 hidden lg:block">
                   {/* Показываем имя из таблицы profiles, если NULL — часть почты */}
-                  {user.name || user.email?.split('@')[0]}
+                  {user.name || user.email?.split("@")[0]}
                 </span>
               </Link>
-
-              <button
-                onClick={handleLogout}
-                className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-              >
-                <LogOut className="w-5 h-5" strokeWidth={2} />
-              </button>
             </div>
           )}
 
@@ -124,13 +121,24 @@ function Header() {
         <div className="md:hidden absolute w-full bg-white border-b border-gray-100 p-6 space-y-4 shadow-xl">
           {/* ... контент мобильного меню ... */}
           {user && (
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-center gap-2 w-full py-3.5 bg-red-50 text-red-600 rounded-xl font-bold"
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Выйти</span>
-            </button>
+            <>
+              <div className=" flex flex-col items-center gap-4">
+                {navLinks.map((link) => (
+                  <Link
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center justify-center gap-2 w-full py-3.5 bg-red-50 text-blue-600 rounded-xl font-bold transition-all duration-300 rounded-lg ${
+                      isLinkActive(link.href)
+                        ? "text-blue-600 bg-blue-50"
+                        : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}
