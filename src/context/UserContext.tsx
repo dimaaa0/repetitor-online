@@ -37,8 +37,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
-      // При любом изменении просто говорим React Query:
-      // "Данные устарели, перекачай их!"
       queryClient.invalidateQueries({ queryKey: ["user-profile"] });
     });
 

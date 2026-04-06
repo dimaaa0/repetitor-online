@@ -70,11 +70,11 @@ const TutorsPageWithAnimation = () => {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1  md:grid-cols-1 lg:grid-cols-2 gap-8">
           {tutors.map((tutor) => (
             <div
               key={tutor.id}
-              className="group bg-white rounded-3xl border border-slate-100 p-6 transition-all duration-500 
+              className="group  bg-white rounded-3xl border border-gray-100 p-6 transition-all duration-500 
                  hover:shadow-[0_20px_50px_rgba(8,112,184,0.12)] hover:-translate-y-2 relative 
                  overflow-hidden flex flex-col h-full" // <-- ДОБАВИЛИ flex-col и h-full
             >

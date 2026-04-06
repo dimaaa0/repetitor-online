@@ -36,7 +36,7 @@ const ads = [
   },
 ];
 
-const AnnouncementsPage = () => {
+const Announcements = () => {
   return (
     <div className="min-h-screen   bg-[#FBFDFF] pb-20">
       {/* Декоративный фон шапки */}
@@ -151,4 +151,4 @@ const AnnouncementsPage = () => {
   );
 };
 
-export default AnnouncementsPage;
+export default Announcements;

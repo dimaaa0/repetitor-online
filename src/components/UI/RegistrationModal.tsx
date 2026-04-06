@@ -14,54 +14,7 @@ import {
 import { useModal } from "../../context/ModalContext";
 import { createClient } from "../../utils/supabase/client";
 import { Session, AuthChangeEvent } from "@supabase/supabase-js";
-
-const getFriendlyError = (message: string) => {
-  // 1. Ошибки входа и регистрации
-  if (message.includes("Invalid login credentials"))
-    return "Неверная почта или пароль";
-  if (message.includes("User already registered"))
-    return "Этот email уже занят";
-  if (message.includes("Password should be at least 6 characters"))
-    return "Пароль должен быть не менее 6 символов";
-  if (message.includes("Email not confirmed"))
-    return "Пожалуйста, подтвердите вашу почту";
-  
-  if (message.includes("Error sending confirmation email")) {
-    return "Не удалось отправить письмо подтверждения. Повторите попытку позже";
-  }
-
-  // 2. Ошибки при сбросе пароля
-  if (message.includes("User not found"))
-    return "Пользователь с такой почтой не найден";
-  if (
-    message.includes("New password should be different from the old password")
-  )
-    return "Новый пароль должен отличаться от старого";
-
-  // 3. Лимиты и безопасность (очень важно!)
-  if (message.includes("Rate limit exceeded"))
-    return "Слишком много попыток. Подождите пару минут";
-  if (message.includes("Email rate limit exceeded"))
-    return "Мы уже отправили письмо. Подождите немного перед повторной попыткой";
-  if (message.includes("Captcha check failed"))
-    return "Ошибка проверки капчи. Попробуйте еще раз";
-
-  // 4. Проблемы с данными
-  if (message.includes("Invalid email address"))
-    return "Некорректный адрес почты";
-  if (message.includes("Anonymous sign-ins are disabled"))
-    return "Вход без регистрации отключен";
-
-  // 5. Сетевые проблемы
-  if (
-    message.includes("Failed to fetch") ||
-    message.includes("Network request failed")
-  ) {
-    return "Проблема с интернет-соединением";
-  }
-
-  return "Произошла ошибка. Попробуйте еще раз";
-};
+import getFriendlyError from "../../app/functions/errorTranslator";
 
 export default function SignInForm() {
   const supabase = createClient();
@@ -72,6 +25,7 @@ export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
   const [role, setRole] = useState("Student");
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
@@ -132,28 +86,24 @@ export default function SignInForm() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { name, role } },
+        options: {
+          // Добавляем surname сюда
+          data: { name, surname, role }
+        },
       });
       if (error) throw error;
 
-      // Если identities пустой — email уже занят
       if (data.user && data.user.identities?.length === 0) {
-        showAlert(
-          "error",
-          "Этот email уже зарегистрирован. Войдите в аккаунт.",
-        );
-
+        showAlert("error", "Этот email уже зарегистрирован. Войдите в аккаунт.");
         setIsLogin(true);
         return;
       }
 
-      showAlert(
-        "success",
-        "Проверьте почту для подтверждения! После подтверждения войдите в аккаунт.",
-      );
+      showAlert("success", "Проверьте почту для подтверждения!");
       setIsLogin(true);
     } catch (error: any) {
-      showAlert("error", error.message);
+      const errorMessage = getFriendlyError(error.message); // Используем ваш переводчик
+      showAlert("error", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -201,13 +151,12 @@ export default function SignInForm() {
         <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[10000] animate-in fade-in slide-in-from-top-4 duration-300">
           <div
             className={`px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 font-bold text-sm
-      ${
-        alert.type === "error"
-          ? "bg-red-50 border-red-100 text-red-600"
-          : alert.type === "success"
-            ? "bg-emerald-50 border-emerald-100 text-emerald-600"
-            : "bg-blue-50 border-blue-100 text-blue-600"
-      }`}
+      ${alert.type === "error"
+                ? "bg-red-50 border-red-100 text-red-600"
+                : alert.type === "success"
+                  ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                  : "bg-blue-50 border-blue-100 text-blue-600"
+              }`}
           >
             {alert.type === "error" && <X size={18} />}
             {alert.type === "success" && (
@@ -282,6 +231,23 @@ export default function SignInForm() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Ваше имя"
+                      className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-sm font-medium"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 col-span-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+                    Фамилия
+                  </label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <input
+                      type="text"
+                      required
+                      value={surname}
+                      onChange={(e) => setSurname(e.target.value)}
+                      placeholder="Ваша фамилия"
                       className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-sm font-medium"
                     />
                   </div>

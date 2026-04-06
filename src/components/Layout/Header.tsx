@@ -58,11 +58,10 @@ function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={`relative px-4 py-2 text-[15px] font-semibold transition-all duration-300 rounded-lg ${
-                isLinkActive(link.href)
-                  ? "text-blue-600 bg-blue-50"
-                  : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
-              }`}
+              className={`relative px-4 py-2 text-[15px] font-semibold transition-all duration-300 rounded-lg ${isLinkActive(link.href)
+                ? "text-blue-600 bg-blue-50"
+                : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
+                }`}
             >
               {link.name}
             </Link>
@@ -128,11 +127,10 @@ function Header() {
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     key={link.href}
                     href={link.href}
-                    className={`flex items-center justify-center gap-2 w-full py-3.5 bg-red-50 text-blue-600 rounded-xl font-bold transition-all duration-300 rounded-lg ${
-                      isLinkActive(link.href)
-                        ? "text-blue-600 bg-blue-50"
-                        : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
-                    }`}
+                    className={`flex items-center justify-center gap-2 w-full py-3.5 bg-red-50 text-blue-600 rounded-xl font-bold transition-all duration-300 rounded-lg ${isLinkActive(link.href)
+                      ? "text-blue-600 bg-blue-50"
+                      : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
+                      }`}
                   >
                     {link.name}
                   </Link>
