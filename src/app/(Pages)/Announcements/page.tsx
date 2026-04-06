@@ -40,8 +40,8 @@ const Announcements = () => {
   return (
     <div className="min-h-screen   bg-[#FBFDFF] pb-20">
       {/* Декоративный фон шапки */}
-      <div className="bg-white border-b  border-slate-100 py-12 mb-8">
-        <div className="max-w-[1250] mx-auto px-6">
+      <div className="bg-white border-b  border-slate-100  py-12 mb-8">
+        <div className="max-w-[1250] mx-auto px-2 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl  md:text-4xl font-black text-slate-900 tracking-tight">
@@ -61,7 +61,7 @@ const Announcements = () => {
         </div>
       </div>
 
-      <div className="max-w-[1250] mx-auto px-6">
+      <div className="max-w-[1250] mx-auto px-2 sm:px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
             Актуальные заявки: {ads.length}
@@ -69,11 +69,11 @@ const Announcements = () => {
         </div>
 
         {/* Список объявлений */}
-        <div className="grid gap-6">
+        <div className="grid gap-6 pb-10">
           {ads.map((ad) => (
             <div
               key={ad.id}
-              className="relative bg-white rounded-3xl border border-slate-100 p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.05)] hover:-translate-y-1 group"
+              className="relative bg-white rounded-3xl border border-slate-100 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.05)] hover:-translate-y-1 group"
             >
               {/* Бейдж цели обучения */}
               <div className="absolute top-6 right-6 hidden sm:block">

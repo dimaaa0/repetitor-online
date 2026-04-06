@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, SlidersHorizontal, Bell, Clock, X } from "lucide-react";
+import { Heart, SlidersHorizontal, Bell, Clock, X, Filter } from "lucide-react";
 import React, { useState, useEffect } from "react";
 
 const tutors = [
@@ -13,7 +13,6 @@ const tutors = [
     students: 8,
     price: "100,000 UZS ",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-    tags: ["Профи", "Терпеливый"],
   },
   {
     id: 2,
@@ -23,7 +22,6 @@ const tutors = [
     students: 5,
     price: "120,000 UZS ",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
-    tags: ["Native Speaker", "Дети"],
   },
   {
     id: 3,
@@ -33,7 +31,6 @@ const tutors = [
     students: 3,
     price: "60,000 UZS ",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dmitry",
-    tags: ["Олимпиады", "Вуз"],
   },
 ];
 
@@ -50,35 +47,44 @@ const TutorsPageWithAnimation = () => {
   }, [userRole]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-4 pb-24">
-      <div className="max-w-[1250] px-6 mx-auto">
-        {/* Header Section */}
-        <div className="flex justify-between items-end mb-10 pt-8">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Наши <span className="text-blue-600">репетиторы</span>
-            </h1>
-            <p className="text-slate-500 mt-2 font-medium">
-              Найдено специалистов:{" "}
-              <span className="text-slate-900">{tutors.length}</span>
-            </p>
+    <div className="min-h-screen   bg-[#FBFDFF] pb-20">
+      {/* Декоративный фон шапки */}
+      <div className="bg-white border-b  border-slate-100  py-12 mb-8">
+        <div className="max-w-[1250] mx-auto px-2 sm:px-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <h1 className="text-3xl  md:text-4xl font-black text-slate-900 tracking-tight">
+                Поиск <span className="text-blue-600">учителя</span>
+              </h1>
+              <p className="text-slate-500 mt-2 font-medium">
+                найдите своего идеального репетитора по предмету, уровню и цене
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+                <Filter size={18} className="text-blue-600" />
+                Фильтры
+              </button>
+            </div>
           </div>
-          <button className="group bg-white flex items-center gap-2 cursor-pointer border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">
-            Фильтры
-            <SlidersHorizontal className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
-          </button>
         </div>
+      </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1  md:grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Grid */}
+      <div className="max-w-[1250] mx-auto px-2 sm:px-6">
+        <div className="flex items-center justify-between mb-6">
+          <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
+            Актуальные заявки: {tutors.length}
+          </span>
+        </div>
+        <div className="grid grid-cols-1 max-w-[1250]  md:grid-cols-1 lg:grid-cols-2  gap-8">
           {tutors.map((tutor) => (
             <div
               key={tutor.id}
-              className="group  bg-white rounded-3xl border border-gray-100 p-6 transition-all duration-500 
+              className="group  bg-white rounded-3xl border border-gray-100 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 
                  hover:shadow-[0_20px_50px_rgba(8,112,184,0.12)] hover:-translate-y-2 relative 
-                 overflow-hidden flex flex-col h-full" // <-- ДОБАВИЛИ flex-col и h-full
+                 overflow-hidden flex flex-col h-full"
             >
-              {/* 1. Верхняя часть (Аватар, Имя, Теги) */}
               <div className="flex items-start gap-4 mb-4">
                 <img
                   src={tutor.avatar}
@@ -101,18 +107,6 @@ const TutorsPageWithAnimation = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-5">
-                {tutor.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-[10px] uppercase font-extrabold bg-slate-100 text-slate-500 px-2.5 py-1 rounded-lg"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* 2. ОПИСАНИЕ - САМЫЙ ВАЖНЫЙ БЛОК */}
               <div className="p-4 bg-slate-50 rounded-2xl mb-6 flex-grow">
                 {" "}
                 {/* <-- flex-grow заставляет этот блок растягиваться */}
