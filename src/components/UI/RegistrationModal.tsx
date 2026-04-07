@@ -72,7 +72,6 @@ export default function SignInForm() {
       showAlert("success", "С возвращением!");
       closeModal();
     } catch (error: any) {
-      // Вот тут магия перевода
       const errorMessage = getFriendlyError(error.message);
       showAlert("error", errorMessage);
     } finally {

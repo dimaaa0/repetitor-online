@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useUser } from "../../../context/UserContext";
 import { createClient } from "../../../utils/supabase/client";
 import { useRouter } from "next/navigation";
@@ -13,19 +14,39 @@ import {
   Calendar,
   Loader2,
   Pencil,
+  CreditCard,
+  Zap,
+  Info,
 } from "lucide-react";
 import CopyButton from "@/src/components/UI/HandleCopyButton";
+import SubjectPicker from '../../../components/UI/SubjectPicker';
+import AddAvatar from "@/src/components/UI/AddAvatar";
+
 
 const profile = () => {
+
   const { user, loading, refreshUser } = useUser();
   const supabase = createClient();
   const router = useRouter();
+  const [imageFile, setImageFile] = useState(null); // Сам файл для отправки в БД
+  const [previewUrl, setPreviewUrl] = useState(null); // Ссылка для отображения картинки в UI
+  const fileInputRef = useRef(null); // Реф для вызова окна выбора файла
+
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.refresh();
     router.push("/");
   };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setPreviewUrl(URL.createObjectURL(file)); // Создаем временную ссылку для превью
+    }
+  };
+
 
   if (loading) {
     return (
@@ -47,7 +68,7 @@ const profile = () => {
   }
 
   return (
-    <div className=" bg-gray-50 py-12 px-0 sm:px-4 lg:px-8">
+    <div className=" bg-gray-50 py-6 px-0 sm:px-4 lg:px-8">
       <div className="max-w-[1250] px-2 sm:px-6  mx-auto">
         {/* Шапка профиля */}
         <div className="bg-white rounded-2xl  shadow-sm border border-gray-100 p-2 pb-4 sm:p-6 md:p-8 mb-6">
@@ -105,89 +126,68 @@ const profile = () => {
             </div>
           </div>
 
-          {/* Карточка: Даты */}
-          <div className="bg-white rounded-2xl py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Calendar className="h-4 w-4" /> Активность
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs text-gray-500 uppercase">
-                  Последний вход
-                </p>
-                <p className="font-medium text-gray-800">
-                  {new Date(user.last_sign_in_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase">На сайте с</p>
-                <p className="font-medium text-gray-800">
-                  {new Date(user.created_at).toLocaleDateString()}
-                </p>
-              </div>
+          {/* Карточка: Подписка (вместо Активности) */}
+          <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                <CreditCard className="h-4 w-4" /> Тарифный план
+              </h3>
+              {/* Бейдж статуса */}
+              <span className="bg-green-50 text-green-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-tighter border border-green-100">
+                Активен
+              </span>
             </div>
-          </div>
-        </div>
 
-        <div className="space-y-8 bg-white py-6 mt-6 px-4 rounded-[32px] shadow-sm shadow-blue-900/5 border border-gray-50">
-          <h1 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] mb-8 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-            Ваше объявление
-          </h1>
-          {/* Секция профиля */}
-          <div className="flex items-start gap-6 flex-col sm:flex-row">
-            <div className="relative group">
-              <div className="w-24 h-24 bg-gray-50 rounded-3xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200 transition-all group-hover:border-blue-500 group-hover:bg-blue-50 cursor-pointer overflow-hidden">
-                <svg
-                  className="w-6 h-6 text-gray-400 group-hover:text-blue-600 mb-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2.5"
-                    d="M12 4v16m8-8H4"
+            <div className="space-y-5">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                  <CreditCard className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase font-medium tracking-tight leading-none">Стоимость</p>
+                  <p className="text-lg font-bold text-gray-800">
+                    15,000 <span className="text-xs font-medium text-gray-400">UZS / мес.</span>
+                  </p>
+                </div>
+              </div>
+              {/* Даты подписки */}
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase font-black tracking-tight">Дата покупки</p>
+                  <p className="font-bold text-gray-800">
+                    {new Date(user.subscription_start).toLocaleDateString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase font-black tracking-tight">Годен до</p>
+                  <p className="font-bold text-blue-600">
+                    {new Date(user.subscription_end).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+
+              {/* Визуальный прогресс-бар (опционально) */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-[10px] font-black text-gray-400 uppercase">
+                  <span>Прогресс периода</span>
+                  <span>70%</span>
+                </div>
+                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
+                    style={{ width: '70%' }}
                   />
-                </svg>
-                <span className="text-[10px] font-black text-gray-400 group-hover:text-blue-600 uppercase tracking-tighter">
-                  Фото
-                </span>
-              </div>
-            </div>
-
-            <div className="flex-1 space-y-4">
-              <div>
-                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-                  Предмет преподавания
-                </label>
-                <div className="relative flex items-center ">
-                  <select className="w-full bg-blue-50/50 hover:bg-blue-50 text-blue-700 font-bold text-base rounded-2xl pl-4 pr-12 py-4 border-none focus:ring-2 focus:ring-blue-500/20 appearance-none transition-colors cursor-pointer">
-                    <option>Английский язык</option>
-                    <option>Математика</option>
-                    <option>Физика</option>
-                  </select>
-                  <div className=" absolute right-2.5 pointer-events-none text-blue-600">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                  {/* Кастомная стрелочка для селекта */}
                 </div>
               </div>
             </div>
           </div>
+
+        </div>
+        <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">
+          <h1 className="text-[14px] font-black  text-gray-500 uppercase tracking-[0.1em] mb-8 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+            Ваше объявление
+          </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -227,16 +227,16 @@ const profile = () => {
             </button>
           </div>
         </div>
-      <div className="mt-10 flex justify-end">
-        <Link
-          href="/"
-          onClick={handleLogout}
-          className="flex items-center cursor-pointer gap-2 mb-4 text-red-500 hover:text-red-600 font-medium transition-colors px-4 py-2 rounded-lg hover:bg-red-50"
-        >
-          <LogOut className="h-5 w-5" />
-          Выйти из аккаунта
-        </Link>
-      </div>
+        <div className="mt-10 flex justify-end">
+          <Link
+            href="/"
+            onClick={handleLogout}
+            className="flex items-center cursor-pointer gap-2 mb-4 text-red-500 hover:text-red-600 font-medium transition-colors px-4 py-2 rounded-lg hover:bg-red-50"
+          >
+            <LogOut className="h-5 w-5" />
+            Выйти из аккаунта
+          </Link>
+        </div>
       </div>
 
     </div>
