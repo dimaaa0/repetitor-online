@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useSubject } from '../../context/SubjectContext';
 
 const SubjectPicker = () => {
+    const { selectedSubjects, addSubject, removeSubject } = useSubject();
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
     const containerRef = useRef<HTMLDivElement>(null);
 
     const subjects = [
@@ -21,16 +22,16 @@ const SubjectPicker = () => {
             .filter(s => s.toLowerCase().includes(query.toLowerCase()));
     }, [query, selectedSubjects]);
 
-    const addSubject = (subject: string) => {
+    const addSubjectLocal = (subject: string) => {
         const trimmed = subject.trim();
         if (trimmed && !selectedSubjects.includes(trimmed)) {
-            setSelectedSubjects([...selectedSubjects, trimmed]);
+            addSubject(trimmed);
         }
         setQuery('');
     };
 
-    const removeSubject = (subjectToRemove: string) => {
-        setSelectedSubjects(selectedSubjects.filter(s => s !== subjectToRemove));
+    const removeSubjectLocal = (subjectToRemove: string) => {
+        removeSubject(subjectToRemove);
     };
 
     // Обработка нажатия клавиш
@@ -38,12 +39,12 @@ const SubjectPicker = () => {
         if (e.key === 'Enter') {
             e.preventDefault(); // Чтобы форма не отправилась случайно
             if (query.trim() !== '') {
-                addSubject(query);
+                addSubjectLocal(query);
                 setIsOpen(false);
             }
         } else if (e.key === 'Backspace' && query === '' && selectedSubjects.length > 0) {
             // Удаление последнего тега при пустом инпуте через Backspace
-            removeSubject(selectedSubjects[selectedSubjects.length - 1]);
+            removeSubjectLocal(selectedSubjects[selectedSubjects.length - 1]);
         }
     };
 
@@ -79,7 +80,7 @@ const SubjectPicker = () => {
                             <button 
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    removeSubject(subject);
+                                    removeSubjectLocal(subject);
                                 }}
                                 className="hover:bg-blue-500 rounded-lg p-0.5 transition-colors"
                             >
@@ -110,7 +111,7 @@ const SubjectPicker = () => {
                             {/* Если пользователь что-то ввел, чего нет в списке, показываем подсказку */}
                             {query && !subjects.includes(query) && (
                                 <button
-                                    onClick={() => { addSubject(query); setIsOpen(false); }}
+                                    onClick={() => { addSubjectLocal(query); setIsOpen(false); }}
                                     className="w-full text-left px-4 py-3 text-blue-500 hover:bg-blue-50 rounded-xl transition-colors font-bold flex items-center gap-2"
                                 >
                                     <span className="text-lg">+</span> Добавить "{query}"
@@ -122,7 +123,7 @@ const SubjectPicker = () => {
                                     key={subject}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        addSubject(subject);
+                                        addSubjectLocal(subject);
                                     }}
                                     className="w-full text-left px-4 py-3 text-blue-700 hover:bg-blue-50 rounded-xl transition-colors font-semibold flex items-center justify-between group"
                                 >

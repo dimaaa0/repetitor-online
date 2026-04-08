@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "../components/Layout/Header";
 import { UserProvider } from "../context/UserContext";
 import QueryProvider from "../providers/QueryProvider";
+import { SubjectProvider } from "../context/SubjectContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,12 +35,14 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>
-          <ModalProvider>
-            <UserProvider>
-              <Header />
-              {children}
-            </UserProvider>
-          </ModalProvider>
+          <SubjectProvider>
+            <ModalProvider>
+              <UserProvider>
+                <Header />
+                {children}
+              </UserProvider>
+            </ModalProvider>
+          </SubjectProvider>
         </QueryProvider>
       </body>
     </html>

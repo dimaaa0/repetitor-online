@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "../../../context/UserContext";
+import { useSubject } from "../../../context/SubjectContext";
 import { createClient } from "../../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -21,6 +22,7 @@ import SubjectPicker from "@/src/components/UI/SubjectPicker";
 
 const Profile = () => {
   const { user, loading, refreshUser } = useUser();
+  const { selectedSubjects, addSubject, removeSubject } = useSubject();
   const supabase = createClient();
   const router = useRouter();
 
@@ -28,7 +30,27 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({ name: "", surname: "" });
-  const [selectedFile, setSelectedFile] = useState(null); // Файл, который выбрал пользователь
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [alert, setAlert] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
+
+  const [subjects, setSubjects] = useState<string[]>([]); // Локальное состояние для отображения выбранных предметов
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+
+  const handlePriceChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ""); // Удаляем всё, кроме цифр
+    const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Добавляем запятые
+    setPrice(formattedValue);
+  };
+
+  useEffect(() => {
+    setSubjects(selectedSubjects);
+  }, [selectedSubjects]);
+
+  console.log("Selected Subjects in Profile:", selectedSubjects);
+  console.log('Price:', price);
+  console.log("Your description:", description);  
+
 
   // Синхронизация данных формы с пользователем
   useEffect(() => {
@@ -52,11 +74,11 @@ const Profile = () => {
   };
 
   // 1. Функция только для ВЫБОРА файла в AddAvatar
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        showAlert("Файл слишком большой (макс. 2МБ)");
+        showAlert("error", "Файл слишком большой (макс. 2МБ)");
         return;
       }
       setSelectedFile(file);
@@ -102,9 +124,9 @@ const Profile = () => {
       await refreshUser(); // Обновляем контекст
       setIsEditing(false);
       setSelectedFile(null); // Очищаем временный файл
-      alert("Профиль обновлен успешно!");
+      showAlert("success", "Профиль обновлен успешно!");
     } catch (error) {
-      alert("Ошибка при обновлении профиля");
+      showAlert("error", "Ошибка при обновлении профиля");
       console.error(error);
     } finally {
       setIsSaving(false);
@@ -133,6 +155,14 @@ const Profile = () => {
   return (
     <div className="bg-gray-50 py-6 px-0 sm:px-4 lg:px-8">
       <div className="max-w-[1250px] px-2 sm:px-6 mx-auto">
+        {alert && (
+          <div className={`mb-4 p-4 rounded-lg border ${alert.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' :
+            alert.type === 'error' ? 'bg-red-50 border-red-200 text-red-800' :
+              'bg-blue-50 border-blue-200 text-blue-800'
+            }`}>
+            {alert.message}
+          </div>
+        )}
         {/* Шапка профиля */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 pb-4 sm:p-6 md:p-8 mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -271,7 +301,7 @@ const Profile = () => {
             {/* Блок с ценой в стиле скрина */}
             <div className="flex items-center gap-4 mb-6">
               {/* Иконка в закругленном боксе */}
-              <div className="bg-green-50/50 p-3 rounded-2xl border border-green-100/50">
+              <div className="bg-green-100 p-3 rounded-2xl border border-green-100/50">
                 <Wallet className="h-6 w-6 text-emerald-600" />
               </div>
 
@@ -318,9 +348,11 @@ const Profile = () => {
               </label>
               <div className="relative">
                 <input
-                  type="number"
+                  type="string"
+                  value={price}
                   className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500/10 focus:bg-white rounded-2xl px-5 py-4 font-bold text-gray-800 outline-none transition-all"
                   placeholder="100,000"
+                  onChange={handlePriceChange}
                 />
                 <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
                   UZS / 60 МИН
@@ -339,6 +371,8 @@ const Profile = () => {
               <textarea
                 className="w-full bg-transparent border-none focus:ring-0 p-0 text-[15px] font-medium text-gray-700 placeholder:text-gray-400 resize-none h-32 leading-relaxed"
                 placeholder="Например: Ваши сертификаты, опыт работы, особенности методики и т.д."
+                onChange={(e) => setDescription(e.target.value)}
+                value={description}
               />
             </div>
           </div>
