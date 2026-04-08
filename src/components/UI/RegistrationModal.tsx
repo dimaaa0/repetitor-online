@@ -80,20 +80,38 @@ export default function SignInForm() {
   };
 
   const handleSignUp = async () => {
+    // Регулярное выражение: разрешаем только буквы (латиница + кириллица) и пробелы
+    // Цифры (\d) запрещены
+    const nameRegex = /^[A-Za-zА-Яа-яЁё\s]+$/;
+
+    // 1. Проверка Имени
+    if (!nameRegex.test(name)) {
+      showAlert("error", "Имя может содержать только буквы");
+      return;
+    }
+
+    // 2. Проверка Фамилии
+    if (!nameRegex.test(surname)) {
+      showAlert("error", "Фамилия может содержать только буквы");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          // Добавляем surname сюда
-          data: { name, surname, role }
+          data: { name, surname, role },
         },
       });
       if (error) throw error;
 
       if (data.user && data.user.identities?.length === 0) {
-        showAlert("error", "Этот email уже зарегистрирован. Войдите в аккаунт.");
+        showAlert(
+          "error",
+          "Этот email уже зарегистрирован. Войдите в аккаунт.",
+        );
         setIsLogin(true);
         return;
       }
@@ -101,7 +119,7 @@ export default function SignInForm() {
       showAlert("success", "Проверьте почту для подтверждения!");
       setIsLogin(true);
     } catch (error: any) {
-      const errorMessage = getFriendlyError(error.message); // Используем ваш переводчик
+      const errorMessage = getFriendlyError(error.message);
       showAlert("error", errorMessage);
     } finally {
       setLoading(false);
@@ -150,12 +168,13 @@ export default function SignInForm() {
         <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[10000] animate-in fade-in slide-in-from-top-4 duration-300">
           <div
             className={`px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 font-bold text-sm
-      ${alert.type === "error"
-                ? "bg-red-50 border-red-100 text-red-600"
-                : alert.type === "success"
-                  ? "bg-emerald-50 border-emerald-100 text-emerald-600"
-                  : "bg-blue-50 border-blue-100 text-blue-600"
-              }`}
+      ${
+        alert.type === "error"
+          ? "bg-red-50 border-red-100 text-red-600"
+          : alert.type === "success"
+            ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+            : "bg-blue-50 border-blue-100 text-blue-600"
+      }`}
           >
             {alert.type === "error" && <X size={18} />}
             {alert.type === "success" && (
@@ -240,7 +259,10 @@ export default function SignInForm() {
                     Фамилия
                   </label>
                   <div className="relative">
-                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <UserIcon
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                      size={18}
+                    />
                     <input
                       type="text"
                       required
