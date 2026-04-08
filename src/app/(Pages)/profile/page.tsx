@@ -13,6 +13,7 @@ import {
   Loader2,
   Check,
   XCircle,
+  Wallet,
 } from "lucide-react";
 import CopyButton from "@/src/components/UI/HandleCopyButton";
 import AddAvatar from "@/src/components/UI/AddAvatar";
@@ -257,7 +258,8 @@ const Profile = () => {
           </div>
 
           <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
-            <div className="flex justify-between items-start mb-4">
+            {/* Верхняя часть: Заголовок и Статус */}
+            <div className="flex justify-between items-start mb-6">
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
                 <CreditCard className="h-4 w-4" /> Тарифный план
               </h3>
@@ -265,7 +267,40 @@ const Profile = () => {
                 Активен
               </span>
             </div>
-            {/* ... тут остальной код подписки ... */}
+
+            {/* Блок с ценой в стиле скрина */}
+            <div className="flex items-center gap-4 mb-6">
+              {/* Иконка в закругленном боксе */}
+              <div className="bg-green-50/50 p-3 rounded-2xl border border-green-100/50">
+                <Wallet className="h-6 w-6 text-emerald-600" />
+              </div>
+
+              {/* Текстовая часть */}
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight leading-none mb-0.5">
+                  Стоимость
+                </span>
+                <div className="text-xl font-medium text-gray-900 leading-none">
+                  15,000 <span className="text-xl">UZS</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Даты оплаты */}
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-1">
+                  Оплачено
+                </p>
+                <p className="text-sm font-medium text-gray-700">08.04.2026</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-1">
+                  Истекает
+                </p>
+                <p className="text-sm font-medium text-gray-700">08.05.2026</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -303,7 +338,7 @@ const Profile = () => {
             <div className="bg-gray-50 rounded-[24px] p-5 border-2 border-transparent focus-within:border-blue-500/10 focus-within:bg-white transition-all">
               <textarea
                 className="w-full bg-transparent border-none focus:ring-0 p-0 text-[15px] font-medium text-gray-700 placeholder:text-gray-400 resize-none h-32 leading-relaxed"
-                placeholder="Например: Опыт работы..."
+                placeholder="Например: Ваши сертификаты, опыт работы, особенности методики и т.д."
               />
             </div>
           </div>
