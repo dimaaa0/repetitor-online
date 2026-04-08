@@ -22,7 +22,8 @@ import SubjectPicker from "@/src/components/UI/SubjectPicker";
 
 const Profile = () => {
   const { user, loading, refreshUser } = useUser();
-  const { selectedSubjects, addSubject, removeSubject } = useSubject();
+  const { selectedSubjects, addSubject, removeSubject, setSelectedSubjects } =
+    useSubject();
   const supabase = createClient();
   const router = useRouter();
 
@@ -31,11 +32,18 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({ name: "", surname: "" });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [alert, setAlert] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
+  const [alert, setAlert] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
 
   const [subjects, setSubjects] = useState<string[]>([]); // Локальное состояние для отображения выбранных предметов
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  const [hasAd, setHasAd] = useState(false); // Есть ли уже объявление в базе
 
   const handlePriceChange = (e) => {
     const value = e.target.value.replace(/\D/g, ""); // Удаляем всё, кроме цифр
@@ -44,13 +52,53 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    const fetchAd = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("ads")
+        .select("*")
+        .eq("user_id", user.id)
+        .single(); // Ожидаем одну запись
+
+      if (data) {
+        // Заполняем поля данными из базы
+        setHasAd(true);
+        setPrice(data.price.toLocaleString()); // Форматируем число обратно в строку с запятыми
+        setDescription(data.description || "");
+        setSubjects(
+          data.subject ? data.subject.split(", ").map((s) => s.trim()) : [],
+        ); // Разбиваем строку на массив и убираем лишние пробелы
+        // Если у вас SubjectContext позволяет программно устанавливать предметы:
+        // data.subject.split(", ").forEach(s => addSubject(s));
+        // Но так как у вас локальный state 'subjects' синхронизирован с контекстом,
+        // лучше убедиться, что контекст подтягивает данные или передать их туда.
+      }
+
+      if (data && data.subject) {
+        // Превращаем строку из базы в массив
+        const subjectsArray = data.subject.split(", ").map((s) => s.trim());
+
+        // Синхронизируем контекст с данными из БД
+        setSelectedSubjects(subjectsArray);
+      }
+
+      if (error && error.code !== "PGRST116") {
+        // PGRST116 — это код "запись не найдена", его игнорируем
+        console.error("Ошибка при загрузке объявления:", error);
+      }
+    };
+
+    fetchAd();
+  }, [user, supabase]);
+
+  useEffect(() => {
     setSubjects(selectedSubjects);
   }, [selectedSubjects]);
 
-  console.log("Selected Subjects in Profile:", selectedSubjects);
-  console.log('Price:', price);
-  console.log("Your description:", description);  
-
+  // console.log("Selected Subjects in Profile:", selectedSubjects);
+  // console.log("Price:", price);
+  // console.log("Your description:", description);
 
   // Синхронизация данных формы с пользователем
   useEffect(() => {
@@ -127,10 +175,66 @@ const Profile = () => {
       showAlert("success", "Профиль обновлен успешно!");
     } catch (error) {
       showAlert("error", "Ошибка при обновлении профиля");
-      console.error(error);
     } finally {
       setIsSaving(false);
     }
+  };
+
+  function checkEmptyFields(
+    subjects: string[],
+    price: string,
+    description: string,
+  ) {
+    if (subjects.length === 0) {
+      showAlert("error", "Пожалуйста, выберите хотя бы один предмет");
+      return false;
+    }
+    if (!price) {
+      showAlert("error", "Пожалуйста, введите цену");
+      return false;
+    }
+    if (!description || description.length < 10) {
+      showAlert("error", "Пожалуйста, введите описание (минимум 10 символов)");
+      return false;
+    }
+    return true;
+  }
+
+  const handlePublishAd = async () => {
+    setIsPublishing(true);
+
+    const payload = {
+      price: parseFloat(price.replace(/,/g, "")),
+      description: description,
+      subject: selectedSubjects.join(", "),
+    };
+
+    let response;
+
+    if (hasAd) {
+      // Явно говорим: "Просто обнови существующее"
+      // Это НЕ активирует ваш триггер на создание
+      response = await supabase
+        .from("ads")
+        .update(payload)
+        .eq("user_id", user.id);
+    } else {
+      // Говорим: "Создай новое"
+      // Это активирует триггер, но так как записи еще нет, он пропустит
+      response = await supabase
+        .from("ads")
+        .insert({ ...payload, user_id: user.id });
+    }
+
+    if (response.error) {
+      console.error("Ошибка:", response.error.message);
+      showAlert("error", response.error.message);
+    } else {
+      setHasAd(true);
+      showAlert("success", "Готово!");
+    }
+
+    setIsPublishing(false);
   };
 
   if (loading) {
@@ -156,11 +260,32 @@ const Profile = () => {
     <div className="bg-gray-50 py-6 px-0 sm:px-4 lg:px-8">
       <div className="max-w-[1250px] px-2 sm:px-6 mx-auto">
         {alert && (
-          <div className={`mb-4 p-4 rounded-lg border ${alert.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' :
-            alert.type === 'error' ? 'bg-red-50 border-red-200 text-red-800' :
-              'bg-blue-50 border-blue-200 text-blue-800'
-            }`}>
-            {alert.message}
+          <div className="fixed top-6 left-0 right-0 z-[9999] flex justify-center px-4 pointer-events-none">
+            <div
+              className={`
+        pointer-events-auto
+        flex items-center gap-3
+        px-6 py-4 rounded-2xl shadow-2xl border
+        animate-in fade-in slide-in-from-top-4 duration-300
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
+      `}
+            >
+              {/* Иконки для красоты (опционально) */}
+              {alert.type === "success" && (
+                <Check className="h-5 w-5 text-green-500" />
+              )}
+              {alert.type === "error" && (
+                <XCircle className="h-5 w-5 text-red-500" />
+              )}
+
+              <span className="font-bold text-sm">{alert.message}</span>
+            </div>
           </div>
         )}
         {/* Шапка профиля */}
@@ -378,8 +503,21 @@ const Profile = () => {
           </div>
 
           <div className="pt-2">
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97]">
-              Опубликовать объявление
+            <button
+              onClick={handlePublishAd}
+              disabled={isPublishing}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
+            >
+              {isPublishing ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Загрузка...
+                </>
+              ) : hasAd ? (
+                "Сохранить изменения"
+              ) : (
+                "Опубликовать объявление"
+              )}
             </button>
           </div>
         </div>
