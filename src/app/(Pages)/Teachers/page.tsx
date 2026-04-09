@@ -3,15 +3,17 @@
 import { Heart, Filter } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../../context/UserContext";
+import { useTutorAnnouncement } from "../../../context/TutotAnnouncementContext";
+import TeacherSkeleton from "../../../components/UI/SkeletonLoader";
 
 const tutors = [
   {
     id: 1,
     name: "Александр Иванов",
     subject: "Математика (ЕГЭ/ОГЭ)",
-    experience:
+    description:
       "10 лет стажа, подготовил 100+ стобалльников аидыовраол арвыоарывл ывоаровыра оырваорвы ыоварлваыр оывра олвыорывал ыволароывр ыовра лдопвалд лваодлпоав двлаопдва",
-    students: 8,
+    likes: 8,
     price: "100,000 UZS ",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
   },
@@ -19,8 +21,8 @@ const tutors = [
     id: 2,
     name: "Мария Петрова",
     subject: "Английский язык",
-    experience: "Native Speaker, сертификат CELTA",
-    students: 5,
+    description: "Native Speaker, сертификат CELTA",
+    likes: 5,
     price: "120,000 UZS ",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
   },
@@ -28,25 +30,30 @@ const tutors = [
     id: 3,
     name: "Никита Соколов",
     subject: "Физика",
-    experience: "Преподаватель МФТИ, олимпиадная физика",
-    students: 3,
+    description: "Преподаватель МФТИ, олимпиадная физика",
+    likes: 3,
     price: "60,000 UZS ",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dmitry",
   },
 ];
 
-
-
 const TutorsPageWithAnimation = () => {
-
+  const { announcements, announcementsLoading } = useTutorAnnouncement();
   const { user, loading } = useUser();
-  
-  const realUser = {
-    id: user.id,
-    name: user.name,
-    avatar_url: user.avatar_url,
-    
-  }
+
+  const teachers = [
+    {
+      id: announcements?.id,
+      name: user?.name,
+      subject: announcements?.subject,
+      avatar: user?.avatar_url,
+      description: announcements?.description,
+      price: announcements?.price + " UZS",
+      likes: 67,
+    },
+  ];
+
+  console.log(teachers);
 
   const [showNotify, setShowNotify] = useState(false);
 
@@ -83,73 +90,77 @@ const TutorsPageWithAnimation = () => {
         </div>
       </div>
 
-      {/* Grid */}
       <div className="max-w-[1250] mx-auto px-2 sm:px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
-            Актуальные заявки: {tutors.length}
+            Актуальные заявки: {teachers.length}
           </span>
         </div>
+
         <div className="grid grid-cols-1 max-w-[1250]  md:grid-cols-1 lg:grid-cols-2  gap-8">
-          {tutors.map((tutor) => (
-            <div
-              key={tutor.id}
-              className="group  bg-white rounded-3xl border border-gray-100 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 
+          {announcementsLoading
+            ? Array.from({ length: teachers.length }).map((_, index) => (
+                <TeacherSkeleton key={`skeleton-${index}`} />
+              ))
+            : teachers.map((teacher, key) => (
+                <div
+                  key={teacher.id || key}
+                  className="group  bg-white rounded-3xl border border-gray-100 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 
                  hover:shadow-[0_20px_50px_rgba(8,112,184,0.12)] hover:-translate-y-2 relative 
                  overflow-hidden flex flex-col h-full"
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <img
-                  src={tutor.avatar}
-                  className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100"
-                  alt=""
-                />
-                <div className="flex-1">
-                  <h3 className="font-bold text-slate-900 text-lg leading-tight">
-                    {tutor.name}
-                  </h3>
-                  <p className="text-blue-600 text-sm font-semibold mt-1 inline-block bg-blue-50 px-2 py-0.5 rounded-md">
-                    {tutor.subject}
-                  </p>
-                </div>
-                <div className="flex flex-col items-center gap-1 bg-slate-50 px-3 py-2 rounded-2xl border border-slate-100">
-                  <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-                  <span className="text-xs font-bold text-slate-600">
-                    {tutor.students}
-                  </span>
-                </div>
-              </div>
+                >
+                  <div className="flex items-start gap-4 mb-4">
+                    <img
+                      src={teacher.avatar}
+                      className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100"
+                      alt=""
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-bold text-slate-900 text-lg leading-tight">
+                        {teacher.name}
+                      </h3>
+                      <p className="text-blue-600 text-sm font-semibold mt-1 inline-block bg-blue-50 px-2 py-0.5 rounded-md">
+                        {teacher.subject}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 bg-slate-50 px-3 py-2 rounded-2xl border border-slate-100">
+                      <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+                      <span className="text-xs font-bold text-slate-600">
+                        {teacher.likes}
+                      </span>
+                    </div>
+                  </div>
 
-              <div className="p-4 bg-slate-50 rounded-2xl mb-6 flex-grow">
-                {" "}
-                {/* <-- flex-grow заставляет этот блок растягиваться */}
-                <div className="p-2 bg-slate-50 rounded-2xl mb-2 flex-grow overflow-hidden">
-                  <p
-                    className="text-sm text-slate-600 leading-relaxed italic 
+                  <div className="p-4 bg-slate-50 rounded-2xl mb-6 flex-grow">
+                    {" "}
+                    {/* <-- flex-grow заставляет этот блок растягиваться */}
+                    <div className="p-2 bg-slate-50 rounded-2xl mb-2 flex-grow overflow-hidden">
+                      <p
+                        className="text-sm text-slate-600 leading-relaxed italic 
                 hyphens-auto break-words line-clamp-3 md:line-clamp-4"
-                    style={{ hyphens: "auto", WebkitHyphens: "auto" }}
-                  >
-                    "{tutor.experience}"
-                  </p>
-                </div>
-              </div>
+                        style={{ hyphens: "auto", WebkitHyphens: "auto" }}
+                      >
+                        "{teacher.description}"
+                      </p>
+                    </div>
+                  </div>
 
-              {/* 3. ПОДВАЛ - ВСЕГДА ПРИЖАТ К НИЗУ */}
-              <div className="mt-auto pt-5 border-t border-slate-50 flex justify-between items-center">
-                <div>
-                  <span className="text-2xl font-black text-slate-900">
-                    {tutor.price}
-                  </span>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-tighter">
-                    за 60 минут
-                  </span>
+                  {/* 3. ПОДВАЛ - ВСЕГДА ПРИЖАТ К НИЗУ */}
+                  <div className="mt-auto pt-5 border-t border-slate-50 flex justify-between items-center">
+                    <div>
+                      <span className="text-2xl font-black text-slate-900">
+                        {teacher.price}
+                      </span>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-tighter">
+                        за 60 минут
+                      </span>
+                    </div>
+                    <button className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-blue-600 transition-all cursor-pointer">
+                      Выбрать
+                    </button>
+                  </div>
                 </div>
-                <button className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-blue-600 transition-all cursor-pointer">
-                  Выбрать
-                </button>
-              </div>
-            </div>
-          ))}
+              ))}
         </div>
       </div>
     </div>

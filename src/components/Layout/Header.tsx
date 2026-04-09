@@ -27,8 +27,7 @@ function Header() {
   ];
 
   // 3. Функция для выхода из системы
-  const avatarUrl = user?.avatar_url
-
+  const avatarUrl = user?.avatar_url;
 
   const isLinkActive = (href: string) => pathname === href;
 
@@ -56,10 +55,11 @@ function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={`relative px-4 py-2 text-[15px] font-semibold transition-all duration-300 rounded-lg ${isLinkActive(link.href)
-                ? "text-blue-600 bg-blue-50"
-                : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
-                }`}
+              className={`relative px-4 py-2 text-[15px] font-semibold transition-all duration-300 rounded-lg ${
+                isLinkActive(link.href)
+                  ? "text-blue-600 bg-blue-50"
+                  : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
+              }`}
             >
               {link.name}
             </Link>
@@ -88,13 +88,6 @@ function Header() {
                 href="/profile"
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-50 transition-all group"
               >
-                {/* <div className="w-9 h-9 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full flex items-center justify-center group-hover:shadow-md transition-all">
-                  <span className="text-white text-xs font-bold">
-                    {user.name
-                      ? user.name[0].toUpperCase()
-                      : user.email[0].toUpperCase()}
-                  </span>
-                </div> */}
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
@@ -109,7 +102,6 @@ function Header() {
                         : user.email[0].toUpperCase()}
                     </span>
                   </div>
-
                 )}
                 <span className="text-[15px] font-semibold text-slate-700 group-hover:text-blue-600 hidden lg:block">
                   {user.name || user.email?.split("@")[0]}
@@ -139,10 +131,11 @@ function Header() {
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     key={link.href}
                     href={link.href}
-                    className={`flex items-center justify-center gap-2 w-full py-3.5 bg-red-50 text-blue-600 rounded-xl font-bold transition-all duration-300 rounded-lg ${isLinkActive(link.href)
-                      ? "text-blue-600 bg-blue-50"
-                      : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
-                      }`}
+                    className={`flex items-center justify-center gap-2 w-full py-3.5 bg-red-50 text-blue-600 rounded-xl font-bold transition-all duration-300 rounded-lg ${
+                      isLinkActive(link.href)
+                        ? "text-blue-600 bg-blue-50"
+                        : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
+                    }`}
                   >
                     {link.name}
                   </Link>

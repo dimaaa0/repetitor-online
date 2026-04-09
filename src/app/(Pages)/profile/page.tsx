@@ -28,8 +28,7 @@ import SubjectPicker from "@/src/components/UI/SubjectPicker";
 
 const Profile = () => {
   const { user, loading, refreshUser } = useUser();
-  const { selectedSubjects, setSelectedSubjects } =
-    useSubject();
+  const { selectedSubjects, setSelectedSubjects } = useSubject();
   const supabase = createClient();
   const router = useRouter();
 
@@ -57,6 +56,7 @@ const Profile = () => {
     setPrice(formattedValue);
   };
 
+//* СИНХРОНИЗАЦИЯ ДАННЫХ ОБЪЯВЛЕНИЯ ПРИ ЗАГРУЗКЕ ПРОФИЛЯ
   useEffect(() => {
     const fetchAd = async () => {
       if (!user) return;
@@ -98,10 +98,6 @@ const Profile = () => {
     setSubjects(selectedSubjects);
   }, [selectedSubjects]);
 
-  // console.log("Selected Subjects in Profile:", selectedSubjects);
-  // console.log("Price:", price);
-  // console.log("Your description:", description);
-
   // Синхронизация данных формы с пользователем
   useEffect(() => {
     if (user) {
@@ -123,7 +119,7 @@ const Profile = () => {
     setTimeout(() => setAlert(null), 3000);
   };
 
-  // 1. Функция только для ВЫБОРА файла в AddAvatar
+  //* ВЫБОР АВАТАРА И ПУБЛИКАЦИЯ ОБЪЯВЛЕНИЯ
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -135,7 +131,7 @@ const Profile = () => {
     }
   };
 
-  // 2. Основная функция сохранения всего профиля
+  //* ОБРАБОТКА ОБНОВЛЕНИЯ ПРОФИЛЯ
   const handleUpdateProfile = async () => {
     setIsSaving(true);
     try {
@@ -145,15 +141,10 @@ const Profile = () => {
         // 1. УДАЛЕНИЕ СТАРОГО ФАЙЛА (если он есть)
         if (user.avatar_url) {
           try {
-            // Извлекаем путь к файлу из URL. 
-            // Обычно URL выглядит так: .../storage/v1/object/public/avatars/USER_ID/filename.jpg
-            // Нам нужно достать "USER_ID/filename.jpg"
             const urlParts = user.avatar_url.split("avatars/");
             if (urlParts.length > 1) {
               const oldFilePath = urlParts[1];
-              await supabase.storage
-                .from("avatars")
-                .remove([oldFilePath]);
+              await supabase.storage.from("avatars").remove([oldFilePath]);
             }
           } catch (removeError) {
             console.error("Ошибка при удалении старого аватара:", removeError);
@@ -202,7 +193,7 @@ const Profile = () => {
     }
   };
 
-  function checkEmptyFields(
+  function checkEmptyFields( //* ПРОВЕРКА ПУСТОТЫ В ПОЛЯХ ПЕРЕД ПУБЛИКАЦИЕЙ
     subjects: string[],
     price: string,
     description: string,
@@ -222,6 +213,7 @@ const Profile = () => {
     return true;
   }
 
+  //* ОБРАБОТКА ПУБЛИКАЦИИ/ОБНОВЛЕНИЯ ОБЪЯВЛЕНИЯ
   const handlePublishAd = async () => {
     setIsPublishing(true);
 
@@ -231,7 +223,7 @@ const Profile = () => {
     }
 
     const payload = {
-      price: parseFloat(price.replace(/,/g, "")),
+      price: price,
       description: description,
       subject: selectedSubjects.join(", "),
     };
@@ -293,12 +285,13 @@ const Profile = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${alert.type === "success"
-                  ? "bg-white border-green-100 text-green-800"
-                  : alert.type === "error"
-                    ? "bg-white border-red-100 text-red-800"
-                    : "bg-white border-blue-100 text-blue-800"
-                }
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
       `}
             >
               {/* Иконки для красоты (опционально) */}

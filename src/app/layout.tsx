@@ -6,6 +6,10 @@ import Header from "../components/Layout/Header";
 import { UserProvider } from "../context/UserContext";
 import QueryProvider from "../providers/QueryProvider";
 import { SubjectProvider } from "../context/SubjectContext";
+import {
+  TutorAnnouncementProvider,
+  useTutorAnnouncement,
+} from "../context/TutotAnnouncementContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,8 +42,10 @@ export default function RootLayout({
           <SubjectProvider>
             <ModalProvider>
               <UserProvider>
-                <Header />
-                {children}
+                <TutorAnnouncementProvider>
+                  <Header />
+                  {children}
+                </TutorAnnouncementProvider>
               </UserProvider>
             </ModalProvider>
           </SubjectProvider>
