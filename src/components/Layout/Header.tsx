@@ -27,10 +27,8 @@ function Header() {
   ];
 
   // 3. Функция для выхода из системы
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.refresh(); // Обновит страницу, контекст сам увидит выход и очистит юзера
-  };
+  const avatarUrl = user?.avatar_url
+
 
   const isLinkActive = (href: string) => pathname === href;
 
@@ -90,16 +88,30 @@ function Header() {
                 href="/profile"
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-50 transition-all group"
               >
-                <div className="w-9 h-9 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full flex items-center justify-center group-hover:shadow-md transition-all">
-                  {/* Иконка или первая буква имени */}
+                {/* <div className="w-9 h-9 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full flex items-center justify-center group-hover:shadow-md transition-all">
                   <span className="text-white text-xs font-bold">
                     {user.name
                       ? user.name[0].toUpperCase()
                       : user.email[0].toUpperCase()}
                   </span>
-                </div>
+                </div> */}
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="Avatar"
+                    className="w-9 h-9 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-9 h-9 bg-gray-300 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">
+                      {user.name
+                        ? user.name[0].toUpperCase()
+                        : user.email[0].toUpperCase()}
+                    </span>
+                  </div>
+
+                )}
                 <span className="text-[15px] font-semibold text-slate-700 group-hover:text-blue-600 hidden lg:block">
-                  {/* Показываем имя из таблицы profiles, если NULL — часть почты */}
                   {user.name || user.email?.split("@")[0]}
                 </span>
               </Link>

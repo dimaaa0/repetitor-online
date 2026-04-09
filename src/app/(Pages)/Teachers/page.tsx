@@ -1,7 +1,8 @@
 "use client";
 
-import { Heart, SlidersHorizontal, Bell, Clock, X, Filter } from "lucide-react";
+import { Heart, Filter } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { useUser } from "../../../context/UserContext";
 
 const tutors = [
   {
@@ -34,7 +35,19 @@ const tutors = [
   },
 ];
 
+
+
 const TutorsPageWithAnimation = () => {
+
+  const { user, loading } = useUser();
+  
+  const realUser = {
+    id: user.id,
+    name: user.name,
+    avatar_url: user.avatar_url,
+    
+  }
+
   const [showNotify, setShowNotify] = useState(false);
 
   const userRole = "Tutor";

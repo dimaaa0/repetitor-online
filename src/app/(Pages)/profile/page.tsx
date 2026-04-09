@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "../../../context/UserContext";
-import { useSubject } from "../../../context/SubjectContext";
 import { createClient } from "../../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+//Контексты
+
+import { useUser } from "../../../context/UserContext";
+import { useSubject } from "../../../context/SubjectContext";
+
 import {
   Mail,
   LogOut,
@@ -16,13 +20,15 @@ import {
   XCircle,
   Wallet,
 } from "lucide-react";
+
+// Компоненты UI
 import CopyButton from "@/src/components/UI/HandleCopyButton";
 import AddAvatar from "@/src/components/UI/AddAvatar";
 import SubjectPicker from "@/src/components/UI/SubjectPicker";
 
 const Profile = () => {
   const { user, loading, refreshUser } = useUser();
-  const { selectedSubjects, addSubject, removeSubject, setSelectedSubjects } =
+  const { selectedSubjects, setSelectedSubjects } =
     useSubject();
   const supabase = createClient();
   const router = useRouter();
@@ -68,11 +74,7 @@ const Profile = () => {
         setDescription(data.description || "");
         setSubjects(
           data.subject ? data.subject.split(", ").map((s) => s.trim()) : [],
-        ); // Разбиваем строку на массив и убираем лишние пробелы
-        // Если у вас SubjectContext позволяет программно устанавливать предметы:
-        // data.subject.split(", ").forEach(s => addSubject(s));
-        // Но так как у вас локальный state 'subjects' синхронизирован с контекстом,
-        // лучше убедиться, что контекст подтягивает данные или передать их туда.
+        );
       }
 
       if (data && data.subject) {
@@ -139,10 +141,29 @@ const Profile = () => {
     try {
       let finalAvatarUrl = user.avatar_url;
 
-      // Если выбран новый файл — сначала загружаем его
       if (selectedFile) {
+        // 1. УДАЛЕНИЕ СТАРОГО ФАЙЛА (если он есть)
+        if (user.avatar_url) {
+          try {
+            // Извлекаем путь к файлу из URL. 
+            // Обычно URL выглядит так: .../storage/v1/object/public/avatars/USER_ID/filename.jpg
+            // Нам нужно достать "USER_ID/filename.jpg"
+            const urlParts = user.avatar_url.split("avatars/");
+            if (urlParts.length > 1) {
+              const oldFilePath = urlParts[1];
+              await supabase.storage
+                .from("avatars")
+                .remove([oldFilePath]);
+            }
+          } catch (removeError) {
+            console.error("Ошибка при удалении старого аватара:", removeError);
+            // Не прерываем процесс, если удаление старого не удалось
+          }
+        }
+
+        // 2. ЗАГРУЗКА НОВОГО ФАЙЛА
         const fileExt = selectedFile.name.split(".").pop();
-        const filePath = `${user.id}/${Math.random()}.${fileExt}`;
+        const filePath = `${user.id}/${Date.now()}.${fileExt}`; // Используем Date.now() вместо Math.random() для надежности
 
         const { error: uploadError } = await supabase.storage
           .from("avatars")
@@ -157,23 +178,24 @@ const Profile = () => {
         finalAvatarUrl = publicUrl;
       }
 
-      // Обновляем данные в таблице profiles
+      // 3. ОБНОВЛЕНИЕ ПРОФИЛЯ
       const { error: updateError } = await supabase
         .from("profiles")
         .update({
           name: formData.name,
           surname: formData.surname,
-          avatar_url: finalAvatarUrl, // Обновляем ссылку на фото
+          avatar_url: finalAvatarUrl,
         })
         .eq("id", user.id);
 
       if (updateError) throw updateError;
 
-      await refreshUser(); // Обновляем контекст
+      await refreshUser();
       setIsEditing(false);
-      setSelectedFile(null); // Очищаем временный файл
+      setSelectedFile(null);
       showAlert("success", "Профиль обновлен успешно!");
     } catch (error) {
+      console.error(error);
       showAlert("error", "Ошибка при обновлении профиля");
     } finally {
       setIsSaving(false);
@@ -203,6 +225,11 @@ const Profile = () => {
   const handlePublishAd = async () => {
     setIsPublishing(true);
 
+    if (!checkEmptyFields(selectedSubjects, price, description)) {
+      setIsPublishing(false);
+      return;
+    }
+
     const payload = {
       price: parseFloat(price.replace(/,/g, "")),
       description: description,
@@ -226,8 +253,7 @@ const Profile = () => {
         .insert({ ...payload, user_id: user.id });
     }
 
-    if (response.error) {
-      console.error("Ошибка:", response.error.message);
+    if (response?.error) {
       showAlert("error", response.error.message);
     } else {
       setHasAd(true);
@@ -267,13 +293,12 @@ const Profile = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                  ? "bg-white border-green-100 text-green-800"
+                  : alert.type === "error"
+                    ? "bg-white border-red-100 text-red-800"
+                    : "bg-white border-blue-100 text-blue-800"
+                }
       `}
             >
               {/* Иконки для красоты (опционально) */}
@@ -467,7 +492,7 @@ const Profile = () => {
           </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
+            <div className="">
               <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
                 Стоимость занятия
               </label>
@@ -475,7 +500,7 @@ const Profile = () => {
                 <input
                   type="string"
                   value={price}
-                  className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500/10 focus:bg-white rounded-2xl px-5 py-4 font-bold text-gray-800 outline-none transition-all"
+                  className="w-full bg-gray-100 border-2 border-transparent focus:border-blue-500/10 focus:bg-white rounded-2xl px-5 py-4 font-bold text-gray-800 outline-none transition-all"
                   placeholder="100,000"
                   onChange={handlePriceChange}
                 />
@@ -492,7 +517,7 @@ const Profile = () => {
             <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
               О себе и методике
             </label>
-            <div className="bg-gray-50 rounded-[24px] p-5 border-2 border-transparent focus-within:border-blue-500/10 focus-within:bg-white transition-all">
+            <div className="bg-gray-100 rounded-[24px] p-5 border-2 border-transparent focus-within:border-blue-500/10 focus-within:bg-white transition-all">
               <textarea
                 className="w-full bg-transparent border-none focus:ring-0 p-0 text-[15px] font-medium text-gray-700 placeholder:text-gray-400 resize-none h-32 leading-relaxed"
                 placeholder="Например: Ваши сертификаты, опыт работы, особенности методики и т.д."

@@ -65,19 +65,18 @@ const SubjectPicker = () => {
                     Предметы преподавания
                 </label>
 
-                <div 
-                    className={`min-h-[64px] w-full bg-blue-50/50 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${
-                        isOpen ? 'border-blue-400 bg-white shadow-sm' : 'border-transparent'
-                    }`}
+                <div
+                    className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${isOpen ? 'border-blue-400 bg-white shadow-sm' : 'border-transparent'
+                        }`}
                     onClick={() => setIsOpen(true)}
                 >
                     {selectedSubjects.map((subject) => (
-                        <span 
+                        <span
                             key={subject}
                             className="flex items-center gap-1.5 bg-blue-600 text-white pl-3 pr-2 py-1.5 rounded-xl text-sm font-bold animate-in zoom-in-95 duration-200"
                         >
                             {subject}
-                            <button 
+                            <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     removeSubjectLocal(subject);
@@ -101,7 +100,7 @@ const SubjectPicker = () => {
                         onFocus={() => setIsOpen(true)}
                         onKeyDown={handleKeyDown}
                         placeholder={selectedSubjects.length === 0 ? "Напишите или выберите..." : ""}
-                        className="flex-1 min-w-[150px] bg-transparent border-none focus:ring-0 outline-none text-blue-700 font-bold placeholder:text-blue-300 px-2"
+                        className="flex-1   min-w-[150px] bg-transparent border-none focus:ring-0 outline-none text-blue-700 font-bold placeholder:text-blue-300 px-2"
                     />
                 </div>
 
@@ -117,7 +116,7 @@ const SubjectPicker = () => {
                                     <span className="text-lg">+</span> Добавить "{query}"
                                 </button>
                             )}
-                            
+
                             {filteredSubjects.map((subject) => (
                                 <button
                                     key={subject}
