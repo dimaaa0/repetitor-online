@@ -4,56 +4,53 @@ import { Heart, Filter } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../../context/UserContext";
 import { useTutorAnnouncement } from "../../../context/TutotAnnouncementContext";
-import TeacherSkeleton from "../../../components/UI/SkeletonLoader";
-
-const tutors = [
-  {
-    id: 1,
-    name: "Александр Иванов",
-    subject: "Математика (ЕГЭ/ОГЭ)",
-    description:
-      "10 лет стажа, подготовил 100+ стобалльников аидыовраол арвыоарывл ывоаровыра оырваорвы ыоварлваыр оывра олвыорывал ыволароывр ыовра лдопвалд лваодлпоав двлаопдва",
-    likes: 8,
-    price: "100,000 UZS ",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-  },
-  {
-    id: 2,
-    name: "Мария Петрова",
-    subject: "Английский язык",
-    description: "Native Speaker, сертификат CELTA",
-    likes: 5,
-    price: "120,000 UZS ",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
-  },
-  {
-    id: 3,
-    name: "Никита Соколов",
-    subject: "Физика",
-    description: "Преподаватель МФТИ, олимпиадная физика",
-    likes: 3,
-    price: "60,000 UZS ",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dmitry",
-  },
-];
+import TeacherCard from "../../../components/UI/TeacherCard";
+import { createClient } from "../../../utils/supabase/client";
 
 const TutorsPageWithAnimation = () => {
   const { announcements, announcementsLoading } = useTutorAnnouncement();
   const { user, loading } = useUser();
+  const [dataLoading, setDataLoading] = useState(false);
+  const [teachers, setTeachers] = useState<any[]>([]);
 
-  const teachers = [
-    {
-      id: announcements?.id,
-      name: user?.name,
-      subject: announcements?.subject,
-      avatar: user?.avatar_url,
-      description: announcements?.description,
-      price: announcements?.price + " UZS",
-      likes: 67,
-    },
-  ];
+  const supabase = createClient();
 
-  console.log(teachers);
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      setDataLoading(true);
+      const { data, error } = await supabase.from("ads").select(`
+          id,
+          subject,
+          description,
+          price,
+          profiles (
+            name,
+            surname,
+            avatar_url
+          )
+        `);
+
+      if (error) {
+        console.error("Ошибка загрузки:", error);
+      } else {
+        const formattedData = data.map((ad) => ({
+          id: ad.id,
+          name: ad.profiles?.name,
+          surname: ad.profiles?.surname,
+          avatar: ad.profiles?.avatar_url,
+          subject: ad.subject,
+          description: ad.description,
+          price: ad.price + " UZS",
+          likes: 67,
+        }));
+        setTeachers(formattedData);
+        console.log(formattedData);
+      }
+      setDataLoading(false);
+    };
+
+    fetchTeachers();
+  }, []);
 
   const [showNotify, setShowNotify] = useState(false);
 
@@ -97,69 +94,17 @@ const TutorsPageWithAnimation = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 max-w-[1250]  md:grid-cols-1 lg:grid-cols-2  gap-8">
-          {announcementsLoading
-            ? Array.from({ length: teachers.length }).map((_, index) => (
-                <TeacherSkeleton key={`skeleton-${index}`} />
+        <div className="grid grid-cols-1 pb-4 gap-8 md:grid-cols-1 lg:grid-cols-2 ">
+          {dataLoading && teachers.length === 0
+            ? Array.from({ length: 4 }).map((_, key) => (
+                <TeacherCard key={`skeleton-${key}`} teacher={{}} isLoading />
               ))
             : teachers.map((teacher, key) => (
-                <div
+                <TeacherCard
                   key={teacher.id || key}
-                  className="group  bg-white rounded-3xl border border-gray-100 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 
-                 hover:shadow-[0_20px_50px_rgba(8,112,184,0.12)] hover:-translate-y-2 relative 
-                 overflow-hidden flex flex-col h-full"
-                >
-                  <div className="flex items-start gap-4 mb-4">
-                    <img
-                      src={teacher.avatar}
-                      className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100"
-                      alt=""
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-bold text-slate-900 text-lg leading-tight">
-                        {teacher.name}
-                      </h3>
-                      <p className="text-blue-600 text-sm font-semibold mt-1 inline-block bg-blue-50 px-2 py-0.5 rounded-md">
-                        {teacher.subject}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-center gap-1 bg-slate-50 px-3 py-2 rounded-2xl border border-slate-100">
-                      <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-                      <span className="text-xs font-bold text-slate-600">
-                        {teacher.likes}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-slate-50 rounded-2xl mb-6 flex-grow">
-                    {" "}
-                    {/* <-- flex-grow заставляет этот блок растягиваться */}
-                    <div className="p-2 bg-slate-50 rounded-2xl mb-2 flex-grow overflow-hidden">
-                      <p
-                        className="text-sm text-slate-600 leading-relaxed italic 
-                hyphens-auto break-words line-clamp-3 md:line-clamp-4"
-                        style={{ hyphens: "auto", WebkitHyphens: "auto" }}
-                      >
-                        "{teacher.description}"
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* 3. ПОДВАЛ - ВСЕГДА ПРИЖАТ К НИЗУ */}
-                  <div className="mt-auto pt-5 border-t border-slate-50 flex justify-between items-center">
-                    <div>
-                      <span className="text-2xl font-black text-slate-900">
-                        {teacher.price}
-                      </span>
-                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-tighter">
-                        за 60 минут
-                      </span>
-                    </div>
-                    <button className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-blue-600 transition-all cursor-pointer">
-                      Выбрать
-                    </button>
-                  </div>
-                </div>
+                  teacher={teacher}
+                  isLoading={!teacher.name || !teacher.subject}
+                />
               ))}
         </div>
       </div>

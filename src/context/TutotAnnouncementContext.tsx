@@ -27,7 +27,7 @@ export const TutorAnnouncementProvider = ({
         .from("ads")
         .select("*")
         .eq("user_id", user.id)
-        .single(); // Берем одно объявление текущего юзера
+        .single(); 
 
       if (!error) setAnnouncements(data);
     }

@@ -56,7 +56,7 @@ const Profile = () => {
     setPrice(formattedValue);
   };
 
-//* СИНХРОНИЗАЦИЯ ДАННЫХ ОБЪЯВЛЕНИЯ ПРИ ЗАГРУЗКЕ ПРОФИЛЯ
+  //* СИНХРОНИЗАЦИЯ ДАННЫХ ОБЪЯВЛЕНИЯ ПРИ ЗАГРУЗКЕ ПРОФИЛЯ
   useEffect(() => {
     const fetchAd = async () => {
       if (!user) return;
@@ -65,12 +65,12 @@ const Profile = () => {
         .from("ads")
         .select("*")
         .eq("user_id", user.id)
-        .single(); // Ожидаем одну запись
+        .single();
 
       if (data) {
-        // Заполняем поля данными из базы
+        //* Заполняем поля данными из базы
         setHasAd(true);
-        setPrice(data.price.toLocaleString()); // Форматируем число обратно в строку с запятыми
+        setPrice(data.price.toLocaleString());
         setDescription(data.description || "");
         setSubjects(
           data.subject ? data.subject.split(", ").map((s) => s.trim()) : [],
@@ -98,7 +98,7 @@ const Profile = () => {
     setSubjects(selectedSubjects);
   }, [selectedSubjects]);
 
-  // Синхронизация данных формы с пользователем
+  //* Синхронизация данных формы с пользователем
   useEffect(() => {
     if (user) {
       setFormData({
@@ -138,21 +138,38 @@ const Profile = () => {
       let finalAvatarUrl = user.avatar_url;
 
       if (selectedFile) {
-        // 1. УДАЛЕНИЕ СТАРОГО ФАЙЛА (если он есть)
+        //* УДАЛЕНИЕ СТАРОГО ФАЙЛА (если он есть)
+        // ... внутри handleUpdateProfile перед загрузкой нового файла
+
         if (user.avatar_url) {
           try {
-            const urlParts = user.avatar_url.split("avatars/");
-            if (urlParts.length > 1) {
-              const oldFilePath = urlParts[1];
-              await supabase.storage.from("avatars").remove([oldFilePath]);
+            // 1. Используем конструктор URL, чтобы корректно распарсить строку
+            const url = new URL(user.avatar_url);
+            const pathParts = url.pathname.split("avatars/");
+
+            if (pathParts.length > 1) {
+              // 2. Декодируем URL (на случай пробелов или спецсимволов %20 и т.д.)
+              const oldFilePath = decodeURIComponent(pathParts[1]);
+
+              console.log("Удаляем старый файл:", oldFilePath);
+
+              // 3. Вызываем удаление
+              const { data, error: removeError } = await supabase.storage
+                .from("avatars")
+                .remove([oldFilePath]);
+
+              if (removeError) {
+                console.error("Supabase Storage Error:", removeError);
+              } else {
+                console.log("Результат удаления:", data);
+              }
             }
-          } catch (removeError) {
-            console.error("Ошибка при удалении старого аватара:", removeError);
-            // Не прерываем процесс, если удаление старого не удалось
+          } catch (e) {
+            console.error("Ошибка парсинга URL или удаления:", e);
           }
         }
 
-        // 2. ЗАГРУЗКА НОВОГО ФАЙЛА
+        //* ЗАГРУЗКА НОВОГО ФАЙЛА
         const fileExt = selectedFile.name.split(".").pop();
         const filePath = `${user.id}/${Date.now()}.${fileExt}`; // Используем Date.now() вместо Math.random() для надежности
 
@@ -169,7 +186,7 @@ const Profile = () => {
         finalAvatarUrl = publicUrl;
       }
 
-      // 3. ОБНОВЛЕНИЕ ПРОФИЛЯ
+      //* ОБНОВЛЕНИЕ ПРОФИЛЯ
       const { error: updateError } = await supabase
         .from("profiles")
         .update({
@@ -193,7 +210,8 @@ const Profile = () => {
     }
   };
 
-  function checkEmptyFields( //* ПРОВЕРКА ПУСТОТЫ В ПОЛЯХ ПЕРЕД ПУБЛИКАЦИЕЙ
+  //* ПРОВЕРКА ПУСТОТЫ В ПОЛЯХ ПЕРЕД ПУБЛИКАЦИЕЙ
+  function checkEmptyFields(
     subjects: string[],
     price: string,
     description: string,
@@ -231,15 +249,11 @@ const Profile = () => {
     let response;
 
     if (hasAd) {
-      // Явно говорим: "Просто обнови существующее"
-      // Это НЕ активирует ваш триггер на создание
       response = await supabase
         .from("ads")
         .update(payload)
         .eq("user_id", user.id);
     } else {
-      // Говорим: "Создай новое"
-      // Это активирует триггер, но так как записи еще нет, он пропустит
       response = await supabase
         .from("ads")
         .insert({ ...payload, user_id: user.id });
@@ -311,7 +325,7 @@ const Profile = () => {
           <div className="flex flex-col sm:flex-row items-center gap-6">
             {/* Секция Аватара */}
             <div className="relative group">
-              <div className="h-24 w-24 mt-4 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg shrink-0 overflow-hidden">
+              <div className="h-24 w-24 mt-4 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shrink-0 overflow-hidden">
                 {/* Приоритет: выбранный файл -> ссылка из базы -> первая буква имени */}
                 {selectedFile ? (
                   <img
@@ -325,12 +339,16 @@ const Profile = () => {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  (user.name?.[0] || user.email?.[0]).toUpperCase()
+                  <div className="w-26 h-26 bg-blue-600 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm">
+                    <span className="text-white text-[32px] font-bold">
+                      {user.name ? user.name[0].toUpperCase() : "?"}
+                    </span>
+                  </div>
                 )}
               </div>
 
               {isEditing && (
-                <div className="absolute inset-0 mt-4 flex items-center justify-center bg-black/30 rounded-full animate-in fade-in zoom-in duration-200">
+                <div className="absolute inset-0 mt-4 flex items-center justify-center bg-black/30 rounded-2xl animate-in fade-in zoom-in duration-200">
                   <AddAvatar uploadAvatar={handleFileSelect} />
                 </div>
               )}
@@ -407,138 +425,151 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Инфо-карточки */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
-          <div className="bg-white rounded-2xl py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4" /> Данные аккаунта
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs text-gray-500 uppercase">Роль</p>
-                <p className="font-medium text-gray-800">
-                  {user.role || "User"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase">
-                  ID Пользователя
-                </p>
-                <p className="font-medium text-gray-800 truncate">{user.id}</p>
-                <CopyButton textToCopy={user.id} label="ID" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
-            {/* Верхняя часть: Заголовок и Статус */}
-            <div className="flex justify-between items-start mb-6">
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                <CreditCard className="h-4 w-4" /> Тарифный план
-              </h3>
-              <span className="bg-green-50 text-green-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-tighter border border-green-100">
-                Активен
-              </span>
-            </div>
-
-            {/* Блок с ценой в стиле скрина */}
-            <div className="flex items-center gap-4 mb-6">
-              {/* Иконка в закругленном боксе */}
-              <div className="bg-green-100 p-3 rounded-2xl border border-green-100/50">
-                <Wallet className="h-6 w-6 text-emerald-600" />
+        {user.role === "Tutor" && (
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+              <div className="bg-white rounded-2xl py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4" /> Данные аккаунта
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase">Роль</p>
+                    <p className="font-medium text-gray-800">
+                      {!user.role
+                        ? "User"
+                        : user.role === "Teacher"
+                          ? "Репетитор"
+                          : "Ученик"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase">
+                      ID Пользователя
+                    </p>
+                    <p className="font-medium text-gray-800 truncate">
+                      {user.id}
+                    </p>
+                    <CopyButton textToCopy={user.id} label="ID" />
+                  </div>
+                </div>
               </div>
 
-              {/* Текстовая часть */}
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight leading-none mb-0.5">
-                  Стоимость
-                </span>
-                <div className="text-xl font-medium text-gray-900 leading-none">
-                  15,000 <span className="text-xl">UZS</span>
+              <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
+                {/* Верхняя часть: Заголовок и Статус */}
+                <div className="flex justify-between items-start mb-6">
+                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" /> Тарифный план
+                  </h3>
+                  <span className="bg-green-50 text-green-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-tighter border border-green-100">
+                    Активен
+                  </span>
+                </div>
+
+                {/* Блок с ценой в стиле скрина */}
+                <div className="flex items-center gap-4 mb-6">
+                  {/* Иконка в закругленном боксе */}
+                  <div className="bg-green-100 p-3 rounded-2xl border border-green-100/50">
+                    <Wallet className="h-6 w-6 text-emerald-600" />
+                  </div>
+
+                  {/* Текстовая часть */}
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight leading-none mb-0.5">
+                      Стоимость
+                    </span>
+                    <div className="text-xl font-medium text-gray-900 leading-none">
+                      15,000 <span className="text-xl">UZS</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Даты оплаты */}
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-1">
+                      Оплачено
+                    </p>
+                    <p className="text-sm font-medium text-gray-700">
+                      08.04.2026
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-1">
+                      Истекает
+                    </p>
+                    <p className="text-sm font-medium text-gray-700">
+                      08.05.2026
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Даты оплаты */}
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
+            {/* Секция объявления */}
+            <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">
+              <h1 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] mb-8 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>{" "}
+                Ваше объявление
+              </h1>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="">
+                  <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
+                    Стоимость занятия
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="string"
+                      value={price}
+                      className="w-full bg-gray-100 border-2 border-transparent focus:border-blue-500/10 focus:bg-white rounded-2xl px-5 py-4 font-bold text-gray-800 outline-none transition-all"
+                      placeholder="100,000"
+                      onChange={handlePriceChange}
+                    />
+                    <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
+                      UZS / 60 МИН
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <SubjectPicker />
+
               <div>
-                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-1">
-                  Оплачено
-                </p>
-                <p className="text-sm font-medium text-gray-700">08.04.2026</p>
+                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
+                  О себе и методике
+                </label>
+                <div className="bg-gray-100 rounded-[24px] p-5 border-2 border-transparent focus-within:border-blue-500/10 focus-within:bg-white transition-all">
+                  <textarea
+                    className="w-full bg-transparent border-none focus:ring-0 p-0 text-[15px] font-medium text-gray-700 placeholder:text-gray-400 resize-none h-32 leading-relaxed"
+                    placeholder="Например: Ваши сертификаты, опыт работы, особенности методики и т.д."
+                    onChange={(e) => setDescription(e.target.value)}
+                    value={description}
+                  />
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-1">
-                  Истекает
-                </p>
-                <p className="text-sm font-medium text-gray-700">08.05.2026</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Секция объявления */}
-        <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">
-          <h1 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] mb-8 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Ваше
-            объявление
-          </h1>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="">
-              <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-                Стоимость занятия
-              </label>
-              <div className="relative">
-                <input
-                  type="string"
-                  value={price}
-                  className="w-full bg-gray-100 border-2 border-transparent focus:border-blue-500/10 focus:bg-white rounded-2xl px-5 py-4 font-bold text-gray-800 outline-none transition-all"
-                  placeholder="100,000"
-                  onChange={handlePriceChange}
-                />
-                <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
-                  UZS / 60 МИН
-                </span>
+              <div className="pt-2">
+                <button
+                  onClick={handlePublishAd}
+                  disabled={isPublishing}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
+                >
+                  {isPublishing ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Загрузка...
+                    </>
+                  ) : hasAd ? (
+                    "Сохранить изменения"
+                  ) : (
+                    "Опубликовать объявление"
+                  )}
+                </button>
               </div>
             </div>
           </div>
-
-          <SubjectPicker />
-
-          <div>
-            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-              О себе и методике
-            </label>
-            <div className="bg-gray-100 rounded-[24px] p-5 border-2 border-transparent focus-within:border-blue-500/10 focus-within:bg-white transition-all">
-              <textarea
-                className="w-full bg-transparent border-none focus:ring-0 p-0 text-[15px] font-medium text-gray-700 placeholder:text-gray-400 resize-none h-32 leading-relaxed"
-                placeholder="Например: Ваши сертификаты, опыт работы, особенности методики и т.д."
-                onChange={(e) => setDescription(e.target.value)}
-                value={description}
-              />
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <button
-              onClick={handlePublishAd}
-              disabled={isPublishing}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
-            >
-              {isPublishing ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Загрузка...
-                </>
-              ) : hasAd ? (
-                "Сохранить изменения"
-              ) : (
-                "Опубликовать объявление"
-              )}
-            </button>
-          </div>
-        </div>
+        )}
 
         <div className="mt-10 flex justify-end">
           <button

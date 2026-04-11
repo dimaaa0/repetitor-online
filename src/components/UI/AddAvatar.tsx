@@ -35,7 +35,7 @@ const AddAvatar = ({ uploadAvatar }: AddAvatarProps) => {
         {/* Визуальный блок */}
         <div
           onClick={() => fileInputRef.current?.click()}
-          className={`w-24 h-24 rounded-full flex flex-col items-center justify-center border-2 border-dashed transition-all cursor-pointer overflow-hidden
+          className={`w-24 h-24 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed transition-all cursor-pointer overflow-hidden
         ${
           previewUrl
             ? "border-blue-500 bg-white"

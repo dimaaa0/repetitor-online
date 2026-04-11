@@ -89,21 +89,21 @@ function Header() {
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-50 transition-all group"
               >
                 {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt="Avatar"
-                    className="w-9 h-9 rounded-full object-cover"
-                  />
+                  <div className="w-9 h-9 rounded-2xl overflow-hidden bg-transparent">
+                    <img
+                      src={avatarUrl}
+                      alt="Avatar"
+                      className="w-full h-full object-cover bg-transparent"
+                    />
+                  </div>
                 ) : (
-                  <div className="w-9 h-9 bg-gray-300 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">
-                      {user.name
-                        ? user.name[0].toUpperCase()
-                        : user.email[0].toUpperCase()}
+                  <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm">
+                    <span className="text-white text-xl font-bold">
+                      {user.name ? user.name[0].toUpperCase() : "?"}
                     </span>
                   </div>
                 )}
-                <span className="text-[15px] font-semibold text-slate-700 group-hover:text-blue-600 hidden lg:block">
+                <span className="text-[15px] font-semibold max-w-[140px] truncate text-slate-700 group-hover:text-blue-600 hidden lg:block">
                   {user.name || user.email?.split("@")[0]}
                 </span>
               </Link>
