@@ -1,42 +1,54 @@
 "use client";
 
-import React from "react";
-import {
-  Search,
-  Clock,
-  Wallet,
-  BookOpen,
-  ChevronRight,
-  MessageCircle,
-  Filter,
-} from "lucide-react";
-
-const ads = [
-  {
-    id: 1,
-    studentName: "Артем, 11 класс",
-    title: "Ищу репетитора по профильной математике",
-    description:
-      "Нужна помощь в подготовке к ЕГЭ. Западают задачи с параметрами и геометрия. Хотелось бы заниматься 2 раза в неделю вечером.",
-    budget: "до 150,000 UZS",
-    subject: "Математика",
-    postedAt: "2 часа назад",
-    goal: "ЕГЭ / ОГЭ",
-  },
-  {
-    id: 2,
-    studentName: "Елена",
-    title: "Разговорный английский для переезда",
-    description:
-      "Уровень сейчас Intermediate. Нужно подтянуть говорение и убрать страх общения. Рассматриваю занятия только с носителем или профи.",
-    budget: "100,000 - 120,000 UZS",
-    subject: "Английский",
-    postedAt: "Сегодня",
-    goal: "Релокация",
-  },
-];
+import React, { useEffect, useState } from "react";
+import { Wallet, BookOpen, MessageCircle, Filter } from "lucide-react";
+import { createClient } from "../../../../src/utils/supabase/client";
+import { title } from "process";
 
 const Announcements = () => {
+  const [dataLoading, setDataLoading] = useState(false);
+  const [students, setStudents] = useState<any[]>([]);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      setDataLoading(true);
+      const { data, error } = await supabase.from("student_ads").select(`
+            id,
+            title,
+            subject,
+            description,
+            price,
+            profiles (
+              name,
+              surname,
+              avatar_url
+            )
+          `);
+
+      if (error) {
+        console.error("Ошибка загрузки:", error);
+      } else {
+        const formattedData = data.map((ad: any) => ({
+          id: ad.id,
+          title: ad.title,  
+          name: ad.profiles?.name,
+          surname: ad.profiles?.surname,
+          avatar: ad.profiles?.avatar_url,
+          subject: ad.subject,
+          description: ad.description,
+          price: ad.price + " UZS",
+          likes: 67,
+        }));
+        setStudents(formattedData);
+        console.log(formattedData);
+      }
+      setDataLoading(false);
+    };
+
+    fetchTeachers();
+  }, []);
+
   return (
     <div className="min-h-screen   bg-[#FBFDFF] pb-20">
       {/* Декоративный фон шапки */}
@@ -64,21 +76,21 @@ const Announcements = () => {
       <div className="max-w-[1250] mx-auto px-2 sm:px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
-            Актуальные заявки: {ads.length}
+            Актуальные заявки: {students.length}
           </span>
         </div>
 
         {/* Список объявлений */}
         <div className="grid gap-6 pb-10">
-          {ads.map((ad) => (
+          {students.map((student) => (
             <div
-              key={ad.id}
+              key={student.id}
               className="relative bg-white rounded-3xl border border-slate-100 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.05)] hover:-translate-y-1 group"
             >
               {/* Бейдж цели обучения */}
               <div className="absolute top-6 right-6 hidden sm:block">
                 <span className="px-3 py-1 bg-slate-900 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">
-                  {ad.goal}
+                  {student.subject}
                 </span>
               </div>
 
@@ -86,23 +98,22 @@ const Announcements = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">
-                      {ad.studentName[0]}
+                      {student.name[0]}
                     </div>
                     <span className="text-sm font-bold text-slate-500">
-                      {ad.studentName}
+                      {student.name} {student.surname}
                     </span>
-                    <span className="text-slate-300">•</span>
                     <span className="text-xs text-slate-400 font-medium">
-                      {ad.postedAt}
+                      {student.postedAt}
                     </span>
                   </div>
 
                   <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
-                    {ad.title}
+                    {student.title}
                   </h3>
 
                   <p className="text-slate-600 leading-relaxed mb-6 max-w-3xl">
-                    {ad.description}
+                    {student.description}
                   </p>
 
                   <div className="flex flex-wrap gap-6 items-center pt-6 border-t border-slate-50">
@@ -115,7 +126,7 @@ const Announcements = () => {
                           Предмет
                         </p>
                         <p className="text-sm font-bold text-slate-700">
-                          {ad.subject}
+                          {student.subject}
                         </p>
                       </div>
                     </div>
@@ -129,7 +140,7 @@ const Announcements = () => {
                           Бюджет
                         </p>
                         <p className="text-sm font-black text-slate-900">
-                          {ad.budget}
+                          {student.price}
                         </p>
                       </div>
                     </div>

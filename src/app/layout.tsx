@@ -5,11 +5,10 @@ import "./globals.css";
 import Header from "../components/Layout/Header";
 import { UserProvider } from "../context/UserContext";
 import QueryProvider from "../providers/QueryProvider";
-import { SubjectProvider } from "../context/TeacherSubjectContext";
-import {
-  TutorAnnouncementProvider,
-  useTutorAnnouncement,
-} from "../context/TutotAnnouncementContext";
+import { TeacherSubjectProvider } from "../context/TeacherSubjectContext";
+import { StudentSubjectProvider } from "../context/StudentSubjectContext";
+import { StudentAnnouncementProvider } from "../context/StudentAnnouncementContext";
+import { TutorAnnouncementProvider } from "../context/TeacherAnnouncementContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,16 +38,20 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>
-          <SubjectProvider>
-            <ModalProvider>
-              <UserProvider>
-                <TutorAnnouncementProvider>
-                  <Header />
-                  {children}
-                </TutorAnnouncementProvider>
-              </UserProvider>
-            </ModalProvider>
-          </SubjectProvider>
+          <TeacherSubjectProvider>
+            <StudentSubjectProvider>
+              <ModalProvider>
+                <UserProvider>
+                  <TutorAnnouncementProvider>
+                    <StudentAnnouncementProvider>
+                      <Header />
+                      {children}
+                    </StudentAnnouncementProvider>
+                  </TutorAnnouncementProvider>
+                </UserProvider>
+              </ModalProvider>
+            </StudentSubjectProvider>
+          </TeacherSubjectProvider>
         </QueryProvider>
       </body>
     </html>

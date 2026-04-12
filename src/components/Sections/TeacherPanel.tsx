@@ -42,7 +42,7 @@ const TeacherPanel = () => {
   } | null>(null);
 
   //* СИНХРОНИЗАЦИЯ Цены ПРИ ЗАГРУЗКЕ ПРОФИЛЯ
-  const handlePriceChange = (e) => {
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, ""); // Удаляем всё, кроме цифр
     const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Добавляем запятые
     setPrice(formattedValue);
@@ -85,13 +85,13 @@ const TeacherPanel = () => {
         setPrice(data.price.toLocaleString());
         setDescription(data.description || "");
         setSubjects(
-          data.subject ? data.subject.split(", ").map((s) => s.trim()) : [],
+          data.subject ? data.subject.split(", ").map((s: string) => s.trim()) : [],
         );
       }
 
       if (data && data.subject) {
         // Превращаем строку из базы в массив
-        const subjectsArray = data.subject.split(", ").map((s) => s.trim());
+        const subjectsArray = data.subject.split(", ").map((s: string) => s.trim());
 
         // Синхронизируем контекст с данными из БД
         setSelectedSubjects(subjectsArray);

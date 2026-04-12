@@ -10,16 +10,22 @@ interface SubjectContextType {
   setSelectedSubjects: (subjects: string[]) => void;
 }
 
-const TeacherSubjectContext = createContext<SubjectContextType | undefined>(undefined);
+const StudentSubjectContext = createContext<SubjectContextType | undefined>(
+  undefined,
+);
 
-export function TeacherSubjectProvider({ children }: { children: React.ReactNode }) {
+export function StudentSubjectProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const userContext = useUser();
   const user = userContext?.user;
   const [selectedSubjects, setSelectedSubjectsState] = useState<string[]>([]);
 
   // Очищаем предметы при смене роли пользователя
   useEffect(() => {
-    if (user && user.role !== "Tutor") {
+    if (user && user.role !== "Student") {
       setSelectedSubjectsState([]);
     }
   }, [user?.role]);
@@ -41,7 +47,7 @@ export function TeacherSubjectProvider({ children }: { children: React.ReactNode
   };
 
   return (
-    <TeacherSubjectContext.Provider
+    <StudentSubjectContext.Provider
       value={{
         selectedSubjects,
         addSubject,
@@ -50,14 +56,14 @@ export function TeacherSubjectProvider({ children }: { children: React.ReactNode
       }}
     >
       {children}
-    </TeacherSubjectContext.Provider>
+    </StudentSubjectContext.Provider>
   );
 }
 
 export const useSubject = () => {
-  const context = useContext(TeacherSubjectContext);
+  const context = useContext(StudentSubjectContext);
   if (!context) {
-    throw new Error("useSubject must be used within a TeacherSubjectProvider");
+    throw new Error("useSubject must be used within a StudentSubjectProvider");
   }
   return context;
 };

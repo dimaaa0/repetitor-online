@@ -15,7 +15,6 @@ import { useModal } from "../../context/ModalContext";
 import { createClient } from "../../utils/supabase/client";
 import { Session, AuthChangeEvent } from "@supabase/supabase-js";
 import getFriendlyError from "../../app/functions/errorTranslator";
-import ErrorNotification from "./ErrorNotification";
 
 export default function SignInForm() {
   const supabase = createClient();

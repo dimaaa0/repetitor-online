@@ -5,8 +5,8 @@ import { createClient } from "../../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import TeacherPanel from "@/src/components/UI/TeacherPanel";
-import StudentPanel from "@/src/components/UI/StudentPanel";
+import TeacherPanel from "@/src/components/Sections/TeacherPanel";
+import StudentPanel from "@/src/components/Sections/StudentPanel";
 
 import { useUser } from "../../../context/UserContext";
 import { useSubject } from "../../../context/TeacherSubjectContext";
@@ -68,13 +68,13 @@ const Profile = () => {
         setPrice(data.price.toLocaleString());
         setDescription(data.description || "");
         setSubjects(
-          data.subject ? data.subject.split(", ").map((s) => s.trim()) : [],
+          data.subject ? data.subject.split(", ").map((s: string) => s.trim()) : [],
         );
       }
 
       if (data && data.subject) {
         // Превращаем строку из базы в массив
-        const subjectsArray = data.subject.split(", ").map((s) => s.trim());
+        const subjectsArray = data.subject.split(", ").map((s: string) => s.trim());
 
         // Синхронизируем контекст с данными из БД
         setSelectedSubjects(subjectsArray);

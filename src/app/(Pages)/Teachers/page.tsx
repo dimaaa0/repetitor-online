@@ -3,7 +3,7 @@
 import { Heart, Filter } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../../context/UserContext";
-import { useTutorAnnouncement } from "../../../context/TutotAnnouncementContext";
+import { useTutorAnnouncement } from "../../../context/TeacherAnnouncementContext";
 import TeacherCard from "../../../components/UI/TeacherCard";
 import { createClient } from "../../../utils/supabase/client";
 
@@ -33,7 +33,7 @@ const TutorsPageWithAnimation = () => {
       if (error) {
         console.error("Ошибка загрузки:", error);
       } else {
-        const formattedData = data.map((ad) => ({
+        const formattedData = data.map((ad: any) => ({
           id: ad.id,
           name: ad.profiles?.name,
           surname: ad.profiles?.surname,
