@@ -6,7 +6,6 @@ interface SubjectContextType {
   selectedSubjects: string[];
   addSubject: (subject: string) => void;
   removeSubject: (subject: string) => void;
-  // Добавляем новый метод для массовой установки (из БД)
   setSelectedSubjects: (subjects: string[]) => void;
 }
 
