@@ -1,7 +1,7 @@
 import { Check, Loader2, Search, XCircle } from "lucide-react";
 import React, { useState } from "react";
 import { useUser } from "../../context/UserContext";
-import SubjectPicker from "./SubjectPicker";
+import SubjectPicker from "./TeacherSubjectPicker";
 
 const StudentPanel = () => {
   const { user } = useUser();

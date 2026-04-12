@@ -9,7 +9,7 @@ import TeacherPanel from "@/src/components/UI/TeacherPanel";
 import StudentPanel from "@/src/components/UI/StudentPanel";
 
 import { useUser } from "../../../context/UserContext";
-import { useSubject } from "../../../context/SubjectContext";
+import { useSubject } from "../../../context/TeacherSubjectContext";
 
 import {
   Mail,
@@ -25,7 +25,7 @@ import {
 // Компоненты UI
 import CopyButton from "@/src/components/UI/HandleCopyButton";
 import AddAvatar from "@/src/components/UI/AddAvatar";
-import SubjectPicker from "@/src/components/UI/SubjectPicker";
+import SubjectPicker from "@/src/components/UI/TeacherSubjectPicker";
 
 const Profile = () => {
   const { user, loading, refreshUser } = useUser();

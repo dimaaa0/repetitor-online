@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useUser } from "./UserContext";
 
 interface SubjectContextType {
   selectedSubjects: string[];
@@ -12,7 +13,16 @@ interface SubjectContextType {
 const SubjectContext = createContext<SubjectContextType | undefined>(undefined);
 
 export function SubjectProvider({ children }: { children: React.ReactNode }) {
+  const userContext = useUser();
+  const user = userContext?.user;
   const [selectedSubjects, setSelectedSubjectsState] = useState<string[]>([]);
+
+  // Очищаем предметы при смене роли пользователя
+  useEffect(() => {
+    if (user && user.role !== "Tutor") {
+      setSelectedSubjectsState([]);
+    }
+  }, [user?.role]);
 
   const addSubject = (subject: string) => {
     const trimmed = subject.trim();

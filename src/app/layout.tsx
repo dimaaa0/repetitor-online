@@ -5,7 +5,7 @@ import "./globals.css";
 import Header from "../components/Layout/Header";
 import { UserProvider } from "../context/UserContext";
 import QueryProvider from "../providers/QueryProvider";
-import { SubjectProvider } from "../context/SubjectContext";
+import { SubjectProvider } from "../context/TeacherSubjectContext";
 import {
   TutorAnnouncementProvider,
   useTutorAnnouncement,

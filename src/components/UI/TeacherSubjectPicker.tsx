@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { useSubject } from "../../context/SubjectContext";
+import { useSubject } from "../../context/TeacherSubjectContext";
 import { useUser } from "../../context/UserContext";
 
 const SubjectPicker = () => {
