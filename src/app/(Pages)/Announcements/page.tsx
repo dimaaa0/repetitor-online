@@ -140,7 +140,7 @@ const Announcements = () => {
                           Бюджет
                         </p>
                         <p className="text-sm font-black text-slate-900">
-                          {student.price}
+                          {student.price.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                         </p>
                       </div>
                     </div>

@@ -97,15 +97,15 @@ const TutorsPageWithAnimation = () => {
         <div className="grid grid-cols-1 pb-4 gap-8 md:grid-cols-1 lg:grid-cols-2 ">
           {dataLoading && teachers.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
-                <TeacherCard key={`skeleton-${key}`} teacher={{}} isLoading />
-              ))
+              <TeacherCard key={`skeleton-${key}`} teacher={{}} isLoading />
+            ))
             : teachers.map((teacher, key) => (
-                <TeacherCard
-                  key={teacher.id || key}
-                  teacher={teacher}
-                  isLoading={!teacher.name || !teacher.subject}
-                />
-              ))}
+              <TeacherCard
+                key={teacher.id || key}
+                teacher={teacher}
+                isLoading={!teacher.name || !teacher.subject}
+              />
+            ))}
         </div>
       </div>
     </div>

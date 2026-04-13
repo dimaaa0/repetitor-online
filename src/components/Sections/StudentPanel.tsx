@@ -65,7 +65,7 @@ const StudentPanel = () => {
       if (data) {
         setHasAd(true);
         setTitle(data.title || "");
-        setPrice(data.price ? Number(data.price).toLocaleString() : "");
+        setPrice(data.price ? (data.price).toLocaleString() : "");
         setDescription(data.description || "");
         const subjectsArray = data.subject
           ? data.subject.split(",").map((subject: string) => subject.trim())
@@ -90,20 +90,20 @@ const StudentPanel = () => {
     }
 
     const payload = {
-      title: title.trim(),
-      price: Number(price.replace(/,/g, "")),
-      description: description.trim(),
+      price: price,
+      title: title,
+      description: description,
       subject: selectedSubjects.join(", "),
     };
 
     const response = hasAd
       ? await supabase
-          .from("student_ads")
-          .update(payload)
-          .eq("user_id", user?.id)
+        .from("student_ads")
+        .update(payload)
+        .eq("user_id", user?.id)
       : await supabase
-          .from("student_ads")
-          .insert({ ...payload, user_id: user?.id });
+        .from("student_ads")
+        .insert({ ...payload, user_id: user?.id });
 
     if (response?.error) {
       showAlert("error", response.error.message);
@@ -120,11 +120,10 @@ const StudentPanel = () => {
       <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">
         {alert && (
           <div
-            className={`p-4 rounded-2xl border ${
-              alert.type === "success"
+            className={`p-4 rounded-2xl border ${alert.type === "success"
                 ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                 : "bg-red-50 border-red-200 text-red-700"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2 font-bold text-sm">
               {alert.type === "success" ? <Check size={18} /> : <XCircle size={18} />}
@@ -189,8 +188,8 @@ const StudentPanel = () => {
             <textarea
               className="w-full bg-transparent border-none focus:ring-0 p-0 text-[15px] font-medium text-gray-700 placeholder:text-gray-400 resize-none h-32 leading-relaxed"
               placeholder="Опишите ваш текущий уровень, цель занятий и удобное время..."
-              value={description}
               onChange={(e) => setDescription(e.target.value)}
+              value={description}
             />
           </div>
         </div>
