@@ -31,7 +31,7 @@ const Announcements = () => {
       } else {
         const formattedData = data.map((ad: any) => ({
           id: ad.id,
-          title: ad.title,  
+          title: ad.title,
           name: ad.profiles?.name,
           surname: ad.profiles?.surname,
           avatar: ad.profiles?.avatar_url,
