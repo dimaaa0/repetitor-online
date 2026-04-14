@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Wallet, BookOpen, MessageCircle, Filter } from "lucide-react";
 import { createClient } from "../../../../src/utils/supabase/client";
 import { title } from "process";
+import SkeletonLoader from "../../../../src/components/UI/SkeletonLoader";
 
 const Announcements = () => {
   const [dataLoading, setDataLoading] = useState(false);
@@ -31,7 +32,7 @@ const Announcements = () => {
       } else {
         const formattedData = data.map((ad: any) => ({
           id: ad.id,
-          title: ad.title,  
+          title: ad.title,
           name: ad.profiles?.name,
           surname: ad.profiles?.surname,
           avatar: ad.profiles?.avatar_url,
@@ -87,13 +88,6 @@ const Announcements = () => {
               key={student.id}
               className="relative bg-white rounded-3xl border border-slate-100 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.05)] hover:-translate-y-1 group"
             >
-              {/* Бейдж цели обучения */}
-              <div className="absolute top-6 right-6 hidden sm:block">
-                <span className="px-3 py-1 bg-slate-900 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">
-                  {student.subject}
-                </span>
-              </div>
-
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-3">
@@ -101,7 +95,7 @@ const Announcements = () => {
                       {student.name[0]}
                     </div>
                     <span className="text-sm font-bold text-slate-500">
-                      {student.name} {student.surname}
+                      {student.name}
                     </span>
                     <span className="text-xs text-slate-400 font-medium">
                       {student.postedAt}

@@ -33,6 +33,7 @@ const TeacherPanel = () => {
   const [subjects, setSubjects] = useState<string[]>([]); // Локальное состояние для отображения выбранных предметов
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  const [contacts, setContacts] = useState("");
   const [hasAd, setHasAd] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
 
@@ -53,6 +54,7 @@ const TeacherPanel = () => {
     subjects: string[],
     price: string,
     description: string,
+    contacts: string,
   ) {
     if (subjects.length === 0) {
       showAlert("error", "Пожалуйста, выберите хотя бы один предмет");
@@ -64,6 +66,10 @@ const TeacherPanel = () => {
     }
     if (!description || description.trim().length < 10) {
       showAlert("error", "Пожалуйста, введите описание (минимум 10 символов)");
+      return false;
+    }
+    if (!contacts) {
+      showAlert("error", "Пожалуйста, укажите ваши контакты ");
       return false;
     }
     return true;
@@ -84,14 +90,19 @@ const TeacherPanel = () => {
         setHasAd(true);
         setPrice(data.price.toLocaleString());
         setDescription(data.description || "");
+        setContacts(data.contacts || "");
         setSubjects(
-          data.subject ? data.subject.split(", ").map((s: string) => s.trim()) : [],
+          data.subject
+            ? data.subject.split(", ").map((s: string) => s.trim())
+            : [],
         );
       }
 
       if (data && data.subject) {
         // Превращаем строку из базы в массив
-        const subjectsArray = data.subject.split(", ").map((s: string) => s.trim());
+        const subjectsArray = data.subject
+          .split(", ")
+          .map((s: string) => s.trim());
 
         // Синхронизируем контекст с данными из БД
         setSelectedSubjects(subjectsArray);
@@ -110,7 +121,7 @@ const TeacherPanel = () => {
   const handlePublishAd = async () => {
     setIsPublishing(true);
 
-    if (!checkEmptyFields(selectedSubjects, price, description)) {
+    if (!checkEmptyFields(selectedSubjects, price, description, contacts)) {
       setIsPublishing(false);
       return;
     }
@@ -119,6 +130,7 @@ const TeacherPanel = () => {
       price: price,
       description: description,
       subject: selectedSubjects.join(", "),
+      contacts: contacts,
     };
 
     let response;
@@ -307,6 +319,23 @@ const TeacherPanel = () => {
               onChange={(e) => setDescription(e.target.value)}
               value={description}
             />
+          </div>
+        </div>
+
+        <div className="md:col-span-2">
+          <div className=" flex-col  items-center gap-2 text-sm text-gray-500">
+            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
+              Контактные данные
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={contacts}
+                onChange={(e) => setContacts(e.target.value)}
+                className="w-full bg-gray-100 border-2 border-transparent focus:border-orange-500/10 focus:bg-white rounded-2xl px-5 py-4 font-bold text-gray-800 outline-none transition-all"
+                placeholder="Например: Номер телефона, Telegram, WhatsApp или email"
+              />
+            </div>
           </div>
         </div>
 
