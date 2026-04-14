@@ -6,12 +6,26 @@ import { useUser } from "../../../context/UserContext";
 import { useTutorAnnouncement } from "../../../context/TeacherAnnouncementContext";
 import TeacherCard from "../../../components/UI/TeacherCard";
 import { createClient } from "../../../utils/supabase/client";
+import FilterPanel from "@/src/components/UI/Filter";
 
 const TutorsPageWithAnimation = () => {
   const { announcements, announcementsLoading } = useTutorAnnouncement();
   const { user, loading } = useUser();
   const [dataLoading, setDataLoading] = useState(false);
+
+  const [filters, setFilters] = useState({
+    subject: '',
+    maxPrice: 500000
+  });
+
   const [teachers, setTeachers] = useState<any[]>([]);
+
+  const [openFilter, setOpenFilter] = useState(false);
+
+  const toggleFilter = () => setOpenFilter(!openFilter);
+
+  console.log(openFilter);
+
 
   const supabase = createClient();
 
@@ -78,10 +92,17 @@ const TutorsPageWithAnimation = () => {
               </p>
             </div>
             <div className="flex gap-3">
-              <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
-                <Filter size={18} className="text-blue-600" />
+              <button className="flex relative cursor-pointer items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
+                onClick={toggleFilter}
+
+              >
+                <Filter
+                  size={18}
+                  className="text-blue-600"
+                />
                 Фильтры
               </button>
+              { openFilter && <FilterPanel filters={filters} setFilters={setFilters} /> }
             </div>
           </div>
         </div>

@@ -20,6 +20,7 @@ import {
   Check,
   XCircle,
   Wallet,
+  RefreshCw,
 } from "lucide-react";
 
 // Компоненты UI
@@ -36,7 +37,7 @@ const Profile = () => {
   // Состояния
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState({ name: "", surname: "" });
+  const [formData, setFormData] = useState({ name: "", surname: "", role: "Student" });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [alert, setAlert] = useState<{
     type: "success" | "error" | "info";
@@ -99,6 +100,7 @@ const Profile = () => {
       setFormData({
         name: user.name || "",
         surname: user.surname || "",
+        role: user.role || "Student"
       });
     }
   }, [user]);
@@ -188,6 +190,7 @@ const Profile = () => {
           name: formData.name,
           surname: formData.surname,
           avatar_url: finalAvatarUrl,
+          role: formData.role
         })
         .eq("id", user.id);
 
@@ -203,6 +206,13 @@ const Profile = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const toggleRole = () => {
+    setFormData(prev => ({
+      ...prev,
+      role: prev.role === "Tutor" ? "Student" : "Tutor"
+    }));
   };
 
   if (loading) {
@@ -235,13 +245,12 @@ const Profile = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                  ? "bg-white border-green-100 text-green-800"
+                  : alert.type === "error"
+                    ? "bg-white border-red-100 text-red-800"
+                    : "bg-white border-blue-100 text-blue-800"
+                }
       `}
             >
               {/* Иконки для красоты (опционально) */}
@@ -292,35 +301,70 @@ const Profile = () => {
 
             <div className="text-center sm:text-left flex-1">
               {isEditing ? (
-                <div className="flex flex-col sm:flex-row gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full sm:w-auto"
-                    placeholder="Имя"
-                  />
-                  <input
-                    type="text"
-                    value={formData.surname}
-                    onChange={(e) =>
-                      setFormData({ ...formData, surname: e.target.value })
-                    }
-                    className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full sm:w-auto"
-                    placeholder="Фамилия"
-                  />
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full sm:w-auto focus:bg-blue-50 transition-colors"
+                      placeholder="Имя"
+                    />
+                    <input
+                      type="text"
+                      value={formData.surname}
+                      onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
+                      className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full sm:w-auto focus:bg-blue-50 transition-colors"
+                      placeholder="Фамилия"
+                    />
+                  </div>
+
+                  {/* Кликабельный бейдж-переключатель */}
+                  <div className="flex justify-center sm:justify-start sm: my-1">
+                    <button
+                      type="button"
+                      title="Сменить роль"
+                      onClick={toggleRole}
+                      className={` cursor-pointer group relative flex items-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border-2 transition-all duration-300 active:scale-95 shadow-sm
+                          ${formData.role === "Tutor"
+                          ? "bg-green-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                          : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                        }
+        `}
+                    >
+                      <span className="mr-2 italic opacity-70">Роль:</span>
+                      <span className="uppercase ">
+                        {formData.role === "Tutor" ? "Репетитор" : "Ученик"}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <div className="flex flex-col min-[400px]:flex-row min-[400px]:gap-2 justify-center sm:justify-start">
+                <div className="flex items-end  min-[400px]:flex-row min-[400px]:items-center min-[400px]:gap-3 justify-center sm:justify-start">
                   <h1 className="text-2xl font-bold text-gray-900">
                     {user.name || "Пользователь"} {user.surname}
                   </h1>
+
+                  {/* Красивый бейдж для роли */}
+                  <span className={`
+  inline-flex items-center self-center sm:self-auto
+  px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider
+  border transition-all duration-300 shadow-sm
+  ${user.role === "Tutor"
+                      ? "bg-blue-50 text-blue-700 border-blue-100 ring-4 ring-blue-50/30"
+                      : "bg-blue-50 text-green-700 border-green-100 ring-4 ring-green-50/30"
+                    }
+`}>
+                    <span className={`w-1.5 h-1.5 rounded-full mr-2 animate-pulse ${user.role === "Tutor" ? "bg-blue-500" : "bg-green-500"
+                      }`} />
+                    {!user.role ? "User" : user.role === "Tutor" ? "Репетитор" : "Ученик"}
+                  </span>
+
                 </div>
               )}
-              <p className="text-gray-500 mt-2 flex items-center justify-center sm:justify-start gap-1">
-                <Mail className="h-4 w-4" /> {user.email}
+
+              <p className="text-gray-500 text-sm mt-2 flex items-center justify-center sm:justify-start gap-1.5">
+                <Mail className="h-3.5 w-3.5" /> {user.email}
               </p>
             </div>
 

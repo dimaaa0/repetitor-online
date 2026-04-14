@@ -187,13 +187,12 @@ const TeacherPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                ? "bg-white border-green-100 text-green-800"
+                : alert.type === "error"
+                  ? "bg-white border-red-100 text-red-800"
+                  : "bg-white border-blue-100 text-blue-800"
+              }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -209,21 +208,12 @@ const TeacherPanel = () => {
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
-        <div className="bg-white rounded-2xl py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
+        <div className="bg-white rounded-2xl flex flex-col justify-between py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
           <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4" /> Данные аккаунта
+            <ShieldCheck className="h-4 w-4" /> Данные аккаунта 
           </h3>
           <div className="space-y-4">
-            <div>
-              <p className="text-xs text-gray-500 uppercase">Роль</p>
-              <p className="font-medium text-gray-800">
-                {!user.role
-                  ? "User"
-                  : user.role === "Tutor"
-                    ? "Репетитор"
-                    : "Ученик"}
-              </p>
-            </div>
+            
             <div>
               <p className="text-xs text-gray-500 uppercase">ID Пользователя</p>
               <p className="font-medium text-gray-800 truncate">{user.id}</p>

@@ -121,8 +121,8 @@ const StudentPanel = () => {
         {alert && (
           <div
             className={`p-4 rounded-2xl border ${alert.type === "success"
-                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                : "bg-red-50 border-red-200 text-red-700"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+              : "bg-red-50 border-red-200 text-red-700"
               }`}
           >
             <div className="flex items-center gap-2 font-bold text-sm">
