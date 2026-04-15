@@ -1,5 +1,8 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSubject } from "../../context/StudentSubjectContext";
+import { createClient } from '../../../src/utils/supabase/client';
+
+const supabase = createClient();
 
 const SubjectPicker = () => {
   const { selectedSubjects, addSubject, removeSubject } = useSubject();
@@ -7,34 +10,24 @@ const SubjectPicker = () => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const subjects = [
-    "Математика",
-    "Русский язык",
-    "Физика",
-    "Химия",
-    "Биология",
-    "История",
-    "География",
-    "Обществознание",
-    "Литература",
-    "Информатика",
-    "Английский язык",
-    "Китайский язык",
-    "Корейский язык",
-    "Японский язык",
-    "Арабский язык",
-    "Немецкий язык",
-    "Французский язык",
-    "Испанский язык",
-    "Итальянский язык",
-    "Португальский язык",
-    "Турецкий язык",
-    "Греческий язык",
-    "Экономика",
-    "ОГП",
-    "Шахматы",
-    "Рисование",
-  ];
+
+  const [subjects, setSubjects] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      const { data, error } = await supabase.from("subjects").select("subject");
+      if (error) {
+        console.error("Ошибка загрузки предметов:", error);
+      } else {
+        const subjectNames = data.map((item) => item.subject);
+        setSubjects(subjectNames);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
+
+
 
   const filteredSubjects = useMemo(() => {
     return subjects
@@ -93,9 +86,8 @@ const SubjectPicker = () => {
         </label>
 
         <div
-          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${
-            isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
-          }`}
+          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
+            }`}
           onClick={() => setIsOpen(true)}
         >
           {selectedSubjects.map((subject) => (

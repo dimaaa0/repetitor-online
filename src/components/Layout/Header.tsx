@@ -71,7 +71,6 @@ function Header() {
             <LanguagePicker />
           </div>
 
-          {/* 4. Динамическое отображение: если грузится — пусто, если нет юзера — Войти, если есть — Ник */}
           {loading ? (
             <div className="w-24 h-10 bg-gray-100 animate-pulse rounded-xl" />
           ) : !user ? (

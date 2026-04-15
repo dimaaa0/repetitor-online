@@ -41,9 +41,8 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
                 alt={teacher.name ? `${teacher.name} avatar` : "teacher avatar"}
                 onLoad={() => setImgLoaded(true)}
                 // ДОБАВЬ w-16 h-16 и исправь синтаксис условий в className
-                className={`w-16 h-16 rounded-2xl object-cover border border-slate-100 transition-opacity duration-300 ${
-                  imgLoaded ? "opacity-100" : "opacity-0"
-                }`}
+                className={`w-16 h-16 rounded-2xl object-cover border border-slate-100 transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"
+                  }`}
               />
               {/* Пока картинка не загрузилась, показываем скелетон-заглушку прямо на её месте */}
               {!imgLoaded && (

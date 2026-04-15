@@ -187,7 +187,6 @@ const TeacherPanel = () => {
     fetchUserData();
   }, [user?.id, user?.role]);
 
-  console.log(selectedSubjects);
 
   return (
     <div>

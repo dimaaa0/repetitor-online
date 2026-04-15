@@ -7,6 +7,7 @@ import { useTutorAnnouncement } from "../../../context/TeacherAnnouncementContex
 import TeacherCard from "../../../components/UI/TeacherCard";
 import { createClient } from "../../../utils/supabase/client";
 import FilterPanel from "@/src/components/UI/Filter";
+import { log } from "console";
 
 const TutorsPageWithAnimation = () => {
   const { announcements, announcementsLoading } = useTutorAnnouncement();
@@ -18,13 +19,15 @@ const TutorsPageWithAnimation = () => {
     maxPrice: 500000
   });
 
+  console.log("filters: ", filters);
+  
+
   const [teachers, setTeachers] = useState<any[]>([]);
 
   const [openFilter, setOpenFilter] = useState(false);
 
   const toggleFilter = () => setOpenFilter(!openFilter);
 
-  console.log(openFilter);
 
 
   const supabase = createClient();
@@ -58,7 +61,6 @@ const TutorsPageWithAnimation = () => {
           likes: 67,
         }));
         setTeachers(formattedData);
-        console.log(formattedData);
       }
       setDataLoading(false);
     };
@@ -91,7 +93,7 @@ const TutorsPageWithAnimation = () => {
                 найдите своего идеального репетитора по предмету, уровню и цене
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 relative">
               <button className="flex relative cursor-pointer items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
                 onClick={toggleFilter}
 
@@ -102,7 +104,7 @@ const TutorsPageWithAnimation = () => {
                 />
                 Фильтры
               </button>
-              { openFilter && <FilterPanel filters={filters} setFilters={setFilters} /> }
+              {openFilter && <FilterPanel filters={filters} setFilters={setFilters} onClose={() => setOpenFilter(false)} />}
             </div>
           </div>
         </div>

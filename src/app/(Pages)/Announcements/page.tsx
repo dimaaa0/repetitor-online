@@ -42,7 +42,6 @@ const Announcements = () => {
           likes: 67,
         }));
         setStudents(formattedData);
-        console.log(formattedData);
       }
       setDataLoading(false);
     };
@@ -133,7 +132,7 @@ const Announcements = () => {
                         <p className="text-[10px] text-slate-400 font-bold uppercase leading-none mb-1">
                           Бюджет
                         </p>
-                        <p className="text-sm font-black text-slate-900">
+                        <p className="text-sm font-bold text-slate-900">
                           {student.price.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                         </p>
                       </div>

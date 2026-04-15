@@ -148,7 +148,6 @@ const Profile = () => {
               // 2. Декодируем URL (на случай пробелов или спецсимволов %20 и т.д.)
               const oldFilePath = decodeURIComponent(pathParts[1]);
 
-              console.log("Удаляем старый файл:", oldFilePath);
 
               // 3. Вызываем удаление
               const { data, error: removeError } = await supabase.storage
@@ -158,7 +157,7 @@ const Profile = () => {
               if (removeError) {
                 console.error("Supabase Storage Error:", removeError);
               } else {
-                console.log("Результат удаления:", data);
+                null; // Файл успешно удален, можно продолжать загрузку нового  
               }
             }
           } catch (e) {
