@@ -40,16 +40,16 @@ export default function RootLayout({
         <QueryProvider>
           <TeacherSubjectProvider>
             <StudentSubjectProvider>
-              <ModalProvider>
-                <UserProvider>
-                  <TutorAnnouncementProvider>
+              <TutorAnnouncementProvider>
+                <ModalProvider>
+                  <UserProvider>
                     <StudentAnnouncementProvider>
                       <Header />
                       {children}
                     </StudentAnnouncementProvider>
-                  </TutorAnnouncementProvider>
-                </UserProvider>
-              </ModalProvider>
+                  </UserProvider>
+                </ModalProvider>
+              </TutorAnnouncementProvider>
             </StudentSubjectProvider>
           </TeacherSubjectProvider>
         </QueryProvider>

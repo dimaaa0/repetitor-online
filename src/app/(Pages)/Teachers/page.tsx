@@ -3,14 +3,13 @@
 import { Heart, Filter } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../../context/UserContext";
-import { useTutorAnnouncement } from "../../../context/TeacherAnnouncementContext";
+import { useTeacherAnnouncement } from "../../../context/TeacherAnnouncementContext";
 import TeacherCard from "../../../components/UI/TeacherCard";
 import { createClient } from "../../../utils/supabase/client";
 import FilterPanel from "@/src/components/UI/Filter";
 import { log } from "console";
 
 const TutorsPageWithAnimation = () => {
-  const { announcements, announcementsLoading } = useTutorAnnouncement();
   const { user, loading } = useUser();
   const [dataLoading, setDataLoading] = useState(false);
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createClient } from '../../../src/utils/supabase/client';
-import { useTutorAnnouncement } from '../../../src/context/TeacherAnnouncementContext';
+import { useTeacherAnnouncement } from '../../context/TeacherAnnouncementContext';
 
 const supabase = createClient();
 
@@ -18,9 +18,12 @@ interface FilterState {
 }
 
 const FilterPanel = ({ filters, setFilters, onClose }: FilterState) => {
-    const { announcements } = useTutorAnnouncement();
-    console.log(announcements);
-    
+
+    const { announcements, setAnnouncements, announcementsLoading } = useTeacherAnnouncement();
+
+
+    console.log(...announcements);
+
 
     const [subjects, setSubjects] = useState<string[]>([]);
     const filterRef = useRef<HTMLDivElement>(null);
@@ -82,7 +85,6 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterState) => {
                 </datalist>
             </div>
 
-            {/* Цена до... */}
             <div className="mb-4 sm:mb-6">
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 flex justify-between">
                     <span>Цена за час:</span> <span className="font-bold text-blue-600">{filters.maxPrice.toLocaleString()} UZS</span>
@@ -100,6 +102,27 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterState) => {
                     <span>0</span>
                     <span>500 000</span>
                 </div>
+            </div>
+
+            <div className="flex items-center mb-2">
+                <input type="checkbox" name="onlyWithReviews" id="onlyWithReviews" />
+                <label htmlFor="onlyWithReviews" className="ml-2 text-xs sm:text-sm font-medium text-gray-700">
+                    По количеству лайков
+                </label>
+            </div>
+
+            <div className="flex items-center mb-2">
+                <input type="checkbox" name="onlyWithReviews" id="onlyWithReviews" />
+                <label htmlFor="onlyWithReviews" className="ml-2 text-xs sm:text-sm font-medium text-gray-700">
+                    Сначало низкие цены
+                </label>
+            </div>
+
+            <div className="flex items-center mb-4 sm:mb-6">
+                <input type="checkbox" name="onlyWithReviews" id="onlyWithReviews" />
+                <label htmlFor="onlyWithReviews" className="ml-2 text-xs sm:text-sm font-medium text-gray-700">
+                    Сначало высокие цены
+                </label>
             </div>
 
             <button
