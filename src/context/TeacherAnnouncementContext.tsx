@@ -11,8 +11,7 @@ export const TutorAnnouncementProvider = ({
 }) => {
   const supabase = createClient();
 
-  // Храним данные объявления здесь, чтобы они были доступны везде
-  const [announcements, setAnnouncements] = useState<any>(null);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
 
   useEffect(() => {

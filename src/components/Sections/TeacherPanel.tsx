@@ -221,10 +221,10 @@ const TeacherPanel = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
         <div className="bg-white rounded-2xl flex flex-col justify-between py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
           <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4" /> Данные аккаунта 
+            <ShieldCheck className="h-4 w-4" /> Данные аккаунта
           </h3>
           <div className="space-y-4">
-            
+
             <div>
               <p className="text-xs text-gray-500 uppercase">ID Пользователя</p>
               <p className="font-medium text-gray-800 truncate">{user.id}</p>
@@ -257,7 +257,7 @@ const TeacherPanel = () => {
                 Стоимость
               </span>
               <div className="text-xl font-medium text-gray-900 leading-none">
-                15,000 <span className="text-xl">UZS</span>
+                20,000 <span className="text-xl">UZS</span>
               </div>
             </div>
           </div>
