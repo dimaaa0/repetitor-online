@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TeacherSkeleton from "./SkeletonLoader";
+import Skeleton from "./SkeletonLoader";
 import { Heart } from "lucide-react";
 
 interface Teacher {
@@ -25,7 +25,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
   const [imgLoaded, setImgLoaded] = useState(false);
 
   if (isLoading) {
-    return <TeacherSkeleton />;
+    return <Skeleton />;
   }
 
   return (

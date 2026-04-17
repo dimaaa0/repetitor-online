@@ -1,4 +1,4 @@
-const TeacherSkeleton = () => (
+const Skeleton = () => (
   <div className="group bg-white rounded-3xl border border-gray-100 p-2 pb-4 sm:p-6 md:p-8 animate-pulse shadow-sm flex flex-col h-full">
     <div className="flex items-start gap-4 mb-4">
       <div className="w-16 h-16 rounded-2xl bg-slate-200" />
@@ -19,4 +19,4 @@ const TeacherSkeleton = () => (
   </div>
 );
 
-export default TeacherSkeleton;
+export default Skeleton;

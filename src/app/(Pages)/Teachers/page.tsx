@@ -18,7 +18,7 @@ const TutorsPageWithAnimation = () => {
     maxPrice: 500000
   });
 
-  console.log("filters: ", filters);
+  // console.log("filters: ", filters);
   
 
   const [teachers, setTeachers] = useState<any[]>([]);

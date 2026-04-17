@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { createClient } from '../../../src/utils/supabase/client';
-import { useTeacherAnnouncement } from '../../context/TeacherAnnouncementContext';
+import React, { useEffect, useRef, useState } from "react";
+import { createClient } from "../../../src/utils/supabase/client";
+import { useTeacherAnnouncement } from "../../context/TeacherAnnouncementContext";
 
 const supabase = createClient();
 
@@ -20,19 +20,27 @@ interface FilterPanelProps {
 
 // Парсим цену типа "40,000 UZS" → 40000
 const parsePrice = (priceStr: string): number =>
-  parseInt(priceStr.replace(/\D/g, ''), 10);
+  parseInt(priceStr.replace(/\D/g, ""), 10);
 
 const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
   const { announcements, setAnnouncements } = useTeacherAnnouncement();
   const [subjects, setSubjects] = useState<string[]>([]);
   const filterRef = useRef<HTMLDivElement>(null);
+  const originalRef = useRef<any[]>([]);
+
+  // Запоминаем оригинал при первом получении данных
+  useEffect(() => {
+    if (announcements.length > 0 && originalRef.current.length === 0) {
+      originalRef.current = announcements;
+    }
+  }, [announcements]);
 
   // Загружаем предметы из Supabase
   useEffect(() => {
     const fetchSubjects = async () => {
-      const { data, error } = await supabase.from('subjects').select('subject');
+      const { data, error } = await supabase.from("subjects").select("subject");
       if (error) {
-        console.error('[FilterPanel] Ошибка загрузки предметов:', error);
+        console.error("[FilterPanel] Ошибка загрузки предметов:", error);
       } else {
         setSubjects(data.map((item) => item.subject));
       }
@@ -47,8 +55,8 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
         onClose?.();
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
   const updateFilter = <K extends keyof Filters>(key: K, value: Filters[K]) => {
@@ -56,7 +64,8 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
   };
 
   const handleApplyFilters = () => {
-    let result = announcements.filter((ad: any) => {
+    // Фильтруем всегда из оригинала, не из текущего состояния
+    let result = originalRef.current.filter((ad: any) => {
       const matchSubject = filters.subject
         ? ad.subject.toLowerCase().includes(filters.subject.toLowerCase())
         : true;
@@ -64,24 +73,34 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
       return matchSubject && matchPrice;
     });
 
-    // Сортировка
     if (filters.sortByLikes) {
-      result = [...result].sort((a: any, b: any) => b.likes - a.likes);
+      result = [...result].sort((a, b) => b.likes - a.likes);
     } else if (filters.sortAscPrice) {
-      result = [...result].sort((a: any, b: any) => parsePrice(a.price) - parsePrice(b.price));
+      result = [...result].sort(
+        (a, b) => parsePrice(a.price) - parsePrice(b.price),
+      );
     } else if (filters.sortDescPrice) {
-      result = [...result].sort((a: any, b: any) => parsePrice(b.price) - parsePrice(a.price));
+      result = [...result].sort(
+        (a, b) => parsePrice(b.price) - parsePrice(a.price),
+      );
     }
 
-    console.log('[FilterPanel] Применённые фильтры:', filters);
-    console.log('[FilterPanel] Результат фильтрации:', result);
-
     setAnnouncements(result);
+    console.log("Подходящие уроки:", announcements);
+    
     onClose?.();
   };
 
   const handleReset = () => {
-    setFilters({ subject: '', maxPrice: 500000, sortByLikes: false, sortAscPrice: false, sortDescPrice: false });
+    setFilters({
+      subject: "",
+      maxPrice: 500000,
+      sortByLikes: false,
+      sortAscPrice: false,
+      sortDescPrice: false,
+    });
+    // Восстанавливаем оригинальный список
+    setAnnouncements(originalRef.current);
   };
 
   return (
@@ -93,17 +112,21 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
 
       {/* Предмет */}
       <div className="mb-4 sm:mb-6">
-        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Предмет</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+          Предмет
+        </label>
         <input
           list="subjects-list"
           type="text"
           placeholder="Поиск или ввод..."
           className="w-full p-2 sm:p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"
           value={filters.subject}
-          onChange={(e) => updateFilter('subject', e.target.value)}
+          onChange={(e) => updateFilter("subject", e.target.value)}
         />
         <datalist id="subjects-list">
-          {subjects.map((sub) => <option key={sub} value={sub} />)}
+          {subjects.map((sub) => (
+            <option key={sub} value={sub} />
+          ))}
         </datalist>
       </div>
 
@@ -111,32 +134,54 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
       <div className="mb-4 sm:mb-6">
         <label className="flex justify-between text-xs sm:text-sm font-medium text-gray-700 mb-2">
           <span>Цена за час:</span>
-          <span className="font-bold text-blue-600">{filters.maxPrice.toLocaleString()} UZS</span>
+          <span className="font-bold text-blue-600">
+            {filters.maxPrice.toLocaleString()} UZS
+          </span>
         </label>
         <input
-          type="range" min="0" max="500000" step="5000"
+          type="range"
+          min="0"
+          max="500000"
+          step="5000"
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
           value={filters.maxPrice}
-          onChange={(e) => updateFilter('maxPrice', Number(e.target.value))}
+          onChange={(e) => updateFilter("maxPrice", Number(e.target.value))}
         />
         <div className="flex justify-between text-[10px] text-gray-400 mt-1">
-          <span>0</span><span>500 000</span>
+          <span>0</span>
+          <span>500 000</span>
         </div>
       </div>
 
       {/* Сортировка */}
       {[
-        { id: 'sortByLikes', key: 'sortByLikes' as const, label: 'По количеству лайков' },
-        { id: 'sortAscPrice', key: 'sortAscPrice' as const, label: 'Сначала низкие цены' },
-        { id: 'sortDescPrice', key: 'sortDescPrice' as const, label: 'Сначала высокие цены' },
+        {
+          id: "sortByLikes",
+          key: "sortByLikes" as const,
+          label: "По количеству лайков",
+        },
+        {
+          id: "sortAscPrice",
+          key: "sortAscPrice" as const,
+          label: "Сначала низкие цены",
+        },
+        {
+          id: "sortDescPrice",
+          key: "sortDescPrice" as const,
+          label: "Сначала высокие цены",
+        },
       ].map(({ id, key, label }) => (
         <div key={id} className="flex items-center mb-2">
           <input
-            type="checkbox" id={id}
+            type="checkbox"
+            id={id}
             checked={filters[key]}
             onChange={(e) => updateFilter(key, e.target.checked)}
           />
-          <label htmlFor={id} className="ml-2 text-xs sm:text-sm font-medium text-gray-700">
+          <label
+            htmlFor={id}
+            className="ml-2 text-xs sm:text-sm font-medium text-gray-700"
+          >
             {label}
           </label>
         </div>

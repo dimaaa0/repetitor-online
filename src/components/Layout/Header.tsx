@@ -32,7 +32,7 @@ function Header() {
   const isLinkActive = (href: string) => pathname === href;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md shadow-sm">
+    <header className="sticky top-0 z-50 max-h-[80px] w-full border-b border-gray-100 bg-white/80 backdrop-blur-md shadow-sm">
       <nav className="max-w-7xl w-full mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center gap-2.5 group">
@@ -72,7 +72,7 @@ function Header() {
           </div>
 
           {loading ? (
-            <div className="w-24 h-10 bg-gray-100 animate-pulse rounded-xl" />
+            <div className="w-24 h-12 bg-gray-100 animate-pulse rounded-xl" />
           ) : !user ? (
             <button
               className="flex items-center cursor-pointer gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-100 transition-all active:scale-95 text-sm font-bold"
@@ -102,7 +102,7 @@ function Header() {
                     </span>
                   </div>
                 )}
-                <span className="text-[15px] font-semibold max-w-[140px] truncate text-slate-700 group-hover:text-blue-600 hidden lg:block">
+                <span className="text-[15px] font-semibold max-w-[140px]  truncate text-slate-700 group-hover:text-blue-600 hidden lg:block">
                   {user.name || user.email?.split("@")[0]}
                 </span>
               </Link>
