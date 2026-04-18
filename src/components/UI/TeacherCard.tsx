@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Skeleton from "./SkeletonLoader";
+import TeacherSkeleton from "./TeacherSkeletonLoader";
 import { Heart } from "lucide-react";
 
 interface Teacher {
@@ -25,11 +25,19 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
   const [imgLoaded, setImgLoaded] = useState(false);
 
   if (isLoading) {
-    return <Skeleton />;
+    return <TeacherSkeleton />;
   }
 
   return (
-    <div className="group bg-white rounded-3xl border border-gray-100 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(8,112,184,0.12)] hover:-translate-y-2 relative overflow-hidden flex flex-col h-full">
+    <div className="group bg-white rounded-3xl  border border-slate-200 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(8,112,184,0.12)] hover:-translate-y-2 relative overflow-hidden flex flex-col h-full">
+
+      <div className="flex right-2 p-2 items-center gap-1 bg-slate-500 px-3 py-2 rounded-2xl border border-slate-100">
+        <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+        <span className="text-xs font-bold text-slate-600">
+          {teacher.likes ?? 0}
+        </span>
+      </div>
+
       <div className="flex items-center gap-4 mb-4">
         {/* Аватар */}
         <div className="w-16 h-16 relative shrink-0">
@@ -69,18 +77,13 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
             {teacher.subject ?? "Предмет не указан"}
           </p>
         </div>
-        <div className="flex flex-col items-center gap-1 bg-slate-50 px-3 py-2 rounded-2xl border border-slate-100">
-          <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-          <span className="text-xs font-bold text-slate-600">
-            {teacher.likes ?? 0}
-          </span>
-        </div>
+
       </div>
 
-      <div className="p-4 bg-slate-50 rounded-2xl mb-6 grow">
-        <div className="p-2 bg-slate-50 rounded-2xl mb-2 grow overflow-hidden">
+      <div className="p-4 bg-slate-100 rounded-2xl mb-6 grow">
+        <div className="p-2 bg-slate-100 rounded-2xl mb-2 grow overflow-hidden">
           <p
-            className="text-sm text-slate-600 leading-relaxed italic hyphens-auto wrap-break-word line-clamp-3 md:line-clamp-4"
+            className="text-sm text-slate-600 leading-relaxed hyphens-auto text-justify italic wrap-break-word line-clamp-3 md:line-clamp-4"
             style={{ hyphens: "auto", WebkitHyphens: "auto" }}
           >
             &quot;{teacher.description ?? "Описание пока недоступно."}&quot;

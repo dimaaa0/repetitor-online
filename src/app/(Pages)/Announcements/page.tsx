@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Wallet, BookOpen, MessageCircle, Filter } from "lucide-react";
 import { createClient } from "../../../../src/utils/supabase/client";
-import SkeletonLoader from "../../../../src/components/UI/SkeletonLoader";
+import SkeletonLoader from "../../../components/UI/TeacherSkeletonLoader";
 import StudentCard from "@/src/components/UI/StudentCard";
 
 const Announcements = () => {
@@ -79,7 +79,7 @@ const Announcements = () => {
             Актуальные заявки: {students.length}
           </span>
         </div>
-        <div className="grid grid-cols-1 pb-4 gap-8 md:grid-cols-1 lg:grid-cols-2 ">
+        <div className="grid grid-cols-1  pb-4 gap-8 ">
           {dataLoading && students.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
                 <StudentCard key={`skeleton-${key}`} student={{}} isLoading />

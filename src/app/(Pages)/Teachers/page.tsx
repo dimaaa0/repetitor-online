@@ -5,67 +5,23 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "../../../context/UserContext";
 import { useTeacherAnnouncement } from "../../../context/TeacherAnnouncementContext";
 import TeacherCard from "../../../components/UI/TeacherCard";
-import { createClient } from "../../../utils/supabase/client";
 import FilterPanel from "@/src/components/UI/Filter";
-import { log } from "console";
 
 const TutorsPageWithAnimation = () => {
   const { user, loading } = useUser();
-  const [dataLoading, setDataLoading] = useState(false);
+  const { announcements, announcementsLoading } = useTeacherAnnouncement();
 
   const [filters, setFilters] = useState({
     subject: '',
-    maxPrice: 500000
+    maxPrice: 500000,
+    sortByLikes: false,
+    sortAscPrice: false,
+    sortDescPrice: false,
   });
-
-  // console.log("filters: ", filters);
-  
-
-  const [teachers, setTeachers] = useState<any[]>([]);
 
   const [openFilter, setOpenFilter] = useState(false);
 
   const toggleFilter = () => setOpenFilter(!openFilter);
-
-
-
-  const supabase = createClient();
-
-  useEffect(() => {
-    const fetchTeachers = async () => {
-      setDataLoading(true);
-      const { data, error } = await supabase.from("ads").select(`
-          id,
-          subject,
-          description,
-          price,
-          profiles (
-            name,
-            surname,
-            avatar_url
-          )
-        `);
-
-      if (error) {
-        console.error("Ошибка загрузки:", error);
-      } else {
-        const formattedData = data.map((ad: any) => ({
-          id: ad.id,
-          name: ad.profiles?.name,
-          surname: ad.profiles?.surname,
-          avatar: ad.profiles?.avatar_url,
-          subject: ad.subject,
-          description: ad.description,
-          price: ad.price + " UZS",
-          likes: 67,
-        }));
-        setTeachers(formattedData);
-      }
-      setDataLoading(false);
-    };
-
-    fetchTeachers();
-  }, []);
 
   const [showNotify, setShowNotify] = useState(false);
 
@@ -112,16 +68,16 @@ const TutorsPageWithAnimation = () => {
       <div className="max-w-[1250] mx-auto px-2 sm:px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
-            Актуальные заявки: {teachers.length}
+            Актуальные заявки: {announcements.length}
           </span>
         </div>
 
         <div className="grid grid-cols-1 pb-4 gap-8 md:grid-cols-1 lg:grid-cols-2 ">
-          {dataLoading && teachers.length === 0
+          {announcementsLoading && announcements.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
               <TeacherCard key={`skeleton-${key}`} teacher={{}} isLoading />
             ))
-            : teachers.map((teacher, key) => (
+            : announcements.map((teacher, key) => (
               <TeacherCard
                 key={teacher.id || key}
                 teacher={teacher}

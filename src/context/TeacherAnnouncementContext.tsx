@@ -12,6 +12,7 @@ export const TutorAnnouncementProvider = ({
   const supabase = createClient();
 
   const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [originalAnnouncements, setOriginalAnnouncements] = useState<any[]>([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export const TutorAnnouncementProvider = ({
           likes: 67,
         }));
         setAnnouncements(formattedData);
+        setOriginalAnnouncements(formattedData);
       }
       setAnnouncementsLoading(false);
     };
@@ -56,6 +58,7 @@ export const TutorAnnouncementProvider = ({
         announcements,
         setAnnouncements,
         announcementsLoading,
+        originalAnnouncements,
       }}
     >
       {children}

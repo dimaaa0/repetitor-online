@@ -23,17 +23,9 @@ const parsePrice = (priceStr: string): number =>
   parseInt(priceStr.replace(/\D/g, ""), 10);
 
 const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
-  const { announcements, setAnnouncements } = useTeacherAnnouncement();
+  const { announcements, setAnnouncements, originalAnnouncements } = useTeacherAnnouncement();
   const [subjects, setSubjects] = useState<string[]>([]);
   const filterRef = useRef<HTMLDivElement>(null);
-  const originalRef = useRef<any[]>([]);
-
-  // Запоминаем оригинал при первом получении данных
-  useEffect(() => {
-    if (announcements.length > 0 && originalRef.current.length === 0) {
-      originalRef.current = announcements;
-    }
-  }, [announcements]);
 
   // Загружаем предметы из Supabase
   useEffect(() => {
@@ -65,9 +57,9 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
 
   const handleApplyFilters = () => {
     // Фильтруем всегда из оригинала, не из текущего состояния
-    let result = originalRef.current.filter((ad: any) => {
+    let result = originalAnnouncements.filter((ad: any) => {
       const matchSubject = filters.subject
-        ? ad.subject.toLowerCase().includes(filters.subject.toLowerCase())
+        ? ad.subject.toLowerCase().trim().includes(filters.subject.toLowerCase().trim())
         : true;
       const matchPrice = parsePrice(ad.price) <= filters.maxPrice;
       return matchSubject && matchPrice;
@@ -86,9 +78,9 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
     }
 
     setAnnouncements(result);
-    console.log("Подходящие уроки:", announcements);
-    
-    onClose?.();
+    console.log("Подходящие уроки:", result);
+
+    // onClose?.();
   };
 
   const handleReset = () => {
@@ -99,8 +91,8 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
       sortAscPrice: false,
       sortDescPrice: false,
     });
-    // Восстанавливаем оригинальный список
-    setAnnouncements(originalRef.current);
+    // Восстанавливаем оригинальный список из контекста
+    setAnnouncements(originalAnnouncements);
   };
 
   return (
