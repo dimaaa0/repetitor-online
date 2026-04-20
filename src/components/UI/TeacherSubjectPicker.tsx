@@ -29,8 +29,6 @@ const SubjectPicker = () => {
     fetchSubjects();
   }, []);
 
-
-
   const filteredSubjects = useMemo(() => {
     return subjects
       .filter((s) => !selectedSubjects.includes(s))
@@ -88,8 +86,9 @@ const SubjectPicker = () => {
         </label>
 
         <div
-          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
-            }`}
+          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${
+            isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
+          }`}
           onClick={() => setIsOpen(true)}
         >
           {selectedSubjects.map((subject) => (
@@ -168,8 +167,8 @@ const SubjectPicker = () => {
               ))}
 
               {filteredSubjects.length === 0 && !query && (
-                <div className="px-4 py-4 text-center text-gray-400 text-sm">
-                  Все предметы выбраны
+                <div className="px-4 py-4 text-center text-gray-400 text-sm ">
+                  Загрузка...
                 </div>
               )}
             </div>

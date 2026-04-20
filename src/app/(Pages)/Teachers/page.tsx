@@ -12,7 +12,7 @@ const TutorsPageWithAnimation = () => {
   const { announcements, announcementsLoading } = useTeacherAnnouncement();
 
   const [filters, setFilters] = useState({
-    subject: '',
+    subject: "",
     maxPrice: 500000,
     sortByLikes: false,
     sortAscPrice: false,
@@ -36,7 +36,6 @@ const TutorsPageWithAnimation = () => {
 
   return (
     <div className="min-h-screen   bg-[#FBFDFF] pb-20">
-      {/* Декоративный фон шапки */}
       <div className="bg-white border-b  border-slate-100  py-12 mb-8">
         <div className="max-w-[1250] mx-auto px-2 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -49,17 +48,20 @@ const TutorsPageWithAnimation = () => {
               </p>
             </div>
             <div className="flex gap-3 relative">
-              <button className="flex relative cursor-pointer items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
+              <button
+                className="flex relative cursor-pointer items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
                 onClick={toggleFilter}
-
               >
-                <Filter
-                  size={18}
-                  className="text-blue-600"
-                />
+                <Filter size={18} className="text-blue-600" />
                 Фильтры
               </button>
-              {openFilter && <FilterPanel filters={filters} setFilters={setFilters} onClose={() => setOpenFilter(false)} />}
+              {openFilter && (
+                <FilterPanel
+                  filters={filters}
+                  setFilters={setFilters}
+                  onClose={() => setOpenFilter(false)}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -75,15 +77,15 @@ const TutorsPageWithAnimation = () => {
         <div className="grid grid-cols-1 pb-4 gap-8 md:grid-cols-1 lg:grid-cols-2 ">
           {announcementsLoading && announcements.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
-              <TeacherCard key={`skeleton-${key}`} teacher={{}} isLoading />
-            ))
+                <TeacherCard key={`skeleton-${key}`} teacher={{}} isLoading />
+              ))
             : announcements.map((teacher, key) => (
-              <TeacherCard
-                key={teacher.id || key}
-                teacher={teacher}
-                isLoading={!teacher.name || !teacher.subject}
-              />
-            ))}
+                <TeacherCard
+                  key={teacher.id || key}
+                  teacher={teacher}
+                  isLoading={!teacher.name || !teacher.subject}
+                />
+              ))}
         </div>
       </div>
     </div>

@@ -29,30 +29,29 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
   }
 
   return (
-    <div className="group bg-white rounded-3xl  border border-slate-200 p-2 pb-4 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(8,112,184,0.12)] hover:-translate-y-2 relative overflow-hidden flex flex-col h-full">
-
-      <div className="flex right-2 p-2 items-center gap-1 bg-slate-500 px-3 py-2 rounded-2xl border border-slate-100">
-        <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-        <span className="text-xs font-bold text-slate-600">
-          {teacher.likes ?? 0}
-        </span>
+    <div className="group bg-white rounded-3xl  border border-slate-200 p-2 pb-4 sm:p-6 md:p-6 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(8,112,184,0.12)] hover:-translate-y-2 relative overflow-hidden flex flex-col h-full">
+      <div className="flex justify-end">
+        <button className="flex items-center cursor-pointer gap-1 bg-slate-500rounded-2xl mb-2 p-2 rounded-xl bg-slate-50  transition duration-300  hover:bg-blue-50 ">
+          <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+          <span className="text-xs font-bold text-slate-600">
+            {teacher.likes ?? 0}
+          </span>
+        </button>
       </div>
 
       <div className="flex items-center gap-4 mb-4">
         {/* Аватар */}
         <div className="w-16 h-16 relative shrink-0">
-          {" "}
           {teacher.avatar ? (
             <>
               <img
                 src={teacher.avatar}
                 alt={teacher.name ? `${teacher.name} avatar` : "teacher avatar"}
                 onLoad={() => setImgLoaded(true)}
-                // ДОБАВЬ w-16 h-16 и исправь синтаксис условий в className
-                className={`w-16 h-16 rounded-2xl object-cover border border-slate-100 transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"
-                  }`}
+                className={`w-16 h-16 rounded-2xl object-cover border border-slate-100 transition-opacity duration-300 ${
+                  imgLoaded ? "opacity-100" : "opacity-0"
+                }`}
               />
-              {/* Пока картинка не загрузилась, показываем скелетон-заглушку прямо на её месте */}
               {!imgLoaded && (
                 <div className="absolute inset-0 w-16 h-16 bg-slate-200 animate-pulse rounded-2xl" />
               )}
@@ -77,7 +76,6 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
             {teacher.subject ?? "Предмет не указан"}
           </p>
         </div>
-
       </div>
 
       <div className="p-4 bg-slate-100 rounded-2xl mb-6 grow">
