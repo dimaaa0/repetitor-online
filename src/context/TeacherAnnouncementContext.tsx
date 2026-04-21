@@ -23,7 +23,7 @@ export const TutorAnnouncementProvider = ({
             subject,
             description,
             price,
-            profiles (
+            profiles:user_id (
               name,
               surname,
               avatar_url
@@ -31,7 +31,13 @@ export const TutorAnnouncementProvider = ({
           `);
 
       if (error) {
-        console.error("Ошибка загрузки:", error);
+        // Выводим конкретное сообщение и код ошибки
+        console.error(
+          "Ошибка загрузки:",
+          error.message,
+          error.details,
+          error.hint,
+        );
       } else {
         const formattedData = data.map((ad: any) => ({
           id: ad.id,
@@ -66,5 +72,5 @@ export const TutorAnnouncementProvider = ({
   );
 };
 
-
-export const useTeacherAnnouncement = () => useContext(TutorAnnouncementContext);
+export const useTeacherAnnouncement = () =>
+  useContext(TutorAnnouncementContext);

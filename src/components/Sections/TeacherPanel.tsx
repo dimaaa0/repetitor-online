@@ -187,7 +187,6 @@ const TeacherPanel = () => {
     fetchUserData();
   }, [user?.id, user?.role]);
 
-
   return (
     <div>
       {alert && (
@@ -198,12 +197,13 @@ const TeacherPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${alert.type === "success"
-                ? "bg-white border-green-100 text-green-800"
-                : alert.type === "error"
-                  ? "bg-white border-red-100 text-red-800"
-                  : "bg-white border-blue-100 text-blue-800"
-              }
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -224,7 +224,6 @@ const TeacherPanel = () => {
             <ShieldCheck className="h-4 w-4" /> Данные аккаунта
           </h3>
           <div className="space-y-4">
-
             <div>
               <p className="text-xs text-gray-500 uppercase">ID Пользователя</p>
               <p className="font-medium text-gray-800 truncate">{user.id}</p>
