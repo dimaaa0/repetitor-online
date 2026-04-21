@@ -102,7 +102,7 @@ export default function SignInForm() {
         email,
         password,
         options: {
-          data: { name, surname, role },
+          data: { surname, name,  role },
         },
       });
       if (error) throw error;
@@ -115,6 +115,26 @@ export default function SignInForm() {
         setIsLogin(true);
         return;
       }
+
+      //############################################
+
+      // if (data.user?.id) {
+      //   const { error: profileError } = await supabase
+      //     .from("profiles")
+      //     .insert({
+      //       id: data.user.id,
+      //       name: name,
+      //       surname: surname,
+      //       role: role,
+      //       email: email,
+      //     });
+
+      //   if (profileError) {
+      //     console.error("Ошибка при создании профиля:", profileError, profileError.details, profileError.message);
+      //   }
+      // }
+      
+      //#############################################
 
       showAlert("success", "Проверьте почту для подтверждения!");
       setIsLogin(true);

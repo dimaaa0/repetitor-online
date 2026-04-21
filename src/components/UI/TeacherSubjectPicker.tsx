@@ -15,8 +15,11 @@ const SubjectPicker = () => {
 
   const [subjects, setSubjects] = useState<string[]>([]);
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchSubjects = async () => {
+      setIsLoading(true); // Начали загрузку
       const { data, error } = await supabase.from("subjects").select("subject");
       if (error) {
         console.error("Ошибка загрузки предметов:", error);
@@ -24,6 +27,7 @@ const SubjectPicker = () => {
         const subjectNames = data.map((item) => item.subject);
         setSubjects(subjectNames);
       }
+      setIsLoading(false); // Закончили загрузку
     };
 
     fetchSubjects();
@@ -33,7 +37,7 @@ const SubjectPicker = () => {
     return subjects
       .filter((s) => !selectedSubjects.includes(s))
       .filter((s) => s.toLowerCase().includes(query.toLowerCase()));
-  }, [query, selectedSubjects]);
+  }, [subjects, query, selectedSubjects]);
 
   const addSubjectLocal = (subject: string) => {
     const trimmed = subject.trim();
@@ -78,6 +82,9 @@ const SubjectPicker = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  console.log(filteredSubjects);
+  
+
   return (
     <div className="flex-1 space-y-4" ref={containerRef}>
       <div className="relative">
@@ -86,9 +93,8 @@ const SubjectPicker = () => {
         </label>
 
         <div
-          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${
-            isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
-          }`}
+          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
+            }`}
           onClick={() => setIsOpen(true)}
         >
           {selectedSubjects.map((subject) => (
@@ -166,11 +172,15 @@ const SubjectPicker = () => {
                 </button>
               ))}
 
-              {filteredSubjects.length === 0 && !query && (
-                <div className="px-4 py-4 text-center text-gray-400 text-sm ">
-                  Загрузка...
+              {isLoading ? (
+                <div className="px-4 py-4 animate-pulse text-center text-gray-400 text-sm">
+                  Загрузка списка...
                 </div>
-              )}
+              ) : filteredSubjects.length === 0 && query ? (
+                <div className="px-4 py-4 text-center text-gray-400 text-sm">
+                  Ничего не найдено
+                </div>
+              ) : null}
             </div>
           </div>
         )}

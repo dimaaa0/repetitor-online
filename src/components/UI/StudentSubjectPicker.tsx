@@ -166,7 +166,7 @@ const SubjectPicker = () => {
               ))}
 
               {filteredSubjects.length === 0 && !query && (
-                <div className="px-4 py-4 text-center text-gray-400 text-sm">
+                <div className="px-4 py-4 text-center animate-pulse text-gray-400 text-sm">
                   Загрузка...
                 </div>
               )}
