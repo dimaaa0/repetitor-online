@@ -102,9 +102,11 @@ export default function SignInForm() {
         email,
         password,
         options: {
-          data: { surname, name,  role },
+          data: { surname, name, role },
         },
       });
+
+
       if (error) throw error;
 
       if (data.user && data.user.identities?.length === 0) {
@@ -118,22 +120,24 @@ export default function SignInForm() {
 
       //############################################
 
-      // if (data.user?.id) {
-      //   const { error: profileError } = await supabase
-      //     .from("profiles")
-      //     .insert({
-      //       id: data.user.id,
-      //       name: name,
-      //       surname: surname,
-      //       role: role,
-      //       email: email,
-      //     });
+      if (data.user?.id) {
+        const { error: profileError } = await supabase.from("profiles").insert({
+          id: data.user.id,
+          name: name,
+          surname: surname,
+          role: role,
+        });
 
-      //   if (profileError) {
-      //     console.error("Ошибка при создании профиля:", profileError, profileError.details, profileError.message);
-      //   }
-      // }
-      
+        if (profileError) {
+          console.error(
+            "Ошибка при создании профиля:",
+            profileError,
+            profileError.details,
+            profileError.message,
+          );
+        }
+      }
+
       //#############################################
 
       showAlert("success", "Проверьте почту для подтверждения!");
