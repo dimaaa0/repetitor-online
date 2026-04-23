@@ -102,7 +102,7 @@ export default function SignInForm() {
         email,
         password,
         options: {
-          data: { surname, name,  role },
+          data: { surname, name, role },
         },
       });
       if (error) throw error;
@@ -116,25 +116,22 @@ export default function SignInForm() {
         return;
       }
 
-      //############################################
 
-      // if (data.user?.id) {
-      //   const { error: profileError } = await supabase
-      //     .from("profiles")
-      //     .insert({
-      //       id: data.user.id,
-      //       name: name,
-      //       surname: surname,
-      //       role: role,
-      //       email: email,
-      //     });
+      if (data.user?.id) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .insert({
+            id: data.user.id,
+            name: name,
+            surname: surname,
+            role: role,
+          });
 
-      //   if (profileError) {
-      //     console.error("Ошибка при создании профиля:", profileError, profileError.details, profileError.message);
-      //   }
-      // }
-      
-      //#############################################
+        if (profileError) {
+          console.error("Ошибка при создании профиля:", profileError, profileError.details, profileError.message);
+        }
+      }
+
 
       showAlert("success", "Проверьте почту для подтверждения!");
       setIsLogin(true);
@@ -188,13 +185,12 @@ export default function SignInForm() {
         <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[10000] animate-in fade-in slide-in-from-top-4 duration-300">
           <div
             className={`px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 font-bold text-sm
-      ${
-        alert.type === "error"
-          ? "bg-red-50 border-red-100 text-red-600"
-          : alert.type === "success"
-            ? "bg-emerald-50 border-emerald-100 text-emerald-600"
-            : "bg-blue-50 border-blue-100 text-blue-600"
-      }`}
+      ${alert.type === "error"
+                ? "bg-red-50 border-red-100 text-red-600"
+                : alert.type === "success"
+                  ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                  : "bg-blue-50 border-blue-100 text-blue-600"
+              }`}
           >
             {alert.type === "error" && <X size={18} />}
             {alert.type === "success" && (
