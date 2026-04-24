@@ -47,7 +47,7 @@ export const TutorAnnouncementProvider = ({
           subject: ad.subject,
           description: ad.description,
           price: ad.price + " UZS",
-          likes: 67,
+          likes: 0,
         }));
         setAnnouncements(formattedData);
         setOriginalAnnouncements(formattedData);
