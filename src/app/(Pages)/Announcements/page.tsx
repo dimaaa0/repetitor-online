@@ -3,13 +3,29 @@
 import React, { useEffect, useState } from "react";
 import { Wallet, BookOpen, MessageCircle, Filter } from "lucide-react";
 import { createClient } from "../../../../src/utils/supabase/client";
-import SkeletonLoader from "../../../components/UI/TeacherSkeletonLoader";
 import StudentCard from "@/src/components/UI/StudentCard";
+import FilterPanel from '../../../components/UI/StudentFilter'
+import { useStudentAnnouncement } from "../../../context/StudentAnnouncementContext";
+import { useUser } from "@/src/context/UserContext";
 
 const Announcements = () => {
   const [dataLoading, setDataLoading] = useState(false);
   const [students, setStudents] = useState<any[]>([]);
+  const { user, loading } = useUser();
+  const { announcements, announcementsLoading } = useStudentAnnouncement();
   const supabase = createClient();
+
+  const [filters, setFilters] = useState({
+    subject: "",
+    maxPrice: 500000,
+    sortByLikes: false,
+    sortAscPrice: false,
+    sortDescPrice: false,
+  });
+
+  const [openFilter, setOpenFilter] = useState(false);
+
+  const toggleFilter = () => setOpenFilter(!openFilter);
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -63,11 +79,21 @@ const Announcements = () => {
                 Свежие запросы от учеников, которым нужна ваша помощь
               </p>
             </div>
-            <div className="flex gap-3">
-              <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+            <div className="flex gap-3 relative">
+              <button
+                className="flex relative cursor-pointer items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
+                onClick={toggleFilter}
+              >
                 <Filter size={18} className="text-blue-600" />
                 Фильтры
               </button>
+              {openFilter && (
+                <FilterPanel
+                  filters={filters}
+                  setFilters={setFilters}
+                  onClose={() => setOpenFilter(false)}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -79,19 +105,21 @@ const Announcements = () => {
             Актуальные заявки: {students.length}
           </span>
         </div>
-        <div className="grid grid-cols-1  pb-4 gap-8 ">
-          {dataLoading && students.length === 0
+
+        <div className="grid grid-cols-1 pb-4 gap-8">
+          {announcementsLoading && announcements.length === 0 
             ? Array.from({ length: 4 }).map((_, key) => (
-                <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
-              ))
-            : students.map((student, key) => (
-                <StudentCard
-                  key={student.id || key}
-                  student={student}
-                  isLoading={!student.name || !student.subject}
-                />
-              ))}
+              <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
+            ))
+            : announcements.map((student, key) => (
+              <StudentCard
+                key={student.id || key}
+                student={student}
+                isLoading={!student.name || !student.subject}
+              />
+            ))}
         </div>
+
       </div>
     </div>
   );

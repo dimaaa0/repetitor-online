@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
-import { createClient } from "../../../src/utils/supabase/client";
+import { createClient } from "../../utils/supabase/client";
 import { useTeacherAnnouncement } from "../../context/TeacherAnnouncementContext";
 import { useDebounce } from "../../app/functions/useDebounce";
 
@@ -19,7 +19,7 @@ interface FilterPanelProps {
   onClose?: () => void;
 }
 
-// Утилита для парсинга цены: "100,000 UZS" -> 100000
+// парсинг цен
 const parsePrice = (priceStr: any): number => {
   if (typeof priceStr === "number") return priceStr;
   if (!priceStr) return 0;

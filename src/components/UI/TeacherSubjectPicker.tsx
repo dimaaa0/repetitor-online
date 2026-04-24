@@ -27,7 +27,7 @@ const SubjectPicker = () => {
         const subjectNames = data.map((item) => item.subject);
         setSubjects(subjectNames);
       }
-      setIsLoading(false); // Закончили загрузку
+      setIsLoading(false);
     };
 
     fetchSubjects();
@@ -82,7 +82,6 @@ const SubjectPicker = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  console.log(filteredSubjects);
 
 
   return (

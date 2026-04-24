@@ -12,7 +12,8 @@ export const StudentAnnouncementProvider = ({
   const supabase = createClient();
 
   // Храним данные объявления здесь, чтобы они были доступны везде
-  const [announcements, setAnnouncements] = useState<any>(null);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [originalAnnouncements, setOriginalAnnouncements] = useState<any[]>([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
 
   // Функция для загрузки данных (можно вызвать при логине или загрузке страницы)
@@ -36,7 +37,42 @@ export const StudentAnnouncementProvider = ({
 
   // Загружаем данные один раз при монтировании провайдера
   useEffect(() => {
-    fetchAnnouncement();
+    const fetchAllAnnouncements = async () => {
+      setAnnouncementsLoading(true);
+      const { data, error } = await supabase.from("student_ads").select(`
+            id,
+            title,
+            subject,
+            description,
+            price,
+            profiles (
+              name,
+              surname,
+              avatar_url
+            )
+          `);
+
+      if (error) {
+        console.error("Ошибка загрузки:", error);
+      } else {
+        const formattedData = data.map((ad: any) => ({
+          id: ad.id,
+          title: ad.title,
+          name: ad.profiles?.name,
+          surname: ad.profiles?.surname,
+          avatar: ad.profiles?.avatar_url,
+          subject: ad.subject,
+          description: ad.description,
+          price: ad.price + " UZS",
+          likes: 0,
+        }));
+        setAnnouncements(formattedData);
+        setOriginalAnnouncements(formattedData);
+      }
+      setAnnouncementsLoading(false);
+    };
+
+    fetchAllAnnouncements();
   }, []);
 
   return (
@@ -46,6 +82,7 @@ export const StudentAnnouncementProvider = ({
         setAnnouncements,
         refreshAnnouncements: fetchAnnouncement,
         announcementsLoading,
+        originalAnnouncements,
       }}
     >
       {children}
