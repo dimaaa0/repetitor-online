@@ -29,11 +29,11 @@ const StudentCard = ({
             </span>
           </div>
 
-          <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
+          <h3 className="text-xl md:text-2xl wrap-break-word leading-relaxed line-clamp-1  hyphens-auto font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
             {student.title}
           </h3>
 
-          <p className="text-slate-600 leading-relaxed hyphens-auto text-justify mb-6 max-w-full">
+          <p className="text-slate-600 wrap-break-word leading-relaxed line-clamp-2  hyphens-auto text-justify mb-6 max-w-full">
             {student.description}
           </p>
 

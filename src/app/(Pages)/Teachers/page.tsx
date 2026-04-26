@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "../../../context/UserContext";
 import { useTeacherAnnouncement } from "../../../context/TeacherAnnouncementContext";
 import TeacherCard from "../../../components/UI/TeacherCard";
-import FilterPanel from "@/src/components/UI/Filter";
+import FilterPanel from "@/src/components/UI/TeacherFilter";
 
 const TutorsPageWithAnimation = () => {
   const { user, loading } = useUser();
@@ -25,14 +25,13 @@ const TutorsPageWithAnimation = () => {
 
   const [showNotify, setShowNotify] = useState(false);
 
-  const userRole = "Tutor";
 
-  useEffect(() => {
-    if (userRole === "Tutor") {
-      const timer = setTimeout(() => setShowNotify(true), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [userRole]);
+  // useEffect(() => {
+  //   if (userRole === "Tutor") {
+  //     const timer = setTimeout(() => setShowNotify(true), 1500);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [userRole]);
 
   return (
     <div className="min-h-screen   bg-[#FBFDFF] pb-20">

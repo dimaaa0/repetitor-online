@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSubject } from "../../context/StudentSubjectContext";
 import { createClient } from '../../../src/utils/supabase/client';
+import { useUser } from "../../context/UserContext";
 
 const supabase = createClient();
 
@@ -10,11 +11,17 @@ const SubjectPicker = () => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const supabase = createClient();
+
+  const { user, loading, refreshUser } = useUser();
 
   const [subjects, setSubjects] = useState<string[]>([]);
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchSubjects = async () => {
+      setIsLoading(true); // Начали загрузку
       const { data, error } = await supabase.from("subjects").select("subject");
       if (error) {
         console.error("Ошибка загрузки предметов:", error);
@@ -22,18 +29,17 @@ const SubjectPicker = () => {
         const subjectNames = data.map((item) => item.subject);
         setSubjects(subjectNames);
       }
+      setIsLoading(false);
     };
 
     fetchSubjects();
   }, []);
 
-
-
   const filteredSubjects = useMemo(() => {
     return subjects
       .filter((s) => !selectedSubjects.includes(s))
       .filter((s) => s.toLowerCase().includes(query.toLowerCase()));
-  }, [query, selectedSubjects]);
+  }, [subjects, query, selectedSubjects]);
 
   const addSubjectLocal = (subject: string) => {
     const trimmed = subject.trim();
@@ -77,6 +83,8 @@ const SubjectPicker = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+
 
   return (
     <div className="flex-1 space-y-4" ref={containerRef}>

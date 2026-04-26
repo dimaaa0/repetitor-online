@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ModalProvider } from "../context/ModalContext";
 import "./globals.css";
 import Header from "../components/Layout/Header";
-import Footer from "../components/Layout/Footer"
+import Footer from "../components/Layout/Footer";
 import { UserProvider } from "../context/UserContext";
 import QueryProvider from "../providers/QueryProvider";
 import { TeacherSubjectProvider } from "../context/TeacherSubjectContext";
@@ -46,7 +46,7 @@ export default function RootLayout({
                   <UserProvider>
                     <StudentAnnouncementProvider>
                       <Header />
-                      {children}
+                      <main className="flex-grow">{children}</main>
                       <Footer />
                     </StudentAnnouncementProvider>
                   </UserProvider>
