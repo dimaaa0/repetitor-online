@@ -107,7 +107,7 @@ const Announcements = () => {
         </div>
 
         <div className="grid grid-cols-1 pb-4 gap-8">
-          {announcementsLoading && announcements.length === 0 
+          {announcementsLoading && announcements.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
               <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
             ))

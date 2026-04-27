@@ -19,42 +19,46 @@ const AdminPanel = () => {
   const { user } = useUser();
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().slice(0, 7),
-  ); // Формат "YYYY-MM"
+  );
   const [revenue, setRevenue] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [stats, setStats] = useState({ newUsers: 0, subscriptionGrowth: 0 });
-  
+
 
   const fetchStats = async (dateString) => {
     const startOfMonth = new Date(`${dateString}-01`);
-    const endOfMonth = new Date(
-      startOfMonth.getFullYear(),
-      startOfMonth.getMonth() + 1,
-      0,
-    );
+    const endOfMonth = new Date(startOfMonth.getFullYear(), startOfMonth.getMonth() + 1, 0, 23, 59, 59);
 
-    // 1. Получаем количество новых пользователей за месяц
+    // 1. Считаем новых пользователей (тут всё верно)
     const { count: newUsers } = await supabase
       .from("profiles")
       .select("*", { count: "exact", head: true })
       .gte("created_at", startOfMonth.toISOString())
       .lte("created_at", endOfMonth.toISOString());
 
-    // 2. Логика для процента (упрощенно: сравнение с прошлым месяцем)
-    // Здесь можно либо сделать сложный расчет, либо просто вывести
-    // общее кол-во активных подписок из payment_history
-    const { count: paidCount } = await supabase
+    // 2. Получаем УНИКАЛЬНЫХ платных пользователей
+    // Мы запрашиваем только колонку user_id
+    const { data: paidRecords, error } = await supabase
       .from("payment_history")
-      .select("user_id", { count: "exact", head: true })
+      .select("user_id")
       .gte("paid_at", startOfMonth.toISOString())
       .lte("paid_at", endOfMonth.toISOString());
 
+    let uniquePaidUsersCount = 0;
+    if (!error && paidRecords) {
+      // Используем Set, чтобы оставить только уникальные ID
+      const uniqueIds = new Set(paidRecords.map(record => record.user_id));
+      uniquePaidUsersCount = uniqueIds.size;
+    }
+
     setStats({
       newUsers: newUsers || 0,
-      subscriptionGrowth: paidCount || 0, // или расчет процента
+      subscriptionGrowth: uniquePaidUsersCount,
     });
   };
+
+  
 
   useEffect(() => {
     fetchStats(selectedDate);
