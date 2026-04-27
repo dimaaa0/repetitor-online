@@ -25,40 +25,67 @@ const AdminPanel = () => {
   const [transactions, setTransactions] = useState([]);
   const [stats, setStats] = useState({ newUsers: 0, subscriptionGrowth: 0 });
 
-
   const fetchStats = async (dateString) => {
     const startOfMonth = new Date(`${dateString}-01`);
-    const endOfMonth = new Date(startOfMonth.getFullYear(), startOfMonth.getMonth() + 1, 0, 23, 59, 59);
+    const endOfMonth = new Date(
+      startOfMonth.getFullYear(),
+      startOfMonth.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+    );
 
-    // 1. Считаем новых пользователей (тут всё верно)
-    const { count: newUsers } = await supabase
+    // 1. Считаем новые регистрации (профили)
+    const { count: newUsersCount } = await supabase
       .from("profiles")
       .select("*", { count: "exact", head: true })
       .gte("created_at", startOfMonth.toISOString())
       .lte("created_at", endOfMonth.toISOString());
 
-    // 2. Получаем УНИКАЛЬНЫХ платных пользователей
-    // Мы запрашиваем только колонку user_id
-    const { data: paidRecords, error } = await supabase
+    // 2. Получаем ВСЮ историю платежей (отсортированную), чтобы вычислить обе метрики за раз
+    const { data: allPayments, error: payError } = await supabase
       .from("payment_history")
-      .select("user_id")
-      .gte("paid_at", startOfMonth.toISOString())
-      .lte("paid_at", endOfMonth.toISOString());
+      .select("user_id, paid_at")
+      .order("paid_at", { ascending: true });
 
-    let uniquePaidUsersCount = 0;
-    if (!error && paidRecords) {
-      // Используем Set, чтобы оставить только уникальные ID
-      const uniqueIds = new Set(paidRecords.map(record => record.user_id));
-      uniquePaidUsersCount = uniqueIds.size;
+    if (payError) {
+      console.error("Ошибка загрузки платежей:", payError);
+      return;
     }
 
+    // --- ЛОГИКА ОБРАБОТКИ ---
+
+    // Карта для поиска самых первых оплат в истории
+    const firstPaymentMap = {};
+    // Сет для уникальных пользователей именно В ЭТОМ месяце
+    const currentMonthUniqueUsers = new Set();
+
+    allPayments.forEach((payment) => {
+      const payDate = new Date(payment.paid_at);
+
+      // Запоминаем самую первую оплату пользователя (для "Новых покупателей")
+      if (!firstPaymentMap[payment.user_id]) {
+        firstPaymentMap[payment.user_id] = payDate;
+      }
+
+      // Если эта оплата была в выбранном месяце, добавляем в уникальные (для "С подпиской")
+      if (payDate >= startOfMonth && payDate <= endOfMonth) {
+        currentMonthUniqueUsers.add(payment.user_id);
+      }
+    });
+
+    // Фильтруем карту первых оплат, оставляя только те, что случились в этом месяце
+    const newPayersCount = Object.values(firstPaymentMap).filter(
+      (date) => date >= startOfMonth && date <= endOfMonth,
+    ).length;
+
     setStats({
-      newUsers: newUsers || 0,
-      subscriptionGrowth: uniquePaidUsersCount,
+      newUsers: newUsersCount || 0,
+      subscriptionGrowth: currentMonthUniqueUsers.size, // Уникальные за месяц
+      newPayers: newPayersCount, // Купившие ВПЕРВЫЕ в этом месяце
     });
   };
-
-  
 
   useEffect(() => {
     fetchStats(selectedDate);
@@ -302,11 +329,16 @@ const AdminPanel = () => {
                 {/* Карточка 2: Новые пользователи */}
                 <div className="bg-gray-50/50 border border-gray-100 rounded-[24px] p-6">
                   <p className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">
-                    Кол-во за месяц
+                    Новых покупателей
                   </p>
-                  <h3 className="text-2xl font-black text-gray-900">
-                    {stats.newUsers}
-                  </h3>
+                  <div className="flex items-baseline gap-2">
+                    <h3 className="text-2xl font-black text-gray-900">
+                      +{stats.newPayers}
+                    </h3>
+                    <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">
+                      First Pay
+                    </span>
+                  </div>
                 </div>
               </div>
 

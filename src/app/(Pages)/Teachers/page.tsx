@@ -19,12 +19,17 @@ const TutorsPageWithAnimation = () => {
     sortDescPrice: false,
   });
 
+  // useEffect(()=> {
+  // const currentSubscriptionStatus = asyns () => {
+  //   if (!user) return;
+
+  // }}
+
   const [openFilter, setOpenFilter] = useState(false);
 
   const toggleFilter = () => setOpenFilter(!openFilter);
 
   const [showNotify, setShowNotify] = useState(false);
-
 
   // useEffect(() => {
   //   if (userRole === "Tutor") {
@@ -76,15 +81,15 @@ const TutorsPageWithAnimation = () => {
         <div className="grid grid-cols-1 pb-4 gap-8 md:grid-cols-1 lg:grid-cols-2 ">
           {announcementsLoading && announcements.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
-              <TeacherCard key={`skeleton-${key}`} teacher={{}} isLoading />
-            ))
+                <TeacherCard key={`skeleton-${key}`} teacher={{}} isLoading />
+              ))
             : announcements.map((teacher, key) => (
-              <TeacherCard
-                key={teacher.id || key}
-                teacher={teacher}
-                isLoading={!teacher.name || !teacher.subject}
-              />
-            ))}
+                <TeacherCard
+                  key={teacher.id || key}
+                  teacher={teacher}
+                  isLoading={!teacher.name || !teacher.subject}
+                />
+              ))}
         </div>
       </div>
     </div>

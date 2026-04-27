@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { createClient } from "../../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
 import TeacherPanel from "@/src/components/Sections/TeacherPanel";
 import StudentPanel from "@/src/components/Sections/StudentPanel";
 import AdminPanel from "@/src/components/Sections/AdminPanel";
@@ -24,7 +23,6 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-// Компоненты UI
 import CopyButton from "@/src/components/UI/HandleCopyButton";
 import AddAvatar from "@/src/components/UI/AddAvatar";
 import SubjectPicker from "@/src/components/UI/TeacherSubjectPicker";
@@ -290,122 +288,155 @@ const Profile = () => {
         )}
         {/* Шапка профиля */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8 mb-6">
-  <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            {/* Аватар */}
+            <div className="relative shrink-0">
+              <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
+                {selectedFile ? (
+                  <img
+                    src={URL.createObjectURL(selectedFile)}
+                    className="h-full w-full object-cover"
+                  />
+                ) : user.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt="Avatar"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-blue-600 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm">
+                    <span className="text-white text-[32px] font-bold">
+                      {user.name ? user.name[0].toUpperCase() : "?"}
+                    </span>
+                  </div>
+                )}
+              </div>
+              {user.role === "Tutor" && isEditing && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-2xl animate-in fade-in zoom-in duration-200">
+                  <AddAvatar uploadAvatar={handleFileSelect} />
+                </div>
+              )}
+            </div>
 
-    {/* Аватар */}
-    <div className="relative shrink-0">
-      <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
-        {selectedFile ? (
-          <img src={URL.createObjectURL(selectedFile)} className="h-full w-full object-cover" />
-        ) : user.avatar_url ? (
-          <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-blue-600 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm">
-            <span className="text-white text-[32px] font-bold">
-              {user.name ? user.name[0].toUpperCase() : "?"}
-            </span>
-          </div>
-        )}
-      </div>
-      {user.role === "Tutor" && isEditing && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-2xl animate-in fade-in zoom-in duration-200">
-          <AddAvatar uploadAvatar={handleFileSelect} />
-        </div>
-      )}
-    </div>
-
-    {/* Информация */}
-    <div className="text-center sm:text-left flex-1 w-full min-w-0">
-      {isEditing ? (
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full focus:bg-blue-50 transition-colors"
-              placeholder="Имя"
-            />
-            <input
-              type="text"
-              value={formData.surname}
-              onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
-              className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full focus:bg-blue-50 transition-colors"
-              placeholder="Фамилия"
-            />
-          </div>
-          <div className="flex justify-center sm:justify-start my-1">
-            <button
-              type="button"
-              title="Сменить роль"
-              onClick={toggleRole}
-              className={`cursor-pointer flex items-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border-2 transition-all duration-300 active:scale-95 shadow-sm
-                ${formData.role === "Tutor"
-                  ? "bg-green-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                  : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+            {/* Информация */}
+            <div className="text-center sm:text-left flex-1 w-full min-w-0">
+              {isEditing ? (
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full focus:bg-blue-50 transition-colors"
+                      placeholder="Имя"
+                    />
+                    <input
+                      type="text"
+                      value={formData.surname}
+                      onChange={(e) =>
+                        setFormData({ ...formData, surname: e.target.value })
+                      }
+                      className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full focus:bg-blue-50 transition-colors"
+                      placeholder="Фамилия"
+                    />
+                  </div>
+                  <div className="flex justify-center sm:justify-start my-1">
+                    <button
+                      type="button"
+                      title="Сменить роль"
+                      onClick={toggleRole}
+                      className={`cursor-pointer flex items-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border-2 transition-all duration-300 active:scale-95 shadow-sm
+                ${
+                  formData.role === "Tutor"
+                    ? "bg-green-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                    : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                 }`}
-            >
-              <span className="mr-2 italic opacity-70">Роль:</span>
-              <span className="uppercase">{formData.role === "Tutor" ? "Репетитор" : "Ученик"}</span>
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center sm:flex-row sm:items-center sm:flex-wrap gap-1.5 sm:gap-3 justify-center sm:justify-start">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate max-w-full">
-            {user.name || "Пользователь"} {user.surname}
-          </h1>
-          <span className={`
+                    >
+                      <span className="mr-2 italic opacity-70">Роль:</span>
+                      <span className="uppercase">
+                        {formData.role === "Tutor" ? "Репетитор" : "Ученик"}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center sm:flex-row sm:items-center sm:flex-wrap gap-1.5 sm:gap-3 justify-center sm:justify-start">
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate max-w-full">
+                    {user.name || "Пользователь"} {user.surname}
+                  </h1>
+                  <span
+                    className={`
             inline-flex items-center shrink-0
             px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider
             border transition-all duration-300 shadow-sm
             ${roleStyles[user.role] || roleStyles.Student}
-          `}>
-            <span className={`w-1.5 h-1.5 rounded-full mr-2 animate-pulse ${
-              user.role === "Admin" ? "bg-red-500" : user.role === "Tutor" ? "bg-blue-500" : "bg-green-500"
-            }`} />
-            {!user.role ? "User" : user.role === "Admin" ? "Администратор" : user.role === "Tutor" ? "Репетитор" : "Ученик"}
-          </span>
+          `}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full mr-2 animate-pulse ${
+                        user.role === "Admin"
+                          ? "bg-red-500"
+                          : user.role === "Tutor"
+                            ? "bg-blue-500"
+                            : "bg-green-500"
+                      }`}
+                    />
+                    {!user.role
+                      ? "User"
+                      : user.role === "Admin"
+                        ? "Администратор"
+                        : user.role === "Tutor"
+                          ? "Репетитор"
+                          : "Ученик"}
+                  </span>
+                </div>
+              )}
+
+              <p className="text-gray-500 text-sm mt-2 flex items-center justify-center sm:justify-start gap-1.5">
+                <Mail className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{user.email}</span>
+              </p>
+            </div>
+
+            {/* Кнопки */}
+            <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={handleUpdateProfile}
+                    disabled={isSaving}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-bold text-sm sm:text-xs transition-all shadow-sm active:scale-95 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 w-full sm:w-auto"
+                  >
+                    {isSaving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
+                    Сохранить
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setSelectedFile(null);
+                    }}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-bold text-sm sm:text-xs transition-all shadow-sm active:scale-95 bg-gray-100 text-gray-600 hover:bg-gray-200 w-full sm:w-auto"
+                  >
+                    <XCircle className="h-4 w-4" /> Отмена
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-bold text-sm sm:text-xs transition-all duration-300 shadow-sm active:scale-95 bg-white text-slate-600 border border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/10 w-full sm:w-auto"
+                >
+                  Настроить профиль
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-      )}
-
-      <p className="text-gray-500 text-sm mt-2 flex items-center justify-center sm:justify-start gap-1.5">
-        <Mail className="h-3.5 w-3.5 shrink-0" />
-        <span className="truncate">{user.email}</span>
-      </p>
-    </div>
-
-    {/* Кнопки */}
-    <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
-      {isEditing ? (
-        <>
-          <button
-            onClick={handleUpdateProfile}
-            disabled={isSaving}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-bold text-sm sm:text-xs transition-all shadow-sm active:scale-95 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 w-full sm:w-auto"
-          >
-            {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-            Сохранить
-          </button>
-          <button
-            onClick={() => { setIsEditing(false); setSelectedFile(null); }}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-bold text-sm sm:text-xs transition-all shadow-sm active:scale-95 bg-gray-100 text-gray-600 hover:bg-gray-200 w-full sm:w-auto"
-          >
-            <XCircle className="h-4 w-4" /> Отмена
-          </button>
-        </>
-      ) : (
-        <button
-          onClick={() => setIsEditing(true)}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-bold text-sm sm:text-xs transition-all duration-300 shadow-sm active:scale-95 bg-white text-slate-600 border border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/10 w-full sm:w-auto"
-        >
-          Настроить профиль
-        </button>
-      )}
-    </div>
-
-  </div>
-</div>
 
         <div>{panel}</div>
 
