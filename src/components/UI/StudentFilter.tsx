@@ -19,7 +19,6 @@ interface FilterPanelProps {
   onClose?: () => void;
 }
 
-// Утилита для парсинга цены: "100,000 UZS" -> 100000
 const parsePrice = (priceStr: any): number => {
   if (typeof priceStr === "number") return priceStr;
   if (!priceStr) return 0;

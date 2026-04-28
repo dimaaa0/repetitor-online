@@ -58,13 +58,69 @@ const StudentPanel = () => {
       return false;
     }
     if (!contacts) {
-      showAlert(
-        "error",
-        "Пожалуйста, укажите ваши контакты ",
-      );
+      showAlert("error", "Пожалуйста, укажите ваши контакты ");
       return false;
     }
     return true;
+  };
+
+  const [announceStatus, setAnnounceStatus] = useState(false);
+
+  useEffect(() => {
+    //? Проверка на наличие объявления
+    const checkAnnouncement = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("student_ads")
+          .select("id") // Достаточно выбрать ID, а не всё
+          .eq("user_id", user.id)
+          .single();
+
+        if (error) {
+          // Если ошибка в том, что запись не найдена — просто ставим false
+          if (error.code === "PGRST116") {
+            setAnnounceStatus(false);
+          } else {
+            console.error("Ошибка при проверке:", error);
+          }
+          return;
+        }
+
+        // Если данные пришли без ошибки — объявление существует
+        setAnnounceStatus(!!data);
+      } catch (err) {
+        console.error("Непредвиденная ошибка:", err);
+      }
+    };
+
+    checkAnnouncement();
+  }, [user?.id, supabase]);
+
+  const deleteAnnouncement = async () => {
+    if (!user?.id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("student_ads")
+        .delete()
+        .eq("user_id", user.id);
+
+      if (error) {
+        // Если ошибка в том, что запись не найдена — просто ставим false
+        if (error.code === "PGRST116") {
+          setAnnounceStatus(false);
+        } else {
+          console.error("Ошибка при проверке:", error);
+        }
+        return;
+      }
+      setAnnounceStatus(false);
+      window.location.reload();
+    } catch (err) {
+      console.error("Не получилось удалить:", err);
+    }
   };
 
   useEffect(() => {
@@ -245,11 +301,19 @@ const StudentPanel = () => {
             </div>
           </div>
         </div>
+        {announceStatus && (
+          <button
+            onClick={deleteAnnouncement}
+            className="w-full cursor-pointer translate-y-4 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
+          >
+            Удалить объявление
+          </button>
+        )}
 
         <button
           onClick={handlePublishAd}
           disabled={isPublishing}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
+          className="w-full bg-blue-600 cursor-pointer  hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
         >
           {isPublishing ? (
             <>

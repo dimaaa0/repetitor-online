@@ -47,7 +47,9 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
   }, []);
 
   // 2. Логика фильтрации и сортировки (Вынесена в useMemo для производительности)
+  // Внутри useMemo добавь проверку на существование полей
   const filteredResult = useMemo(() => {
+    // 1. Фильтрация
     let result = originalAnnouncements.filter((ad: any) => {
       const matchSubject = debouncedFilters.subject
         ? ad.subject
@@ -55,24 +57,30 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
             .trim()
             .includes(debouncedFilters.subject.toLowerCase().trim())
         : true;
-      const matchPrice = parsePrice(ad.price) <= debouncedFilters.maxPrice;
+
+      // Парсим цену объявления и сравниваем с ползунком
+      const adPrice = parsePrice(ad.price);
+      const matchPrice = adPrice <= debouncedFilters.maxPrice;
+
       return matchSubject && matchPrice;
     });
 
+    // 2. Сортировка (Важно: создаем копию [...result])
     if (debouncedFilters.sortByLikes) {
-      result = [...result].sort((a: any, b: any) => b.likes - a.likes);
+      result = [...result].sort((a, b) => (b.likes || 0) - (a.likes || 0));
     } else if (debouncedFilters.sortAscPrice) {
       result = [...result].sort(
-        (a: any, b: any) => parsePrice(a.price) - parsePrice(b.price),
+        (a, b) => parsePrice(a.price) - parsePrice(b.price),
       );
     } else if (debouncedFilters.sortDescPrice) {
       result = [...result].sort(
-        (a: any, b: any) => parsePrice(b.price) - parsePrice(a.price),
+        (a, b) => parsePrice(b.price) - parsePrice(a.price),
       );
     }
 
     return result;
   }, [debouncedFilters, originalAnnouncements]);
+
 
   // 3. Закрытие панели при клике вне её
   useEffect(() => {
@@ -132,7 +140,6 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
     });
     setAnnouncements(originalAnnouncements);
   };
-
 
   return (
     <div

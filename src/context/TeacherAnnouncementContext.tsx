@@ -18,6 +18,8 @@ export const TutorAnnouncementProvider = ({
   useEffect(() => {
     const fetchTeachers = async () => {
       setAnnouncementsLoading(true);
+
+      // 1. Добавляем запрос количества из связанной таблицы ads_likes
       const { data, error } = await supabase.from("ads").select(`
             id,
             subject,
@@ -27,17 +29,12 @@ export const TutorAnnouncementProvider = ({
               name,
               surname,
               avatar_url
-            )
+            ),
+            ads_likes (count) 
           `);
 
       if (error) {
-        // Выводим конкретное сообщение и код ошибки
-        console.error(
-          "Ошибка загрузки:",
-          error.message,
-          error.details,
-          error.hint,
-        );
+        console.error("Ошибка загрузки:", error.message);
       } else {
         const formattedData = data.map((ad: any) => ({
           id: ad.id,
@@ -47,8 +44,11 @@ export const TutorAnnouncementProvider = ({
           subject: ad.subject,
           description: ad.description,
           price: ad.price + " UZS",
-          likes: 0,
+          // 2. Достаем count из массива ads_likes
+          // Supabase возвращает массив объектов, берем первый и его свойство count
+          likes: ad.ads_likes?.[0]?.count || 0,
         }));
+
         setAnnouncements(formattedData);
         setOriginalAnnouncements(formattedData);
       }
