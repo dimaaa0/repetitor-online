@@ -33,6 +33,38 @@ const Profile = () => {
   const supabase = createClient();
   const router = useRouter();
 
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!user?.id) return;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("subscription_ends_at")
+        .eq("id", user.id)
+        .single(); // Получаем один конкретный объект
+
+      if (error) {
+        console.error("Ошибка при проверке подписки:", error.message);
+        return;
+      }
+
+      if (data?.subscription_ends_at) {
+        const now = new Date();
+        const expiry = new Date(data.subscription_ends_at);
+
+        // Статус: true, если дата в будущем
+        setIsSubscribed(expiry > now);
+      } else {
+        setIsSubscribed(false);
+      }
+    };
+
+    checkSubscription();
+  }, [user?.id]);
+
+
   // Состояния
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);

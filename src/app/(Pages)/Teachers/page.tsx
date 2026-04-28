@@ -2,13 +2,11 @@
 
 import { Heart, Filter } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { useUser } from "../../../context/UserContext";
 import { useTeacherAnnouncement } from "../../../context/TeacherAnnouncementContext";
 import TeacherCard from "../../../components/UI/TeacherCard";
 import FilterPanel from "@/src/components/UI/TeacherFilter";
 
 const TutorsPageWithAnimation = () => {
-  const { user, loading } = useUser();
   const { announcements, announcementsLoading } = useTeacherAnnouncement();
 
   const [filters, setFilters] = useState({
@@ -18,12 +16,6 @@ const TutorsPageWithAnimation = () => {
     sortAscPrice: false,
     sortDescPrice: false,
   });
-
-  // useEffect(()=> {
-  // const currentSubscriptionStatus = asyns () => {
-  //   if (!user) return;
-
-  // }}
 
   const [openFilter, setOpenFilter] = useState(false);
 

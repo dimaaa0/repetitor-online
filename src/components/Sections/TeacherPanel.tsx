@@ -10,8 +10,6 @@ import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/TeacherSubjectContext";
 
 import {
-  Mail,
-  LogOut,
   ShieldCheck,
   CreditCard,
   Loader2,
@@ -36,6 +34,42 @@ const TeacherPanel = () => {
   const [contacts, setContacts] = useState("");
   const [hasAd, setHasAd] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subLoading, setSubLoading] = useState(false);
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!user?.id) return;
+
+      setSubLoading(true); // 1. Включаем перед запросом
+
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("subscription_ends_at")
+          .eq("id", user.id)
+          .single();
+
+        if (error) throw error;
+
+        if (data?.subscription_ends_at) {
+          const now = new Date();
+          const expiry = new Date(data.subscription_ends_at);
+          setIsSubscribed(expiry > now);
+        } else {
+          setIsSubscribed(false);
+        }
+      } catch (error) {
+        console.error("Ошибка при проверке подписки:", error.message);
+        setIsSubscribed(false);
+      } finally {
+        setSubLoading(false); // 2. Выключаем ТОЛЬКО когда всё закончилось
+      }
+    };
+
+    checkSubscription();
+  }, [user?.id]);
 
   const [alert, setAlert] = useState<{
     type: "success" | "error" | "info";
@@ -219,7 +253,7 @@ const TeacherPanel = () => {
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
-        <div className="bg-white rounded-2xl flex flex-col justify-between py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
+        <div className="bg-white rounded-2xl  flex flex-col justify-between py-6 shadow-sm border border-gray-100 p-4 pb-6 sm:p-6 md:p-8">
           <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
             <ShieldCheck className="h-4 w-4" /> Данные аккаунта
           </h3>
@@ -232,15 +266,26 @@ const TeacherPanel = () => {
           </div>
         </div>
 
-        <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-2 pb-6 sm:p-6 md:p-8">
+        <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-4 pb-6 sm:p-6 md:p-8">
           {/* Верхняя часть: Заголовок и Статус */}
           <div className="flex justify-between items-start mb-6">
             <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
               <CreditCard className="h-4 w-4" /> Тарифный план
             </h3>
-            <span className="bg-green-50 text-green-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-tighter border border-green-100">
-              Активен
-            </span>
+            {!subLoading ? (
+              <span
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
+                  isSubscribed
+                    ? "bg-green-50 text-green-600 border-green-100"
+                    : "bg-red-50 text-red-600 border-red-100"
+                }`}
+              >
+                {isSubscribed ? "Активен" : "Не активен"}
+              </span>
+            ) : (
+              /* Скелетон в размер бейджа */
+              <div className="w-[60px] h-[25px] bg-gray-100 animate-pulse rounded-lg border border-gray-200" />
+            )}
           </div>
 
           {/* Блок с ценой в стиле скрина */}
@@ -263,14 +308,17 @@ const TeacherPanel = () => {
 
           {/* Даты оплаты */}
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
-            <div>
-              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-1">
+            {/* Левая колонка */}
+            <div className="flex  flex-row items-end h-full gap-2 justify-center pl-4">
+              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
                 Оплачено
               </p>
               <p className="text-sm font-medium text-gray-700">08.04.2026</p>
             </div>
-            <div>
-              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-1">
+
+            {/* Правая колонка */}
+            <div className="flex  flex-row items-end h-full gap-2 justify-center pl-4">
+              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
                 Истекает
               </p>
               <p className="text-sm font-medium text-gray-700">08.05.2026</p>
@@ -278,6 +326,7 @@ const TeacherPanel = () => {
           </div>
         </div>
       </div>
+
       <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">
         <h1 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] mb-8 flex items-center gap-2">
           <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Ваше

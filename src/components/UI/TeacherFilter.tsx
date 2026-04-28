@@ -133,7 +133,6 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
     setAnnouncements(originalAnnouncements);
   };
 
-  console.log(filters);
 
   return (
     <div
