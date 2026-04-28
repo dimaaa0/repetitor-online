@@ -12,6 +12,26 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+// Тип для отдельной транзакции из истории
+interface Transaction {
+  id: string;
+  amount: number;
+  paid_at: string;
+  months_paid: number;
+  user_id: string;
+  profiles: {
+    name: string | null;
+    surname: string | null;
+  } | null;
+}
+
+// Тип для состояния статистики
+interface Stats {
+  newUsers: number;
+  subscriptionGrowth: number;
+  newPayers: number;
+}
+
 const AdminPanel = () => {
   const supabase = createClient();
   const [months, setMonths] = useState(1);
@@ -22,10 +42,14 @@ const AdminPanel = () => {
   );
   const [revenue, setRevenue] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [transactions, setTransactions] = useState([]);
-  const [stats, setStats] = useState({ newUsers: 0, subscriptionGrowth: 0 });
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [stats, setStats] = useState<Stats>({
+    newUsers: 0,
+    subscriptionGrowth: 0,
+    newPayers: 0,
+  });
 
-  const fetchStats = async (dateString) => {
+  const fetchStats = async (dateString: any) => {
     const startOfMonth = new Date(`${dateString}-01`);
     const endOfMonth = new Date(
       startOfMonth.getFullYear(),
@@ -57,7 +81,7 @@ const AdminPanel = () => {
     // --- ЛОГИКА ОБРАБОТКИ ---
 
     // Карта для поиска самых первых оплат в истории
-    const firstPaymentMap = {};
+    const firstPaymentMap: any = {};
     // Сет для уникальных пользователей именно В ЭТОМ месяце
     const currentMonthUniqueUsers = new Set();
 
@@ -77,7 +101,7 @@ const AdminPanel = () => {
 
     // Фильтруем карту первых оплат, оставляя только те, что случились в этом месяце
     const newPayersCount = Object.values(firstPaymentMap).filter(
-      (date) => date >= startOfMonth && date <= endOfMonth,
+      (date: any) => date >= startOfMonth && date <= endOfMonth,
     ).length;
 
     setStats({
@@ -110,14 +134,14 @@ const AdminPanel = () => {
       .order("paid_at", { ascending: false })
       .limit(10); // Берем последние 10 для истории
 
-    if (!error) setTransactions(data);
+    if (!error && data) setTransactions(data as unknown as Transaction[]);
   };
 
   useEffect(() => {
     fetchTransactions();
   }, []);
 
-  const getMonthWord = (number) => {
+  const getMonthWord = (number: any) => {
     const cases = [2, 0, 1, 1, 1, 2];
     const titles = ["мес.", "мес.", "мес."]; // Для краткости как в макете
     return titles[
@@ -127,7 +151,7 @@ const AdminPanel = () => {
     ];
   };
 
-  const fetchRevenue = async (dateString) => {
+  const fetchRevenue = async (dateString: any) => {
     setIsLoading(true);
 
     // Вызываем нашу SQL функцию через .rpc()
@@ -348,7 +372,7 @@ const AdminPanel = () => {
                   История транзакций
                 </h4>
                 <div className="space-y-4 max-h-[400px]  overflow-y-auto no-scrollbar pr-2">
-                  {transactions.map((tx) => (
+                  {transactions.map((tx: any) => (
                     <div
                       key={tx.id}
                       className="flex  cursor-pointer items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-colors group"
