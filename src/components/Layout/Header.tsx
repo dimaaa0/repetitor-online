@@ -122,7 +122,6 @@ function Header() {
       {isMenuOpen && (
         <div className="md:hidden absolute w-full bg-white border-b border-gray-100 p-6 space-y-4 shadow-xl">
           {/* ... контент мобильного меню ... */}
-          {user && (
             <>
               <div className=" flex flex-col items-center gap-4">
                 {navLinks.map((link) => (
@@ -141,7 +140,6 @@ function Header() {
                 ))}
               </div>
             </>
-          )}
         </div>
       )}
     </header>

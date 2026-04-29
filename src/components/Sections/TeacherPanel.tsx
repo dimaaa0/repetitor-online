@@ -221,6 +221,44 @@ const TeacherPanel = () => {
     fetchUserData();
   }, [user?.id, user?.role]);
 
+  const [paymentDate, setPaymentDate] = useState<string | null>(null);
+  const [dateOfExpiry, setDateOfExpiry] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getSubscriptionData = async (userId: string) => {
+      //? ПОЛУЧЕНИЕ ДАТ О ПОДПИСКАХ
+      const { data: lastPayment, error } = await supabase
+        .from("payment_history")
+        .select("paid_at, months_paid")
+        .eq("user_id", userId)
+        .order("paid_at", { ascending: false })
+        .limit(1) // Используем limit вместо single для избежания лишних ошибок, если записей 0
+        .maybeSingle();
+
+      if (error) {
+        console.error("Ошибка запроса:", error.message);
+        return;
+      }
+
+      if (lastPayment) {
+        const startDate = new Date(lastPayment.paid_at);
+
+        // Важно: setMonth изменяет исходный объект даты.
+        // Создаем копию, чтобы не испортить оригинал (хотя здесь это не критично)
+        const expiryDate = new Date(startDate);
+        expiryDate.setMonth(expiryDate.getMonth() + lastPayment.months_paid);
+
+        setPaymentDate(lastPayment.paid_at);
+        setDateOfExpiry(expiryDate.toISOString());
+      }
+    };
+
+    // Проверяем, что ID пользователя существует перед вызовом
+    if (user?.id) {
+      getSubscriptionData(user.id);
+    }
+  }, [user?.id]); // Эффект перезапустится, когда ID появится
+
   return (
     <div>
       {alert && (
@@ -231,12 +269,13 @@ const TeacherPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${alert.type === "success"
-                ? "bg-white border-green-100 text-green-800"
-                : alert.type === "error"
-                  ? "bg-white border-red-100 text-red-800"
-                  : "bg-white border-blue-100 text-blue-800"
-              }
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -273,10 +312,11 @@ const TeacherPanel = () => {
             </h3>
             {!subLoading ? (
               <span
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${isSubscribed
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
+                  isSubscribed
                     ? "bg-green-50 text-green-600 border-green-100"
                     : "bg-red-50 text-red-600 border-red-100"
-                  }`}
+                }`}
               >
                 {isSubscribed ? "Активен" : "Не активен"}
               </span>
@@ -311,7 +351,11 @@ const TeacherPanel = () => {
               <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
                 Оплачено
               </p>
-              <p className="text-sm font-medium text-gray-700">08.04.2026</p>
+              <p className="text-sm font-medium text-gray-700">
+                {paymentDate
+                  ? new Date(paymentDate).toLocaleDateString("ru-RU")
+                  : "—"}
+              </p>
             </div>
 
             {/* Правая колонка */}
@@ -319,7 +363,11 @@ const TeacherPanel = () => {
               <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
                 Истекает
               </p>
-              <p className="text-sm font-medium text-gray-700">08.05.2026</p>
+              <p className="text-sm font-medium text-gray-700">
+                {dateOfExpiry
+                  ? new Date(dateOfExpiry).toLocaleDateString("ru-RU")
+                  : "—"}
+              </p>
             </div>
           </div>
         </div>

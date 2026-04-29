@@ -4,26 +4,37 @@ import { useState } from "react";
 import { UserPlus, Calendar, Search, BookOpen } from "lucide-react";
 import { useModal } from "../../context/ModalContext";
 import { useUser } from "../../context/UserContext";
-import BecomeTeacherModal from '../UI/BecomeTeacherModal'
+import BecomeTeacherModal from "../UI/BecomeTeacherModal";
 
 export default function HomePage() {
   const { openModal } = useModal();
   const { user } = useUser();
-  const [becomeTeacher, setBecomeTeacher] = useState(false)
+  const [becomeTeacher, setBecomeTeacher] = useState(false);
+  // Стейт для запуска анимации
+  const [isClosing, setIsClosing] = useState(false);
 
-  interface OpenBecomeTeacherModalType {
-    (): void;
-  }
-  
-  const closeBecomeTeacherModal = () => setBecomeTeacher(false);
+  // Функция открытия
+  const openBecomeTeacherModal = () => {
+    setIsClosing(false);
+    setBecomeTeacher(true);
+  };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const closeBecomeTeacherModal = () => {
+    setIsClosing(true);
 
+    setTimeout(() => {
+      setBecomeTeacher(false);
+      setIsClosing(false);
+    }, 300);
+  };
   return (
     <div className="font-sans overflow-hidden">
-      {becomeTeacher &&
-        <BecomeTeacherModal onClose={closeBecomeTeacherModal} />
-      }
+      {becomeTeacher && (
+        <BecomeTeacherModal
+          onClose={closeBecomeTeacherModal}
+          isClosing={isClosing}
+        />
+      )}
       {/* Hero Section с "живым" фоном */}
       <section className="relative py-24 px-4 text-center bg-white overflow-hidden">
         {/* Декоративные анимированные круги на фоне */}
@@ -50,7 +61,7 @@ export default function HomePage() {
             </a>
             <a
               onClick={() => {
-                setBecomeTeacher(!becomeTeacher)
+                setBecomeTeacher(!becomeTeacher);
               }}
               className="px-4 py-4 cursor-pointer border-2 w-[250px] border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all"
             >
