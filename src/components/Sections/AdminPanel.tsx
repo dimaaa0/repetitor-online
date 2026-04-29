@@ -188,19 +188,11 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-6 ">
+    <div className="min-h-screen bg-gray-50/50 py-2 ">
       <div className="max-w-[1250px] mx-auto ">
         {/* Шапка панели */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              Управление платформой
-            </h1>
-          </div>
-          <div className="flex gap-3"></div>
-        </div>
 
-        <div className="grid w-full  gap-8">
+        <div className="grid w-full  gap-6">
           {/* ЛЕВАЯ КОЛОНКА: Форма активации */}
           <div className=" space-y-8">
             <section className="bg-white border border-gray-100 rounded-[32px] p-6 md:p-10 shadow-xl shadow-blue-900/5">

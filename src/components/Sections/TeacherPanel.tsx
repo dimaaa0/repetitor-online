@@ -231,13 +231,12 @@ const TeacherPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                ? "bg-white border-green-100 text-green-800"
+                : alert.type === "error"
+                  ? "bg-white border-red-100 text-red-800"
+                  : "bg-white border-blue-100 text-blue-800"
+              }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -274,11 +273,10 @@ const TeacherPanel = () => {
             </h3>
             {!subLoading ? (
               <span
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
-                  isSubscribed
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${isSubscribed
                     ? "bg-green-50 text-green-600 border-green-100"
                     : "bg-red-50 text-red-600 border-red-100"
-                }`}
+                  }`}
               >
                 {isSubscribed ? "Активен" : "Не активен"}
               </span>
@@ -298,7 +296,7 @@ const TeacherPanel = () => {
             {/* Текстовая часть */}
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight leading-none mb-0.5">
-                Стоимость
+                Стоимость в месяц
               </span>
               <div className="text-xl font-medium text-gray-900 leading-none">
                 20,000 <span className="text-xl">UZS</span>

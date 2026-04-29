@@ -1,15 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import { UserPlus, Calendar, Search, BookOpen } from "lucide-react";
 import { useModal } from "../../context/ModalContext";
 import { useUser } from "../../context/UserContext";
+import BecomeTeacherModal from '../UI/BecomeTeacherModal'
 
 export default function HomePage() {
   const { openModal } = useModal();
   const { user } = useUser();
+  const [becomeTeacher, setBecomeTeacher] = useState(false)
+
+  interface OpenBecomeTeacherModalType {
+    (): void;
+  }
+  
+  const closeBecomeTeacherModal = () => setBecomeTeacher(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="font-sans overflow-hidden">
+      {becomeTeacher &&
+        <BecomeTeacherModal onClose={closeBecomeTeacherModal} />
+      }
       {/* Hero Section с "живым" фоном */}
       <section className="relative py-24 px-4 text-center bg-white overflow-hidden">
         {/* Декоративные анимированные круги на фоне */}
@@ -35,10 +49,12 @@ export default function HomePage() {
               Найти учителя
             </a>
             <a
-              href="/announcements"
-              className="px-4 py-4 border-2 w-[250px] border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all"
+              onClick={() => {
+                setBecomeTeacher(!becomeTeacher)
+              }}
+              className="px-4 py-4 cursor-pointer border-2 w-[250px] border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all"
             >
-              Смотреть объявления
+              Стать учителем
             </a>
           </div>
         </div>
@@ -46,7 +62,6 @@ export default function HomePage() {
 
       {!user && (
         <>
-          {/* Секция "Как это работает" с градиентом */}
           <section className="py-24 px-4 bg-gradient-to-b from-blue-50/50 to-white">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16">
