@@ -78,7 +78,7 @@ const BecomeTeacherModal = ({
                   Отправьте чек
                 </h4>
                 <p className="text-[11px] sm:text-sm text-slate-600 mt-1 leading-normal">
-                  Для активации отправьте чек в поддержку:
+                  Для активации отправьте чек и ваш ID пользователя в поддержку:
                 </p>
                 <a
                   href="https://t.me/dimaaa_o"
