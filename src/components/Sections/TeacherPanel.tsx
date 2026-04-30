@@ -16,6 +16,8 @@ import {
   Check,
   XCircle,
   Wallet,
+  MessageCircle,
+  Send
 } from "lucide-react";
 
 import CopyButton from "@/src/components/UI/HandleCopyButton";
@@ -305,72 +307,79 @@ const TeacherPanel = () => {
         </div>
 
         <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-4 pb-6 sm:p-6 md:p-8">
-          {/* Верхняя часть: Заголовок и Статус */}
-          <div className="flex justify-between items-start mb-6">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-              <CreditCard className="h-4 w-4" /> Тарифный план
-            </h3>
-            {!subLoading ? (
-              <span
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
-                  isSubscribed
-                    ? "bg-green-50 text-green-600 border-green-100"
-                    : "bg-red-50 text-red-600 border-red-100"
-                }`}
-              >
-                {isSubscribed ? "Активен" : "Не активен"}
-              </span>
-            ) : (
-              /* Скелетон в размер бейджа */
-              <div className="w-[60px] h-[25px] bg-gray-100 animate-pulse rounded-lg border border-gray-200" />
-            )}
-          </div>
+  {/* Верхняя часть: Заголовок и Статус */}
+  <div className="flex justify-between items-start mb-6">
+    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+      <CreditCard className="h-4 w-4" /> Тарифный план
+    </h3>
+    {!subLoading ? (
+      <span
+        className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
+          isSubscribed
+            ? "bg-green-50 text-green-600 border-green-100"
+            : "bg-red-50 text-red-600 border-red-100"
+        }`}
+      >
+        {isSubscribed ? "Активен" : "Не активен"}
+      </span>
+    ) : (
+      <div className="w-[60px] h-[25px] bg-gray-100 animate-pulse rounded-lg border border-gray-200" />
+    )}
+  </div>
 
-          {/* Блок с ценой в стиле скрина */}
-          <div className="flex items-center gap-4 mb-6">
-            {/* Иконка в закругленном боксе */}
-            <div className="bg-green-100 p-3 rounded-2xl border border-green-100/50">
-              <Wallet className="h-6 w-6 text-emerald-600" />
-            </div>
+  {/* Блок с ценой */}
+  <div className="flex items-center gap-4 mb-6">
+    <div className="bg-green-100 p-3 rounded-2xl border border-green-100/50">
+      <Wallet className="h-6 w-6 text-emerald-600" />
+    </div>
+    <div className="flex flex-col">
+      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight leading-none mb-0.5">
+        Стоимость в месяц
+      </span>
+      <div className="text-xl font-medium text-gray-900 leading-none">
+        20,000 <span className="text-xl">UZS</span>
+      </div>
+    </div>
+  </div>
 
-            {/* Текстовая часть */}
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight leading-none mb-0.5">
-                Стоимость в месяц
-              </span>
-              <div className="text-xl font-medium text-gray-900 leading-none">
-                20,000 <span className="text-xl">UZS</span>
-              </div>
-            </div>
-          </div>
+  {/* --- НОВЫЙ БЛОК: Реквизиты и Активация --- */}
+    <div className="mb-6 p-4 bg-blue-50/50 border border-blue-100 rounded-2xl">
+      <div className="flex items-start gap-3 mb-3">
 
-          {/* Даты оплаты */}
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
-            {/* Левая колонка */}
-            <div className="flex  flex-row items-end h-full gap-2 justify-center pl-4">
-              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
-                Оплачено
-              </p>
-              <p className="text-sm font-medium text-gray-700">
-                {paymentDate
-                  ? new Date(paymentDate).toLocaleDateString("ru-RU")
-                  : "—"}
-              </p>
-            </div>
-
-            {/* Правая колонка */}
-            <div className="flex  flex-row items-end h-full gap-2 justify-center pl-4">
-              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
-                Истекает
-              </p>
-              <p className="text-sm font-medium text-gray-700">
-                {dateOfExpiry
-                  ? new Date(dateOfExpiry).toLocaleDateString("ru-RU")
-                  : "—"}
-              </p>
-            </div>
-          </div>
+        <div>
+          <p className="text-[11px] font-bold text-blue-900 uppercase tracking-wide">Как оплатить?</p>
+          <p className="text-[13px] text-blue-700 leading-snug">
+            Переведите <b>20,000 UZS</b> на карту или через Payme/Click, затем отправьте скриншот чека и ваш ID в Telegram для активации.
+          </p>
         </div>
+      </div>
+      
+      {/* Кнопка действия */}
+      <a 
+        href="https://t.me/dimaaa_o" 
+        target="_blank"
+        className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-blue-100"
+      >
+        <Send className="h-4 w-4" /> Подтвердить оплату
+      </a>
+    </div>
+
+  {/* Даты оплаты */}
+  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
+    <div className="flex flex-row items-end h-full gap-2 justify-center">
+      <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">Оплачено</p>
+      <p className="text-sm font-medium text-gray-700">
+        {paymentDate ? new Date(paymentDate).toLocaleDateString("ru-RU") : "—"}
+      </p>
+    </div>
+    <div className="flex flex-row items-end h-full gap-2 justify-center">
+      <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">Истекает</p>
+      <p className="text-sm font-medium text-gray-700">
+        {dateOfExpiry ? new Date(dateOfExpiry).toLocaleDateString("ru-RU") : "—"}
+      </p>
+    </div>
+  </div>
+</div>
       </div>
 
       <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">

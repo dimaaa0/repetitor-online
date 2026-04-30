@@ -30,7 +30,7 @@ const BecomeTeacherModal = ({
               Как стать учителем?
             </h2>
             <p className="text-slate-500 mt-1 text-xs sm:text-base px-4">
-              3 простых шага к преподаванию
+              4 простых шага к преподаванию
             </p>
           </div>
 
@@ -46,6 +46,11 @@ const BecomeTeacherModal = ({
                 n: 2,
                 t: "Создайте объявление",
                 d: "Опишите ваши навыки и предметы.",
+              },
+              {
+                n: 3,
+                t: "Оплатите ежемесячную подписку",
+                d: "20 000 UZS / месяц",
               },
             ].map((s) => (
               <div key={s.n} className="flex gap-3 sm:gap-4">
@@ -66,11 +71,11 @@ const BecomeTeacherModal = ({
             {/* Шаг 3 */}
             <div className="flex gap-3 sm:gap-4">
               <div className="flex-shrink-0 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shadow-md text-xs sm:text-base">
-                3
+                4
               </div>
               <div className="bg-slate-100 p-3 sm:p-4 rounded-2xl border border-slate-100 w-full min-w-0">
                 <h4 className="font-semibold text-slate-800 text-sm sm:text-base">
-                  Приобретите подписку
+                  Отправьте чек
                 </h4>
                 <p className="text-[11px] sm:text-sm text-slate-600 mt-1 leading-normal">
                   Для активации отправьте чек в поддержку:
