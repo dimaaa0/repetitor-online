@@ -11,7 +11,7 @@ const PaymentInstructionsModal = ({
   isClosing,
   userId,
 }: PaymentInstructionsModalProps) => {
-  
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     // Здесь можно добавить уведомление об успехе
@@ -26,11 +26,10 @@ const PaymentInstructionsModal = ({
       <div
         onClick={(e) => e.stopPropagation()}
         className={`bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-lg border border-slate-100 flex flex-col max-h-[95vh] overflow-hidden
-                    ${
-                      isClosing
-                        ? "animate-[slideDown_0.3s_ease-in_forwards] sm:animate-[zoomOut_0.2s_ease-in_forwards]"
-                        : "animate-[slideUp_0.4s_cubic-bezier(0.16,1,0.3,1)] sm:animate-[zoomIn_0.3s_ease-out]"
-                    }`}
+                    ${isClosing
+            ? "animate-[slideDown_0.3s_ease-in_forwards] sm:animate-[zoomOut_0.2s_ease-in_forwards]"
+            : "animate-[slideUp_1s_cubic-bezier(0.16,1,0.3,1)] sm:animate-[zoomIn_0.3s_ease-out]"
+          }`}
       >
         {/* Декоративная полоска для мобилок */}
 
@@ -64,7 +63,7 @@ const PaymentInstructionsModal = ({
                   <span className="font-mono font-bold text-slate-700 tracking-wider text-sm sm:text-base">
                     4916 9903 1909 4485
                   </span>
-                  <button 
+                  <button
                     onClick={() => copyToClipboard("4916990319094485")}
                     className="p-2 cursor-pointer hover:bg-white rounded-lg transition-colors text-blue-600"
                   >
@@ -84,7 +83,9 @@ const PaymentInstructionsModal = ({
                   Отправьте чек и ID
                 </h4>
                 <div className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-100 mt-2">
-                  <code className="text-xs font-mono text-blue-600 font-bold">ID: {userId || "загрузка..."}</code>
+                  <code className="text-xs font-mono text-blue-600 font-bold block truncate max-w-[150px] sm:max-w-[280px]">
+                    ID: {userId || "загрузка..."}
+                  </code>
                   <button onClick={() => copyToClipboard(userId)} className="cursor-pointer text-slate-400 hover:text-blue-600">
                     <Copy size={14} />
                   </button>

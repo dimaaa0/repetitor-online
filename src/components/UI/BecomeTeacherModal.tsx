@@ -18,11 +18,10 @@ const BecomeTeacherModal = ({
       <div
         onClick={(e) => e.stopPropagation()}
         className={`bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-lg border border-slate-100 flex flex-col max-h-[95vh] overflow-hidden
-                    ${
-                      isClosing
-                        ? "animate-[slideDown_0.3s_ease-in_forwards] sm:animate-[zoomOut_0.2s_ease-in_forwards]"
-                        : "animate-[slideUp_0.4s_cubic-bezier(0.16,1,0.3,1)] sm:animate-[zoomIn_0.3s_ease-out]"
-                    }`}
+                    ${isClosing
+            ? "animate-[slideDown_0.3s_ease-in_forwards] sm:animate-[zoomOut_0.2s_ease-in_forwards]"
+            : "animate-[slideUp_0.8s_cubic-bezier(0.16,1,0.3,1)] sm:animate-[zoomIn_0.3s_ease-out]"
+          }`}
       >
         <div className="p-5 sm:p-8 overflow-y-auto custom-scrollbar">
           <div className="text-center mb-6">

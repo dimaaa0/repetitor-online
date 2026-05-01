@@ -6,6 +6,7 @@ import { createClient } from "../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PaymentInstructionsModal from '../UI/PaymentInstructionsModal'
+import SubscriptionSkeleton from '../UI/SubscriptionSkeleton';
 
 import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/TeacherSubjectContext";
@@ -17,11 +18,9 @@ import {
   Check,
   XCircle,
   Wallet,
-  MessageCircle,
-  Send,
-  Info,
   HelpCircle,
   ChevronRight,
+  Lock
 } from "lucide-react";
 
 import CopyButton from "@/src/components/UI/HandleCopyButton";
@@ -60,38 +59,7 @@ const TeacherPanel = () => {
     }, 300);
   };
 
-  useEffect(() => {
-    const checkSubscription = async () => {
-      if (!user?.id) return;
 
-      setSubLoading(true); // 1. Включаем перед запросом
-
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("subscription_ends_at")
-          .eq("id", user.id)
-          .single();
-
-        if (error) throw error;
-
-        if (data?.subscription_ends_at) {
-          const now = new Date();
-          const expiry = new Date(data.subscription_ends_at);
-          setIsSubscribed(expiry > now);
-        } else {
-          setIsSubscribed(false);
-        }
-      } catch (error) {
-        console.error("Ошибка при проверке подписки:", error.message);
-        setIsSubscribed(false);
-      } finally {
-        setSubLoading(false); // 2. Выключаем ТОЛЬКО когда всё закончилось
-      }
-    };
-
-    checkSubscription();
-  }, [user?.id]);
 
   const [alert, setAlert] = useState<{
     type: "success" | "error" | "info";
@@ -247,39 +215,62 @@ const TeacherPanel = () => {
   const [dateOfExpiry, setDateOfExpiry] = useState<string | null>(null);
 
   useEffect(() => {
-    const getSubscriptionData = async (userId: string) => {
-      //? ПОЛУЧЕНИЕ ДАТ О ПОДПИСКАХ
-      const { data: lastPayment, error } = await supabase
-        .from("payment_history")
-        .select("paid_at, months_paid")
-        .eq("user_id", userId)
-        .order("paid_at", { ascending: false })
-        .limit(1) // Используем limit вместо single для избежания лишних ошибок, если записей 0
-        .maybeSingle();
+    const checkAndCalculateSubscription = async () => {
+      if (!user?.id) return;
 
-      if (error) {
-        console.error("Ошибка запроса:", error.message);
-        return;
-      }
+      setSubLoading(true);
 
-      if (lastPayment) {
-        const startDate = new Date(lastPayment.paid_at);
+      try {
+        // 1. Получаем историю платежей напрямую (источник истины)
+        const { data: payments, error } = await supabase
+          .from("payment_history")
+          .select("paid_at, months_paid")
+          .eq("user_id", user.id)
+          .order("paid_at", { ascending: true });
 
-        // Важно: setMonth изменяет исходный объект даты.
-        // Создаем копию, чтобы не испортить оригинал (хотя здесь это не критично)
-        const expiryDate = new Date(startDate);
-        expiryDate.setMonth(expiryDate.getMonth() + lastPayment.months_paid);
+        if (error) throw error;
 
-        setPaymentDate(lastPayment.paid_at);
-        setDateOfExpiry(expiryDate.toISOString());
+        if (payments && payments.length > 0) {
+          let currentExpiry: Date | null = null;
+          const now = new Date();
+
+          // 2. Расчет даты окончания с учетом пауз
+          payments.forEach((payment) => {
+            const payDate = new Date(payment.paid_at);
+
+            // Если подписка первая или предыдущая уже истекла к моменту нового платежа
+            if (!currentExpiry || payDate > currentExpiry) {
+              // Начинаем отсчет с чистого листа от даты этого платежа
+              currentExpiry = new Date(payDate);
+            }
+
+            // Добавляем оплаченные месяцы к текущему периоду
+            currentExpiry.setMonth(currentExpiry.getMonth() + payment.months_paid);
+          });
+
+          if (currentExpiry) {
+            const lastPayment = payments[payments.length - 1];
+
+            // 3. Обновляем все состояния разом
+            setPaymentDate(lastPayment.paid_at);
+            setDateOfExpiry(currentExpiry.toISOString());
+            setIsSubscribed(currentExpiry > now);
+          }
+        } else {
+          // Если платежей нет
+          setIsSubscribed(false);
+          setDateOfExpiry(null);
+        }
+      } catch (err) {
+        console.error("Ошибка при обработке подписки:", err.message);
+        setIsSubscribed(false);
+      } finally {
+        setSubLoading(false);
       }
     };
 
-    // Проверяем, что ID пользователя существует перед вызовом
-    if (user?.id) {
-      getSubscriptionData(user.id);
-    }
-  }, [user?.id]); // Эффект перезапустится, когда ID появится
+    checkAndCalculateSubscription();
+  }, [user?.id]);
 
   return (
     <div>
@@ -291,13 +282,12 @@ const TeacherPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                ? "bg-white border-green-100 text-green-800"
+                : alert.type === "error"
+                  ? "bg-white border-red-100 text-red-800"
+                  : "bg-white border-blue-100 text-blue-800"
+              }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -326,101 +316,96 @@ const TeacherPanel = () => {
           </div>
         </div>
 
-        <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-4 pb-6 sm:p-6 md:p-8">
-          {/* Верхняя часть: Заголовок и Статус */}
-          <div className="flex justify-between items-start mb-6">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-              <CreditCard className="h-4 w-4" /> Тарифный план
-            </h3>
-            {!subLoading ? (
+        {subLoading ? (
+          <SubscriptionSkeleton />
+        ) : (
+          <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-4 pb-6 sm:p-6 md:p-8">
+            {/* Верхняя часть: Заголовок и Статус */}
+            <div className="flex justify-between items-start mb-6">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                <CreditCard className="h-4 w-4" /> Тарифный план
+              </h3>
               <span
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
-                  isSubscribed
-                    ? "bg-green-50 text-green-600 border-green-100"
-                    : "bg-red-50 text-red-600 border-red-100"
-                }`}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${isSubscribed
+                  ? "bg-green-50 text-green-600 border-green-100"
+                  : "bg-red-50 text-red-600 border-red-100"
+                  }`}
               >
                 {isSubscribed ? "Активен" : "Не активен"}
               </span>
+            </div>
+
+            {/* Блок с ценой */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="bg-green-100 p-3 rounded-2xl border border-green-100/50">
+                <Wallet className="h-6 w-6 text-emerald-600" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight leading-none mb-0.5">
+                  Стоимость в месяц
+                </span>
+                <div className="text-xl font-medium text-gray-900 leading-none">
+                  20,000 <span className="text-xl">UZS</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Кнопка вызова модалки */}
+            {!isSubscribed ? (
+              <div className="mb-0 group">
+                <button
+                  onClick={openPaymentModal}
+                  className="w-full cursor-pointer flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-blue-50 hover:border-blue-100 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white rounded-xl shadow-sm group-hover:bg-blue-100 transition-colors">
+                      <HelpCircle className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-tight leading-none mb-1">
+                        Доступ ограничен
+                      </p>
+                      <p className="text-xs font-semibold text-slate-700">
+                        Как активировать подписку?
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-blue-400 transform group-hover:translate-x-0.5 transition-all" />
+                </button>
+              </div>
             ) : (
-              <div className="w-[60px] h-[25px] bg-gray-100 animate-pulse rounded-lg border border-gray-200" />
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
+                <div className="flex flex-row items-end h-full gap-2 justify-center">
+                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
+                    Оплачено
+                  </p>
+                  <p className="text-sm font-medium text-gray-700">
+                    {paymentDate ? new Date(paymentDate).toLocaleDateString("ru-RU") : "—"}
+                  </p>
+                </div>
+                <div className="flex flex-row items-end h-full gap-2 justify-center">
+                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
+                    Истекает
+                  </p>
+                  <p className="text-sm font-medium text-gray-700">
+                    {dateOfExpiry ? new Date(dateOfExpiry).toLocaleDateString("ru-RU") : "—"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Модалка */}
+            {showPaymentInfo && (
+              <PaymentInstructionsModal
+                onClose={closePaymentModal}
+                isClosing={isPaymentClosing}
+                userId={user?.id}
+              />
             )}
           </div>
+        )}
 
-          {/* Блок с ценой */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="bg-green-100 p-3 rounded-2xl border border-green-100/50">
-              <Wallet className="h-6 w-6 text-emerald-600" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight leading-none mb-0.5">
-                Стоимость в месяц
-              </span>
-              <div className="text-xl font-medium text-gray-900 leading-none">
-                20,000 <span className="text-xl">UZS</span>
-              </div>
-            </div>
-          </div>
 
-          {/* --- УЛУЧШЕННЫЙ БЛОК: Кнопка вызова модалки --- */}
-          {!isSubscribed && (
-            <div className="mb-0 group">
-              <button
-                onClick={openPaymentModal}
-                className="w-full cursor-pointer flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-blue-50 hover:border-blue-100 transition-all duration-300"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-xl shadow-sm group-hover:bg-blue-100 transition-colors">
-                    <HelpCircle className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-tight leading-none mb-1">
-                      Доступ ограничен
-                    </p>
-                    <p className="text-xs font-semibold text-slate-700">
-                      Как активировать подписку?
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-blue-400 transform group-hover:translate-x-0.5 transition-all" />
-              </button>
-            </div>
-          )}
-
-          {/* Модалка остается той же */}
-          {showPaymentInfo && (
-            <PaymentInstructionsModal
-              onClose={closePaymentModal}
-              isClosing={isPaymentClosing}
-              userId={user?.id}
-            />
-          )}
-
-          {isSubscribed && (
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
-              <div className="flex flex-row items-end h-full gap-2 justify-center">
-                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
-                  Оплачено
-                </p>
-                <p className="text-sm font-medium text-gray-700">
-                  {paymentDate
-                    ? new Date(paymentDate).toLocaleDateString("ru-RU")
-                    : "—"}
-                </p>
-              </div>
-              <div className="flex flex-row items-end h-full gap-2 justify-center">
-                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
-                  Истекает
-                </p>
-                <p className="text-sm font-medium text-gray-700">
-                  {dateOfExpiry
-                    ? new Date(dateOfExpiry).toLocaleDateString("ru-RU")
-                    : "—"}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">
@@ -483,25 +468,36 @@ const TeacherPanel = () => {
         </div>
 
         <div className="pt-2">
-          <button
-            onClick={handlePublishAd}
-            disabled={isPublishing}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
-          >
-            {isPublishing ? (
+          {isSubscribed ? (
+            <button
+              onClick={handlePublishAd}
+              disabled={isPublishing}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
+            >
+              {isPublishing ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
                 Загрузка...
               </>
-            ) : hasAd ? (
+              ) : hasAd ? (
               "Сохранить изменения"
-            ) : (
+              ) : (
               "Опубликовать объявление"
-            )}
-          </button>
+              )}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={openPaymentModal}
+              className="w-full bg-amber-50 cursor-pointer text-amber-700 border border-amber-200 py-3 px-4 rounded-xl font-semibold hover:bg-amber-100 transition-colors flex items-center justify-center gap-2"
+            >
+              <Lock className="h-4 w-4" />
+              Активировать подписку
+            </button>
+          )}
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

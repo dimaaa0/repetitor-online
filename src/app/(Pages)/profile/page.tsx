@@ -33,38 +33,6 @@ const Profile = () => {
   const supabase = createClient();
   const router = useRouter();
 
-  const [isSubscribed, setIsSubscribed] = useState(false);
-
-  useEffect(() => {
-    const checkSubscription = async () => {
-      if (!user?.id) return;
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("subscription_ends_at")
-        .eq("id", user.id)
-        .single(); // Получаем один конкретный объект
-
-      if (error) {
-        console.error("Ошибка при проверке подписки:", error.message);
-        return;
-      }
-
-      if (data?.subscription_ends_at) {
-        const now = new Date();
-        const expiry = new Date(data.subscription_ends_at);
-
-        // Статус: true, если дата в будущем
-        setIsSubscribed(expiry > now);
-      } else {
-        setIsSubscribed(false);
-      }
-    };
-
-    checkSubscription();
-  }, [user?.id]);
-
-
   // Состояния
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -327,9 +295,9 @@ const Profile = () => {
                 setConfirmation(false)
               }}
               className="fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm">
-              <div 
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm transform transition-all pointer-events-auto scale-100 border border-gray-100">
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm transform transition-all pointer-events-auto scale-100 border border-gray-100">
                 {/* Иконка или Заголовок (опционально для красоты) */}
                 <div className="flex flex-col items-center text-center">
                   <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4">
