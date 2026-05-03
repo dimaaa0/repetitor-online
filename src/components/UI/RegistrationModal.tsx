@@ -79,6 +79,24 @@ export default function SignInForm() {
     }
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      // 1. Переносим пользователя на самый верх
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      
+      // 2. Блокируем скролл основного контента
+      document.body.style.overflow = "hidden";
+    } else {
+      // 3. Возвращаем скролл при закрытии
+      document.body.style.overflow = "unset";
+    }
+
+    // Чистим эффект при размонтировании компонента
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   const handleSignUp = async () => {
     // Регулярное выражение: разрешаем только буквы (латиница + кириллица) и пробелы
     // Цифры (\d) запрещены
@@ -106,7 +124,6 @@ export default function SignInForm() {
         },
       });
 
-
       if (error) throw error;
 
       if (data.user && data.user.identities?.length === 0) {
@@ -117,7 +134,6 @@ export default function SignInForm() {
         setIsLogin(true);
         return;
       }
-
 
       // if (data.user?.id) {
       //   const { error: profileError } = await supabase
@@ -133,7 +149,6 @@ export default function SignInForm() {
       //     console.error("Ошибка при создании профиля:", profileError, profileError.details, profileError.message);
       //   }
       // }
-
 
       showAlert("success", "Проверьте почту для подтверждения!");
       setIsLogin(true);
@@ -172,18 +187,19 @@ export default function SignInForm() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed min-h-screen inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+    <div className="absolute min-h-screen inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
       {/* Кастомное уведомление */}
       {alert && (
         <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[10000] animate-in fade-in slide-in-from-top-4 duration-300">
           <div
             className={`px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 font-bold text-sm
-      ${alert.type === "error"
-                ? "bg-red-50 border-red-100 text-red-600"
-                : alert.type === "success"
-                  ? "bg-emerald-50 border-emerald-100 text-emerald-600"
-                  : "bg-blue-50 border-blue-100 text-blue-600"
-              }`}
+    ${
+      alert.type === "error"
+        ? "bg-red-50 border-red-100 text-red-600"
+        : alert.type === "success"
+          ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+          : "bg-blue-50 border-blue-100 text-blue-600"
+    }`}
           >
             {alert.type === "error" && <X size={18} />}
             {alert.type === "success" && (

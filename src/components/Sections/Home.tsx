@@ -5,6 +5,7 @@ import { UserPlus, Calendar, Search, BookOpen } from "lucide-react";
 import { useModal } from "../../context/ModalContext";
 import { useUser } from "../../context/UserContext";
 import BecomeTeacherModal from "../UI/BecomeTeacherModal";
+import SignInForm from "../UI/SignInForm";
 
 export default function HomePage() {
   const { openModal } = useModal();
