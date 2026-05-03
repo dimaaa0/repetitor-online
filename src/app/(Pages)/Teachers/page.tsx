@@ -1,13 +1,16 @@
 "use client";
 
-import { Heart, Filter } from "lucide-react";
+import { Heart, Filter, X, Clock } from "lucide-react"; // Добавил X и Clock
 import React, { useState, useEffect } from "react";
 import { useTeacherAnnouncement } from "../../../context/TeacherAnnouncementContext";
+// Предполагаю, что у вас есть контекст пользователя, чтобы узнать его роль
+// import { useAuth } from "../../../context/AuthContext";
 import TeacherCard from "../../../components/UI/TeacherCard";
 import FilterPanel from "@/src/components/UI/TeacherFilter";
 
 const TutorsPageWithAnimation = () => {
   const { announcements, announcementsLoading } = useTeacherAnnouncement();
+  // const { profile } = useAuth(); // Достаем профиль, где лежит роль (Tutor/Student)
 
   const [filters, setFilters] = useState({
     subject: "",
@@ -18,25 +21,30 @@ const TutorsPageWithAnimation = () => {
   });
 
   const [openFilter, setOpenFilter] = useState(false);
+  const [showNotify, setShowNotify] = useState(false);
 
   const toggleFilter = () => setOpenFilter(!openFilter);
 
-  const [showNotify, setShowNotify] = useState(false);
-
-  // useEffect(() => {
-  //   if (userRole === "Tutor") {
-  //     const timer = setTimeout(() => setShowNotify(true), 1500);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [userRole]);
+  // Логика уведомления для репетитора
+  useEffect(() => {
+    // Вставьте сюда вашу проверку роли (например, profile?.role === "Tutor")
+    // Для примера оставил закомментированным, пока не привяжете к своему AuthContext
+    /* if (profile?.role === "Tutor") {
+      const timer = setTimeout(() => setShowNotify(true), 1500);
+      return () => clearTimeout(timer);
+    } 
+    */
+  }, []); // Зависимость от profile?.role
 
   return (
-    <div className="min-h-screen   bg-[#FBFDFF] pb-20">
-      <div className="bg-white border-b  border-slate-100  py-12 mb-8">
-        <div className="max-w-[1250] mx-auto px-2 sm:px-6">
+    <div className="min-h-screen bg-[#FBFDFF] pb-20">
+      <div className="bg-white border-b border-slate-100 py-12 mb-8">
+        <div className="max-w-[1250px] mx-auto px-2 sm:px-6">
+          {" "}
+          {/* Исправил max-w-[1250] на [1250px] */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <h1 className="text-3xl  md:text-4xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
                 Поиск <span className="text-blue-600">учителя</span>
               </h1>
               <p className="text-slate-500 mt-2 font-medium">
@@ -63,43 +71,35 @@ const TutorsPageWithAnimation = () => {
         </div>
       </div>
 
-      <div className="max-w-[1250] mx-auto px-2 sm:px-6">
+      <div className="max-w-[1250px] mx-auto px-2 sm:px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
-            Актуальные заявки: {announcements.length}
+            Актуальные заявки: {announcements?.length || 0}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 pb-4 gap-8 md:grid-cols-1 lg:grid-cols-2 ">
-          {announcementsLoading && announcements.length === 0
-            ? // Показываем скелетоны только при первой загрузке
-              Array.from({ length: 4 }).map((_, index) => (
+        <div className="grid grid-cols-1 pb-4 gap-8 md:grid-cols-1 lg:grid-cols-2">
+          {announcementsLoading &&
+          (!announcements || announcements.length === 0)
+            ? Array.from({ length: 4 }).map((_, index) => (
                 <TeacherCard
                   key={`skeleton-${index}`}
                   teacher={{} as any}
                   isLoading={true}
                 />
               ))
-            : // Показываем реальные данные
-              announcements.map((teacher: any) => (
+            : announcements?.map((teacher: any) => (
                 <TeacherCard
-                  key={teacher.id} // Всегда используйте уникальный ID из базы
+                  key={teacher.id || Math.random()}
                   teacher={teacher}
                   isLoading={false}
                 />
               ))}
         </div>
       </div>
-    </div>
-  );
-};
 
-export default TutorsPageWithAnimation;
-
-//! СДЕЛАТЬ ЕСЛИ АККАУНТА РОЛЬ РЕПЕТИТОР, ТО КАЖДЫЙ РАЗ ВЫДАВАТЬ В ПРАВОМ НИЖНЕМ УГЛУ УВЕДОМЛЕНИЕ, ЧТОБЫ ЧЕЛОВЕК НЕ ЗАБЫЛ ИЗМЕНИТЬ СВОЕ РАСПИСАНИЕ, ДЛЯ КОРРЕКТНОЙ СОРТИРОВКИ.
-
-{
-  /* {showNotify && (
+      {/* Уведомление для репетитора */}
+      {/* {showNotify && (
         <div className="fixed bottom-6 right-6 z-[100] animate-in fade-in slide-in-from-bottom-10 duration-500">
           <div className="bg-white border-l-4 border-blue-600 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-2xl p-5 max-w-[320px] relative group">
             <button
@@ -120,12 +120,19 @@ export default TutorsPageWithAnimation;
                 <p className="text-xs text-slate-500 mt-1 leading-snug">
                   Чтобы быть выше в поиске, держите календарь актуальным.
                 </p>
-                <button className="mt-3 text-xs font-bold text-blue-600 hover:text-blue-700 underline decoration-2 underline-offset-4">
+                <button
+                  className="mt-3 text-xs font-bold text-blue-600 hover:text-blue-700 underline decoration-2 underline-offset-4"
+                  onClick={() => (window.location.href = "/profile")} // Пример ссылки
+                >
                   Перейти в календарь →
                 </button>
               </div>
             </div>
           </div>
         </div>
-      )} */
-}
+      )} */}
+    </div>
+  );
+};
+
+export default TutorsPageWithAnimation;

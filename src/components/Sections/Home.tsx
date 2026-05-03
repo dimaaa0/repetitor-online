@@ -45,7 +45,7 @@ export default function HomePage() {
 
         <div className="relative z-10">
           <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">
-            Найдите идеального <span className="text-blue-600">репетитора</span>{" "}
+            Найдите ааааааааааааааааааааа идеального <span className="text-blue-600">репетитора</span>{" "}
             для вас
           </h1>
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-500 mb-10 leading-relaxed">
