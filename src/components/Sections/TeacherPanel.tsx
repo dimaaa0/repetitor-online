@@ -5,8 +5,8 @@ import { useState, useEffect } from "react";
 import { createClient } from "../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import PaymentInstructionsModal from '../UI/PaymentInstructionsModal'
-import SubscriptionSkeleton from '../UI/SubscriptionSkeleton';
+import PaymentInstructionsModal from "../UI/PaymentInstructionsModal";
+import SubscriptionSkeleton from "../UI/SubscriptionSkeleton";
 
 import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/TeacherSubjectContext";
@@ -20,7 +20,7 @@ import {
   Wallet,
   HelpCircle,
   ChevronRight,
-  Lock
+  Lock,
 } from "lucide-react";
 
 import CopyButton from "@/src/components/UI/HandleCopyButton";
@@ -58,8 +58,6 @@ const TeacherPanel = () => {
       setIsPaymentClosing(false);
     }, 300);
   };
-
-
 
   const [alert, setAlert] = useState<{
     type: "success" | "error" | "info";
@@ -221,7 +219,7 @@ const TeacherPanel = () => {
       setSubLoading(true);
 
       try {
-        // 1. Получаем историю платежей напрямую (источник истины)
+        // 1. Указываем ожидаемый тип данных из таблицы
         const { data: payments, error } = await supabase
           .from("payment_history")
           .select("paid_at, months_paid")
@@ -230,39 +228,44 @@ const TeacherPanel = () => {
 
         if (error) throw error;
 
+        // Проверяем наличие данных и их длину
         if (payments && payments.length > 0) {
           let currentExpiry: Date | null = null;
           const now = new Date();
 
-          // 2. Расчет даты окончания с учетом пауз
-          payments.forEach((payment) => {
-            const payDate = new Date(payment.paid_at);
+          // 2. Расчет даты окончания
+          payments.forEach(
+            (payment: { paid_at: string; months_paid: number }) => {
+              const payDate = new Date(payment.paid_at);
 
-            // Если подписка первая или предыдущая уже истекла к моменту нового платежа
-            if (!currentExpiry || payDate > currentExpiry) {
-              // Начинаем отсчет с чистого листа от даты этого платежа
-              currentExpiry = new Date(payDate);
-            }
+              if (!currentExpiry || payDate > currentExpiry) {
+                currentExpiry = new Date(payDate);
+              }
 
-            // Добавляем оплаченные месяцы к текущему периоду
-            currentExpiry.setMonth(currentExpiry.getMonth() + payment.months_paid);
-          });
+              currentExpiry.setMonth(
+                currentExpiry.getMonth() + payment.months_paid,
+              );
+            },
+          );
 
           if (currentExpiry) {
             const lastPayment = payments[payments.length - 1];
 
-            // 3. Обновляем все состояния разом
             setPaymentDate(lastPayment.paid_at);
-            setDateOfExpiry(currentExpiry.toISOString());
-            setIsSubscribed(currentExpiry > now);
+            setDateOfExpiry((currentExpiry as Date).toISOString());
+            setIsSubscribed(currentExpiry > now.getTime());
           }
         } else {
-          // Если платежей нет
           setIsSubscribed(false);
           setDateOfExpiry(null);
         }
       } catch (err) {
-        console.error("Ошибка при обработке подписки:", err.message);
+        // Исправляем ошибку: 'err' is of type 'unknown'
+        if (err instanceof Error) {
+          console.error("Ошибка при обработке подписки:", err.message);
+        } else {
+          console.error("Неизвестная ошибка:", err);
+        }
         setIsSubscribed(false);
       } finally {
         setSubLoading(false);
@@ -270,7 +273,7 @@ const TeacherPanel = () => {
     };
 
     checkAndCalculateSubscription();
-  }, [user?.id]);
+  }, [user?.id, supabase]); // Добавил supabase в зависимости для корректности
 
   return (
     <div>
@@ -282,12 +285,13 @@ const TeacherPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${alert.type === "success"
-                ? "bg-white border-green-100 text-green-800"
-                : alert.type === "error"
-                  ? "bg-white border-red-100 text-red-800"
-                  : "bg-white border-blue-100 text-blue-800"
-              }
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -326,10 +330,11 @@ const TeacherPanel = () => {
                 <CreditCard className="h-4 w-4" /> Тарифный план
               </h3>
               <span
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${isSubscribed
-                  ? "bg-green-50 text-green-600 border-green-100"
-                  : "bg-red-50 text-red-600 border-red-100"
-                  }`}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
+                  isSubscribed
+                    ? "bg-green-50 text-green-600 border-green-100"
+                    : "bg-red-50 text-red-600 border-red-100"
+                }`}
               >
                 {isSubscribed ? "Активен" : "Не активен"}
               </span>
@@ -380,7 +385,9 @@ const TeacherPanel = () => {
                     Оплачено
                   </p>
                   <p className="text-sm font-medium text-gray-700">
-                    {paymentDate ? new Date(paymentDate).toLocaleDateString("ru-RU") : "—"}
+                    {paymentDate
+                      ? new Date(paymentDate).toLocaleDateString("ru-RU")
+                      : "—"}
                   </p>
                 </div>
                 <div className="flex flex-row items-end h-full gap-2 justify-center">
@@ -388,7 +395,9 @@ const TeacherPanel = () => {
                     Истекает
                   </p>
                   <p className="text-sm font-medium text-gray-700">
-                    {dateOfExpiry ? new Date(dateOfExpiry).toLocaleDateString("ru-RU") : "—"}
+                    {dateOfExpiry
+                      ? new Date(dateOfExpiry).toLocaleDateString("ru-RU")
+                      : "—"}
                   </p>
                 </div>
               </div>
@@ -404,8 +413,6 @@ const TeacherPanel = () => {
             )}
           </div>
         )}
-
-
       </div>
 
       <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">
@@ -475,14 +482,14 @@ const TeacherPanel = () => {
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
             >
               {isPublishing ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Загрузка...
-              </>
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Загрузка...
+                </>
               ) : hasAd ? (
-              "Сохранить изменения"
+                "Сохранить изменения"
               ) : (
-              "Опубликовать объявление"
+                "Опубликовать объявление"
               )}
             </button>
           ) : (
@@ -497,7 +504,7 @@ const TeacherPanel = () => {
           )}
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
