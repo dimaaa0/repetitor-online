@@ -28,7 +28,8 @@ export const TutorAnnouncementProvider = ({
             profiles:user_id (
               name,
               surname,
-              avatar_url
+              avatar_url,
+              is_subscribed
             ),
             ads_likes (count) 
           `);
@@ -36,20 +37,24 @@ export const TutorAnnouncementProvider = ({
       if (error) {
         console.error("Ошибка загрузки:", error.message);
       } else {
-        const formattedData = data.map((ad: any) => ({
-          id: ad.id,
-          name: ad.profiles?.name,
-          surname: ad.profiles?.surname,
-          avatar: ad.profiles?.avatar_url,
-          subject: ad.subject,
-          description: ad.description,
-          price: ad.price + " UZS",
-          // 2. Достаем count из массива ads_likes
-          // Supabase возвращает массив объектов, берем первый и его свойство count
-          likes: ad.ads_likes?.[0]?.count || 0,
-        }));
+        const formattedData = data
+          .map((ad: any) => ({
+            id: ad.id,
+            name: ad.profiles?.name,
+            surname: ad.profiles?.surname,
+            avatar: ad.profiles?.avatar_url,
+            subject: ad.subject,
+            description: ad.description,
+            price: ad.price + " UZS",
+            likes: ad.ads_likes?.[0]?.count || 0,
+            is_subscribed: ad.profiles?.is_subscribed || false,
+          }))
+          // Оставляем только тех, у кого подписка true
+          .filter((ad) => ad.is_subscribed === true);
 
         setAnnouncements(formattedData);
+
+        // setAnnouncements(formattedData);
         setOriginalAnnouncements(formattedData);
       }
       setAnnouncementsLoading(false);
@@ -57,6 +62,12 @@ export const TutorAnnouncementProvider = ({
 
     fetchTeachers();
   }, []);
+
+  useEffect(() => {
+    for (let i = 0; i < announcements.length; i++) {
+      const element = announcements[i];
+    }
+  }, [announcements]);
 
   return (
     <TutorAnnouncementContext.Provider

@@ -3,14 +3,11 @@
 import { Heart, Filter, X, Clock } from "lucide-react"; // Добавил X и Clock
 import React, { useState, useEffect } from "react";
 import { useTeacherAnnouncement } from "../../../context/TeacherAnnouncementContext";
-// Предполагаю, что у вас есть контекст пользователя, чтобы узнать его роль
-// import { useAuth } from "../../../context/AuthContext";
 import TeacherCard from "../../../components/UI/TeacherCard";
 import FilterPanel from "@/src/components/UI/TeacherFilter";
 
 const TutorsPageWithAnimation = () => {
   const { announcements, announcementsLoading } = useTeacherAnnouncement();
-  // const { profile } = useAuth(); // Достаем профиль, где лежит роль (Tutor/Student)
 
   const [filters, setFilters] = useState({
     subject: "",

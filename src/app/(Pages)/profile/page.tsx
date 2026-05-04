@@ -55,9 +55,9 @@ const Profile = () => {
 
   const [hasAd, setHasAd] = useState(false);
 
-  const [confirmation, setConfirmation] = useState(false)
+  const [confirmation, setConfirmation] = useState(false);
 
-  const roleStyles:any = {
+  const roleStyles: any = {
     Tutor: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100",
     Student: "bg-green-50 text-green-700 border-green-200 hover:bg-green-100",
     Admin: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100",
@@ -267,14 +267,14 @@ const Profile = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${alert.type === "success"
-                  ? "bg-white border-green-100 text-green-800"
-                  : alert.type === "error"
-                    ? "bg-white border-red-100 text-red-800"
-                    : "bg-white border-blue-100 text-blue-800"
-                }
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
       `}
-
             >
               {alert.type === "success" && (
                 <Check className="h-5 w-5 text-green-500" />
@@ -288,53 +288,55 @@ const Profile = () => {
           </div>
         )}
 
-        {
-          confirmation && (
+        {confirmation && (
+          <div
+            onClick={() => {
+              setConfirmation(false);
+            }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm"
+          >
             <div
-              onClick={() => {
-                setConfirmation(false)
-              }}
-              className="fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm">
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm transform transition-all pointer-events-auto scale-100 border border-gray-100">
-                {/* Иконка или Заголовок (опционально для красоты) */}
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4">
-                    <LogOut className="w-6 h-6 text-[#C92222]" />
-                  </div>
-
-                  <h3 className="text-lg font-semibold text-gray-900">Выход из аккаунта</h3>
-                  <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-                    Вы уверены, что хотите выйти? Вам придется заново вводить логин и пароль.
-                  </p>
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm transform transition-all pointer-events-auto scale-100 border border-gray-100"
+            >
+              {/* Иконка или Заголовок (опционально для красоты) */}
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4">
+                  <LogOut className="w-6 h-6 text-[#C92222]" />
                 </div>
 
-                {/* Кнопки действий */}
-                <div className="mt-6 flex flex-col gap-2 sm:flex-row-reverse sm:gap-3">
-                  <button
-                    onClick={handleLogout
-                    }
-                    className="w-full sm:w-1/2 px-4 py-2.5 bg-[#C92222] text-white text-sm font-medium rounded-xl 
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Выход из аккаунта
+                </h3>
+                <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+                  Вы уверены, что хотите выйти? Вам придется заново вводить
+                  логин и пароль.
+                </p>
+              </div>
+
+              {/* Кнопки действий */}
+              <div className="mt-6 flex flex-col gap-2 sm:flex-row-reverse sm:gap-3">
+                <button
+                  onClick={handleLogout}
+                  className="w-full sm:w-1/2 px-4 py-2.5 bg-[#C92222] text-white text-sm font-medium rounded-xl 
                    hover:bg-[#b01e1e] active:scale-[0.97] transition-all shadow-md shadow-red-200 cursor-pointer"
-                  >
-                    Подтвердить
-                  </button>
+                >
+                  Подтвердить
+                </button>
 
-                  <button
-                    onClick={() => {
-                      setConfirmation(false)
-                    }}
-                    className="w-full sm:w-1/2 px-4 py-2.5 bg-gray-50 text-gray-700 text-sm font-medium rounded-xl 
+                <button
+                  onClick={() => {
+                    setConfirmation(false);
+                  }}
+                  className="w-full sm:w-1/2 px-4 py-2.5 bg-gray-50 text-gray-700 text-sm font-medium rounded-xl 
                    hover:bg-gray-100 active:scale-[0.97] transition-all cursor-pointer border border-gray-200"
-                  >
-                    Отмена
-                  </button>
-                </div>
+                >
+                  Отмена
+                </button>
               </div>
             </div>
-          )
-        }
+          </div>
+        )}
         {/* Шапка профиля */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8 mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
@@ -397,10 +399,11 @@ const Profile = () => {
                       title="Сменить роль"
                       onClick={toggleRole}
                       className={`cursor-pointer flex items-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border-2 transition-all duration-300 active:scale-95 shadow-sm
-                ${formData.role === "Tutor"
-                          ? "bg-green-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                          : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                        }`}
+                ${
+                  formData.role === "Tutor"
+                    ? "bg-green-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                    : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                }`}
                     >
                       <span className="mr-2 italic opacity-70">Роль:</span>
                       <span className="uppercase">
@@ -423,12 +426,13 @@ const Profile = () => {
           `}
                   >
                     <span
-                      className={`w-1.5 h-1.5 rounded-full mr-2 animate-pulse ${user.role === "Admin"
-                        ? "bg-red-500"
-                        : user.role === "Tutor"
-                          ? "bg-blue-500"
-                          : "bg-green-500"
-                        }`}
+                      className={`w-1.5 h-1.5 rounded-full mr-2 animate-pulse ${
+                        user.role === "Admin"
+                          ? "bg-red-500"
+                          : user.role === "Tutor"
+                            ? "bg-blue-500"
+                            : "bg-green-500"
+                      }`}
                     />
                     {!user.role
                       ? "User"
@@ -490,7 +494,7 @@ const Profile = () => {
         <div className="mt-4 flex justify-end">
           <button
             onClick={() => {
-              setConfirmation(true)
+              setConfirmation(true);
             }}
             className="flex items-center gap-2 mb-1 px-4 py-2 rounded-lg font-medium transition-all 
              border border-red-400 bg-transparent text-red-500 hover:bg-red-400 hover:text-white hover:border-red-400 cursor-pointer"
