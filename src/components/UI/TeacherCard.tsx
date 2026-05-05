@@ -8,6 +8,7 @@ const supabase = createClient();
 
 interface Teacher {
   id: number | string; // ID обязателен для работы лайков
+  user_id?: string; // Для получения короткого ID
   name?: string;
   surname?: string;
   subject?: string;
@@ -37,16 +38,27 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
   const [isLiked, setIsLiked] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
+
   // Проверяем, лайкнул ли текущий пользователь этого учителя при загрузке
   useEffect(() => {
     const fetchCurrentStatus = async () => {
-      // 1. Получаем текущего пользователя
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
 
-      // 2. Запрашиваем актуальное кол-во лайков именно для этого учителя
-      // Это защитит от ситуации, если данные в пропсах устарели
+      // Если юзер есть, сохраняем его короткий ID
+      if (user) {
+
+        // Проверка лайка (ваш существующий код)
+        const { data: likeData } = await supabase
+          .from("ads_likes")
+          .select("id")
+          .eq("ad_id", teacher.id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        setIsLiked(!!likeData);
+      }
+
+      // Запрос лайков объявления (ваш существующий код)
       const { data: adData } = await supabase
         .from("ads")
         .select("likes")
@@ -54,18 +66,6 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
         .single();
 
       if (adData) setLikesCount(adData.likes);
-
-      // 3. Проверяем, лайкал ли этот пользователь данную карточку
-      if (user) {
-        const { data: likeData } = await supabase
-          .from("ads_likes")
-          .select("id")
-          .eq("ad_id", teacher.id)
-          .eq("user_id", user.id)
-          .maybeSingle(); // Используем maybeSingle, чтобы не было ошибки, если лайка нет
-
-        setIsLiked(!!likeData);
-      }
     };
 
     if (teacher.id) fetchCurrentStatus();
@@ -84,6 +84,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return showAlert("error", "Войдите, чтобы ставить лайки");
+
 
     setIsProcessing(true);
 
@@ -113,7 +114,9 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
     }
   };
 
-  const shortId = teacher.id?.toString().slice(0, 8);
+  console.log(teacher.id);
+  const displayId = teacher.id ? String(teacher.id).slice(0, 8) : "";
+
 
   if (isLoading) return <TeacherSkeleton />;
 
@@ -216,11 +219,11 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
             за 60 минут
           </span>
         </div>
-        <Link href={`/teachers/${shortId}`}>
-          <button className="bg-[#0f172a] cursor-pointer text-white px-8 py-3 rounded-2xl font-semibold">
-            Выбрать
-          </button>
-        </Link>
+        <Link href={`/teachers/${displayId}`}>
+      <button className="bg-[#0f172a] cursor-pointer text-white px-8 py-3 rounded-2xl font-semibold hover:bg-slate-800 transition-colors">
+        Выбрать
+      </button>
+    </Link>
       </div>
     </div>
   );
