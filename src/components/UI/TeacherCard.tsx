@@ -217,7 +217,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
           </span>
         </div>
         <Link href={`/teachers/${shortId}`}>
-          <button className="bg-[#0f172a] text-white px-8 py-3 rounded-2xl font-semibold">
+          <button className="bg-[#0f172a] cursor-pointer text-white px-8 py-3 rounded-2xl font-semibold">
             Выбрать
           </button>
         </Link>
