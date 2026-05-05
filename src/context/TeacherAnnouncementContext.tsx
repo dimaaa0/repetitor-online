@@ -20,9 +20,7 @@ export const TutorAnnouncementProvider = ({
       setAnnouncementsLoading(true);
 
       // 1. Добавляем запрос количества из связанной таблицы ads_likes
-      const { data, error } = await supabase
-      .from("ads")
-      .select(`
+      const { data, error } = await supabase.from("ads").select(`
             id,
             subject,
             description,
