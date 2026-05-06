@@ -114,7 +114,6 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
     }
   };
 
-  console.log(teacher.id);
   const displayId = teacher.id ? String(teacher.id).slice(0, 8) : "";
 
 
