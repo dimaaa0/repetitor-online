@@ -11,8 +11,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Основной запрос данных профиля
   const {
-    data:
-    user,
+    data: user,
     isLoading,
     refetch,
   } = useQuery({

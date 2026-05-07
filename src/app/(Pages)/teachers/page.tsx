@@ -34,7 +34,7 @@ const TutorsPageWithAnimation = () => {
   }, []); // Зависимость от profile?.role
 
   return (
-    <div className="min-h-screen bg-[#FBFDFF] pb-20">
+    <div className="min-h-screen bg-[#FBFDFF] pb-20 relative ">
       <div className="bg-white border-b border-slate-100 py-12 mb-8">
         <div className="max-w-[1250px] mx-auto px-2 sm:px-6">
           {" "}
@@ -77,21 +77,21 @@ const TutorsPageWithAnimation = () => {
 
         <div className="grid grid-cols-1 pb-4 gap-8 md:grid-cols-1 lg:grid-cols-2">
           {announcementsLoading &&
-            (!announcements || announcements.length === 0)
+          (!announcements || announcements.length === 0)
             ? Array.from({ length: 4 }).map((_, index) => (
-              <TeacherCard
-                key={`skeleton-${index}`}
-                teacher={{} as any}
-                isLoading={true}
-              />
-            ))
+                <TeacherCard
+                  key={`skeleton-${index}`}
+                  teacher={{} as any}
+                  isLoading={true}
+                />
+              ))
             : announcements?.map((teacher: any) => (
-              <TeacherCard
-                key={teacher.id || Math.random()}
-                teacher={teacher}
-                isLoading={false}
-              />
-            ))}
+                <TeacherCard
+                  key={teacher.id || Math.random()}
+                  teacher={teacher}
+                  isLoading={false}
+                />
+              ))}
         </div>
       </div>
 

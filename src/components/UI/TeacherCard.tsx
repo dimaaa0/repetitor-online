@@ -3,6 +3,7 @@ import TeacherSkeleton from "./TeacherSkeletonLoader";
 import { Check, Heart, XCircle } from "lucide-react";
 import { createClient } from "../../../src/utils/supabase/client";
 import Link from "next/link";
+import { useModal } from "../../../src/context/ModalContext";
 
 const supabase = createClient();
 
@@ -29,6 +30,8 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
 
+  const { openModal } = useModal();
+
   const [alert, setAlert] = useState<{
     type: "success" | "error" | "info";
     message: string;
@@ -38,15 +41,15 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
   const [isLiked, setIsLiked] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-
   // Проверяем, лайкнул ли текущий пользователь этого учителя при загрузке
   useEffect(() => {
     const fetchCurrentStatus = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       // Если юзер есть, сохраняем его короткий ID
       if (user) {
-
         // Проверка лайка (ваш существующий код)
         const { data: likeData } = await supabase
           .from("ads_likes")
@@ -83,8 +86,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return showAlert("error", "Войдите, чтобы ставить лайки");
-
+    if (!user) return  openModal();
 
     setIsProcessing(true);
 
@@ -116,7 +118,6 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
 
   const displayId = teacher.id ? String(teacher.id).slice(0, 8) : "";
 
-
   if (isLoading) return <TeacherSkeleton />;
 
   return (
@@ -129,12 +130,13 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${alert.type === "success"
-                ? "bg-white border-green-100 text-green-800"
-                : alert.type === "error"
-                  ? "bg-white border-red-100 text-red-800"
-                  : "bg-white border-blue-100 text-blue-800"
-              }
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -153,12 +155,14 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
         <button
           onClick={handleLike}
           disabled={isProcessing}
-          className={`flex items-center cursor-pointer gap-1 mb-2 p-2 rounded-xl transition duration-300 ${isLiked ? "bg-rose-50" : "bg-slate-50 hover:bg-blue-50"
-            }`}
+          className={`flex items-center cursor-pointer gap-1 mb-2 p-2 rounded-xl transition duration-300 ${
+            isLiked ? "bg-rose-50" : "bg-slate-50 hover:bg-blue-50"
+          }`}
         >
           <Heart
-            className={`w-5 h-5 transition-colors ${isLiked ? "text-rose-500 fill-rose-500" : "text-slate-400"
-              }`}
+            className={`w-5 h-5 transition-colors ${
+              isLiked ? "text-rose-500 fill-rose-500" : "text-slate-400"
+            }`}
           />
           <span
             className={`text-xs font-bold ${isLiked ? "text-rose-600" : "text-slate-600"}`}
@@ -219,10 +223,10 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
           </span>
         </div>
         <Link href={`/teachers/${displayId}`}>
-      <button className="bg-[#0f172a] cursor-pointer text-white px-8 py-3 rounded-2xl font-semibold hover:bg-slate-800 transition-colors">
-        Выбрать
-      </button>
-    </Link>
+          <button className="bg-[#0f172a] cursor-pointer text-white px-8 py-3 rounded-2xl font-semibold hover:bg-slate-800 transition-colors">
+            Выбрать
+          </button>
+        </Link>
       </div>
     </div>
   );

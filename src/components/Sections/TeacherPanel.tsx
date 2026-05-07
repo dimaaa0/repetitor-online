@@ -28,7 +28,7 @@ import AddAvatar from "@/src/components/UI/AddAvatar";
 import SubjectPicker from "@/src/components/UI/TeacherSubjectPicker";
 
 const TeacherPanel = () => {
-  const { user, loading, refreshUser } = useUser();
+  const { user } = useUser();
   const { selectedSubjects, setSelectedSubjects } = useSubject();
   const supabase = createClient();
   const router = useRouter();

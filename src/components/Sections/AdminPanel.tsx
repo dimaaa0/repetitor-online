@@ -10,6 +10,8 @@ import {
   Users,
   Activity,
   ChevronRight,
+  Check,
+  XCircle,
 } from "lucide-react";
 
 // Тип для отдельной транзакции из истории
@@ -172,23 +174,62 @@ const AdminPanel = () => {
     fetchRevenue(selectedDate);
   }, [selectedDate]);
 
+  const [alert, setAlert] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+
+  const showAlert = (type: "success" | "error" | "info", message: string) => {
+    setAlert({ type, message });
+    setTimeout(() => setAlert(null), 3000);
+  };
+
   const handleActivate = async () => {
-    if (!targetId) return alert("Введите ID репетитора");
+    if (!targetId) return showAlert("error", "Введите ID репетитора");
     const { error } = await supabase.rpc("activate_custom_sub", {
       target_user_id: targetId,
       months_to_add: months,
     });
 
     if (error) {
-      alert("Ошибка: " + error.message);
+      showAlert("error", "Ошибка: " + error.message);
     } else {
-      alert(`Успешно активировано!`);
+      showAlert("success", `Успешно активировано!`);
       setTargetId("");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-2 ">
+      {alert && (
+        <div className="fixed top-6 left-0 right-0 z-[9999] flex justify-center px-4 pointer-events-none">
+          <div
+            className={`
+        pointer-events-auto
+        flex items-center gap-3
+        px-6 py-4 rounded-2xl shadow-2xl border
+        animate-in fade-in slide-in-from-top-4 duration-300
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
+      `}
+          >
+            {/* Иконки для красоты (опционально) */}
+            {alert.type === "success" && (
+              <Check className="h-5 w-5 text-green-500" />
+            )}
+            {alert.type === "error" && (
+              <XCircle className="h-5 w-5 text-red-500" />
+            )}
+
+            <span className="font-bold text-sm">{alert.message}</span>
+          </div>
+        </div>
+      )}
       <div className="max-w-[1250px] mx-auto ">
         {/* Шапка панели */}
 

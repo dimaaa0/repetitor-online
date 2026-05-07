@@ -46,7 +46,7 @@ export default function RootLayout({
                   <UserProvider>
                     <StudentAnnouncementProvider>
                       <Header />
-                      <main className="flex-grow">{children}</main>
+                      <main className="flex-grow ">{children}</main>
                       <Footer />
                     </StudentAnnouncementProvider>
                   </UserProvider>

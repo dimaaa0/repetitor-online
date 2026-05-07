@@ -25,6 +25,7 @@
     
   }
 
+
   .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -57,8 +58,31 @@
   }
 }
 
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Скрывает для IE, Edge и Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
 @layer utilities {
   .mobile-nav-hidden {
     @apply hidden min-[940px]:flex;
+  }
+}
+
+@layer base {
+  /* Скрываем полосу для всех браузеров */
+  html, body {
+    /* Для Chrome, Safari и Opera */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    /* Для IE, Edge и Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
