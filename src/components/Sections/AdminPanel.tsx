@@ -113,6 +113,43 @@ const AdminPanel = () => {
     });
   };
 
+  const [numberOfUsers, setNumberOfUsers] = useState(0);
+  const [subscribedUsers, setSubscribedUsers] = useState(0)
+
+  useEffect(() => {
+    // 1. Условие выхода, чтобы не делать лишних запросов
+    if (!user) return;
+
+    const fetchStats = async () => {
+      try {
+        // 2. Используем Promise.all для параллельных и быстрых запросов
+        // count: 'exact' и head: true не качают строки, только цифры. Это ОЧЕНЬ быстро.
+        const [totalRes, subRes] = await Promise.all([
+          supabase.from("profiles").select("*", { count: "exact", head: true }),
+          supabase.from("profiles").select("*", { count: "exact", head: true }).eq("is_subscribed", true)
+        ]);
+
+        if (totalRes.error) throw totalRes.error;
+        if (subRes.error) throw subRes.error;
+
+        // 3. Обновляем стейт один раз финальными значениями
+        setNumberOfUsers(totalRes.count || 0);
+        setSubscribedUsers(subRes.count || 0);
+
+      } catch (err) {
+        console.error("Ошибка при загрузке статистики:", err.message);
+      }
+    };
+
+    fetchStats();
+    // В зависимостях только user, чтобы запрос шел один раз при логине
+  }, []);
+
+  useEffect(() => {
+    console.log("Общее кол-во пользователей:", numberOfUsers);
+    console.log("Подписанные пользователи:", subscribedUsers);
+  }, [numberOfUsers, subscribedUsers]);
+
   useEffect(() => {
     fetchStats(selectedDate);
   }, [selectedDate]);
@@ -209,13 +246,12 @@ const AdminPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                ? "bg-white border-green-100 text-green-800"
+                : alert.type === "error"
+                  ? "bg-white border-red-100 text-red-800"
+                  : "bg-white border-blue-100 text-blue-800"
+              }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -374,11 +410,11 @@ const AdminPanel = () => {
                 {/* Карточка 1: Процент подписчиков */}
                 <div className="bg-gray-50/50 border border-gray-100 rounded-[24px] p-6">
                   <p className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">
-                    Пользователей с подпиской
+                    Пользователей с подпиской сейчас
                   </p>
                   <div className="flex items-baseline gap-1">
                     <h3 className="text-2xl font-black text-gray-900">
-                      +{stats.subscriptionGrowth}
+                      +{subscribedUsers}
                     </h3>
                   </div>
                 </div>
@@ -386,7 +422,7 @@ const AdminPanel = () => {
                 {/* Карточка 2: Новые пользователи */}
                 <div className="bg-gray-50/50 border border-gray-100 rounded-[24px] p-6">
                   <p className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">
-                    Новых покупателей
+                    Новых покупателей 
                   </p>
                   <div className="flex items-baseline gap-2">
                     <h3 className="text-2xl font-black text-gray-900">

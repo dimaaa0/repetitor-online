@@ -38,36 +38,41 @@ export default function CommentForm({
 
     try {
       const { error } = await supabase.from("comments").insert({
+        user_data: user.name + " " + user.surname,
         user_id: user.id,
         ad_id: adId,
         content: commentContent.trim(),
       });
 
       if (error) {
-        // 2. Обработка конкретных ошибок Supabase/Postgres
+        setPublishing(false); // Снимаем загрузку сразу, если ошибка
         if (error.code === "23505") {
           showAlert("error", "Вы уже оставили отзыв к этому объявлению!");
-        } else if (error.code === "42501") {
-          showAlert("error", "У вас нет прав для выполнения этого действия");
         } else {
           showAlert("error", "Ошибка при отправке отзыва");
-          console.error("Supabase error:", error);
         }
-        return; // Прерываем выполнение, если есть ошибка
+        return;
       }
 
-      // 3. Успешный сценарий
-      setCommentContent("");
-      showAlert("success", "Отзыв успешно отправлен");
+      // --- УСПЕШНЫЙ СЦЕНАРИЙ ---
+      // setCommentContent("");
 
-      // Опционально: обновляем страницу, чтобы пользователь увидел свой коммент
-      // router.refresh();
+      // Ждем 3 секунды, пока крутится анимация, а потом показываем алерт и релоад
+      setTimeout(() => {
+        setCommentContent("");
+        setPublishing(false);
+        showAlert("success", "Отзыв успешно отправлен");
+
+        // Перезагружаем чуть позже после алерта, чтобы юзер успел его увидеть
+        setTimeout(() => {
+          location.reload();
+        }, 1500);
+      }, 3000);
+
     } catch (err) {
-      // 4. Обработка непредвиденных ошибок (проблемы с сетью и т.д.)
+      setPublishing(false);
       showAlert("error", "Произошла непредвиденная ошибка");
-      console.error("Unexpected error:", err);
-    } finally {
-      setTimeout(() => setPublishing(false), 3000);
+      console.error(err);
     }
   };
 
@@ -86,13 +91,12 @@ export default function CommentForm({
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                ? "bg-white border-green-100 text-green-800"
+                : alert.type === "error"
+                  ? "bg-white border-red-100 text-red-800"
+                  : "bg-white border-blue-100 text-blue-800"
+              }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -123,7 +127,13 @@ export default function CommentForm({
             disabled={publishing}
             className="  flex justify-center w-[200px] py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-200 cursor-pointer disabled:opacity-50"
           >
-            {publishing ? "Отправка..." : "Отправить отзыв"}
+            {publishing ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              </>
+            ) : (
+              "Отправить отзыв"
+            )}
           </button>
         </div>
       </div>
