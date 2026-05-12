@@ -36,7 +36,9 @@ const Announcements = () => {
             subject,
             description,
             price,
+            created_at,
             profiles (
+              id,
               name,
               surname,
               avatar_url
@@ -56,6 +58,12 @@ const Announcements = () => {
           description: ad.description,
           price: ad.price + " UZS",
           likes: 0,
+          user_id: ad.profiles?.id,
+          postedAt: new Date(ad.created_at).toLocaleDateString("ru-RU", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }),
         }));
         setStudents(formattedData);
       }
@@ -64,6 +72,12 @@ const Announcements = () => {
 
     fetchTeachers();
   }, []);
+
+  useEffect(() => {
+    console.log("PAGE:", announcements[0], );
+  }, [students[0]]);
+
+
 
   return (
     <div className="min-h-screen   bg-[#FBFDFF] pb-20">
@@ -109,15 +123,15 @@ const Announcements = () => {
         <div className="grid grid-cols-1 pb-4 gap-8">
           {announcementsLoading && announcements.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
-                <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
-              ))
+              <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
+            ))
             : announcements.map((student: any, key: number) => (
-                <StudentCard
-                  key={student.id || key}
-                  student={student}
-                  isLoading={!student.name || !student.subject}
-                />
-              ))}
+              <StudentCard
+                key={student.id || key}
+                student={student}
+                isLoading={!student.name || !student.subject}
+              />
+            ))}
         </div>
       </div>
     </div>

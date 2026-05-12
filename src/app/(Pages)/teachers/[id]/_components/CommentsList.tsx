@@ -132,6 +132,9 @@ export default function CommentsList({
 
   const remainingCount = comments.length - visibleCount;
 
+  console.log();
+
+
   return (
     <div className="space-y-3">
       {alert && (
@@ -142,13 +145,12 @@ export default function CommentsList({
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                ? "bg-white border-green-100 text-green-800"
+                : alert.type === "error"
+                  ? "bg-white border-red-100 text-red-800"
+                  : "bg-white border-blue-100 text-blue-800"
+              }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -200,11 +202,10 @@ export default function CommentsList({
         return (
           <div
             key={comment.id}
-            className={`group p-3 sm:p-5 rounded-2xl md:rounded-[2rem] border transition-all duration-300 ${
-              isMyComment
-                ? "bg-blue-50/30 border-blue-100 shadow-sm"
-                : "bg-gray-50/40 border-transparent hover:bg-white hover:border-slate-200"
-            }`}
+            className={`group p-3 sm:p-5 rounded-2xl md:rounded-[2rem] border transition-all duration-300 ${isMyComment
+              ? "bg-blue-50/30 border-blue-100 shadow-sm"
+              : "bg-gray-50/40 border-transparent hover:bg-white hover:border-slate-200"
+              }`}
           >
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-2">
@@ -230,7 +231,7 @@ export default function CommentsList({
                       </span>
                     )}
                   </div>
-                  <p className="text-[9px] text-slate-400 mt-0.5">
+                  <p className="text-[11px] text-slate-400 mt-0.5">
                     {
                       new Date(comment.created_at)
                         .toLocaleString("ru-RU", {
@@ -247,7 +248,20 @@ export default function CommentsList({
                 </div>
               </div>
             </div>
-
+            <div className="flex mb-2 items-center gap-1">
+              {user?.role === "Admin" && (
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(comment.user_id);
+                    // Опционально: можно добавить здесь toast-уведомление
+                  }}
+                  title="Нажмите, чтобы скопировать ID"
+                  className="cursor-pointer active:scale-95 transition-transform bot-0 text-[11px] sm:text-[12px] bg-gray-100 hover:bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-md font-bold"
+                >
+                  {comment.user_id}
+                </button>
+              )}
+            </div>
             {isEditing ? (
               <div className="space-y-2 animate-in fade-in duration-200">
                 <textarea
@@ -282,8 +296,11 @@ export default function CommentsList({
             ) : (
               <p className="text-slate-600 leading-normal hyphens-auto text-justify text-[13px] whitespace-pre-line break-words md:text-base whitespace-pre-line px-0.5">
                 {comment.content}
+
               </p>
             )}
+
+
             {isMyComment && !isEditing && (
               <div className="flex justify-end">
                 <div className="translate-y-2">
@@ -311,6 +328,7 @@ export default function CommentsList({
                 )}
               </div>
             )}
+
           </div>
         );
       })}

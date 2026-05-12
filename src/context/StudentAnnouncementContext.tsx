@@ -45,7 +45,9 @@ export const StudentAnnouncementProvider = ({
             subject,
             description,
             price,
+            created_at,
             profiles (
+              id,
               name,
               surname,
               avatar_url
@@ -65,6 +67,8 @@ export const StudentAnnouncementProvider = ({
           description: ad.description,
           price: ad.price + " UZS",
           likes: 0,
+          postedAt: ad.created_at,
+          user_id: ad.profiles?.id,
         }));
         setAnnouncements(formattedData);
         setOriginalAnnouncements(formattedData);

@@ -12,6 +12,9 @@ import {
   ChevronRight,
   Check,
   XCircle,
+  ShieldAlert,
+  Search,
+  Lock,
 } from "lucide-react";
 
 // Тип для отдельной транзакции из истории
@@ -234,6 +237,27 @@ const AdminPanel = () => {
     }
   };
 
+  const [uuid, setUuid] = useState("");
+  const [reason, setReason] = useState("");
+
+  const handleBan = async (uuid: string) => {
+    if (!uuid) return showAlert("error", "Введите UUID пользователя");
+
+    const { error } = await supabase.from("ban_history").insert({
+      user_uuid: uuid,
+      reason: reason || "Без указания причины",
+
+    });
+
+    if (error) {
+      showAlert("error", "Ошибка при блокировке: " + error.message);
+    } else {
+      showAlert("success", "Пользователь успешно заблокирован");
+      setUuid("");
+      setReason("");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50/50 py-2 ">
       {alert && (
@@ -244,13 +268,12 @@ const AdminPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                ? "bg-white border-green-100 text-green-800"
+                : alert.type === "error"
+                  ? "bg-white border-red-100 text-red-800"
+                  : "bg-white border-blue-100 text-blue-800"
+              }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -435,7 +458,7 @@ const AdminPanel = () => {
               </div>
 
               {/* Список последних действий скроллируемый */}
-              <div className="mt-8 ">
+              <div className="mt-8">
                 <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
                   История транзакций
                 </h4>
@@ -484,6 +507,54 @@ const AdminPanel = () => {
           </div>
         </div>
       </div>
+
+      {/* БАН ЛИСТ */}
+      <div className="max-w-full mt-6 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+          <ShieldAlert size={18} className="text-red-500" />
+          <span className="font-semibold text-slate-700 text-sm uppercase tracking-wider">Управление доступом</span>
+        </div>
+
+        <div className="p-5 space-y-4">
+          {/* Поле ввода UUID */}
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1 ml-1">UUID ПОЛЬЗОВАТЕЛЯ</label>
+            <div className="relative">
+              <input
+                type="text"
+                value={uuid}
+                onChange={(e) => setUuid(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-mono"
+              />
+              <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1 ml-1">ПРИЧИНА (ОПЦИОНАЛЬНО)</label>
+            <textarea
+              rows="2"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Нарушение правил сообщества..."
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-slate-400 outline-none transition-all resize-none"
+            />
+          </div>
+
+          {/* Кнопка действия */}
+          <button
+            onClick={() => handleBan(uuid)}
+            disabled={!uuid}
+            className={`w-full hover:bg-red-700 cursor-pointer py-2.5 bg-red-600 text-white rounded-lg flex items-center justify-center gap-2 font-medium transition-colors
+
+                `}
+          >
+            <Lock size={16} />
+            Заблокировать доступ
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 };

@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+
+import { useUser } from "@/src/context/UserContext";
+import React, { useEffect } from "react";
 import { BookOpen, MessageCircle, Wallet } from "lucide-react";
 import StudentSkeleton from "./StudentSkeletonLoader";
 
@@ -13,6 +16,12 @@ const StudentCard = ({
     return <StudentSkeleton />;
   }
 
+  const { user, loading } = useUser();
+
+  // useEffect(() => {
+  //   console.log("CARD:", student);
+  // }, [student]);
+
   return (
     <div className="relative bg-white rounded-3xl border border-slate-200 p-3 pb-4 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.05)] hover:-translate-y-1 group">
       <div className="flex flex-col md:flex-row gap-6">
@@ -21,12 +30,39 @@ const StudentCard = ({
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">
               {student?.name?.[0] ?? "?"}
             </div>
-            <span className="text-sm font-bold text-slate-500">
-              {student.name}
-            </span>
-            <span className="text-xs text-slate-400 font-medium">
-              {student.postedAt}
-            </span>
+            
+            <div className="flex flex-col"> {/* Добавили контейнер для инфо */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-slate-700 leading-none">
+                  {student.name}
+                </span>
+                {/* user_id как маленькая кнопка-копия для админа */}
+                {user?.role === "Admin" && (
+                  <button
+                    onClick={() => navigator.clipboard.writeText(student.user_id)}
+                    className="text-[10px] cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded font-mono transition-colors"
+                    title="Copy ID"
+                  >
+                    #{student.user_id?.slice(0, 8)}...
+                  </button>
+                )}
+              </div>
+
+              <span className="text-[11px] text-slate-400 font-medium">
+                {
+                  new Date(student.postedAt)
+                    .toLocaleString("ru-RU", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                    .replace(",", "") // Убираем запятую между датой и временем
+                    .replace(" г.", "") // Убираем " г." после года
+                }
+              </span>
+            </div>
           </div>
 
           <h3 className="text-xl md:text-2xl wrap-break-word leading-relaxed line-clamp-1  hyphens-auto font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
