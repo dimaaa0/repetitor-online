@@ -30,6 +30,7 @@ export interface adType {
 }
 
 export interface commentType {
+  user_id: string;
   id: number;
   content: string;
   created_at: string;
@@ -37,6 +38,7 @@ export interface commentType {
     name: string;
     surname: string;
     avatar_url: string;
+    is_banned: boolean;
   };
 }
 
@@ -45,10 +47,6 @@ export default async function TeacherProfilePage({
 }: TeacherProfilePageProps) {
   const supabase = await createClient();
   const { id: shortId } = await params;
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   // 1. Данные объявления
   const { data: adData, error: adError }: { data: adType | null; error: any } =
@@ -63,43 +61,42 @@ export default async function TeacherProfilePage({
     .eq("id", adData.user_id)
     .single();
 
-  // 3. Проверка, оставлял ли пользователь отзыв
-  let hasCommented = false;
-  if (user) {
-    const { data: existingComment } = await supabase
-      .from("comments")
-      .select("id")
-      .eq("ad_id", adData.id)
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    hasCommented = !!existingComment;
-  }
-
   // 4. Загрузка всех комментариев
   const { data: commentsData } = await supabase
     .from("comments")
-    .select(`
+    .select(
+      `
+      user_id,
       id,
       content,
       created_at,
       profiles (
         avatar_url,
         name,
-        surname
+        surname,
+        is_banned
       )
-    `)
+    `,
+    )
     .eq("ad_id", adData.id)
     .order("created_at", { ascending: false });
 
   const teacher = { ...adData, profiles: profileData };
   const comments: commentType[] = (commentsData as any) || [];
 
+  let grammar = "отзывов";
+
+  if (comments.length === 1) {
+    grammar = "отзыв";
+  } else {
+    grammar = "отзыва";
+  }
+
+
   return (
     <main className="min-h-screen bg-[#f8fafc] pb-20">
       <div className="max-w-[1250px] relative mx-auto px-4 sm:px-6 pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          
           {/* ЛЕВАЯ КОЛОНКА */}
           <div className="lg:col-span-8 space-y-6">
             <section className="bg-white rounded-3xl md:rounded-[2.5rem] p-6 md:p-10 border border-slate-200 shadow-sm relative overflow-hidden transition-all hover:shadow-[0_20px_50px_rgba(8,112,184,0.05)]">
@@ -132,7 +129,7 @@ export default async function TeacherProfilePage({
                       <div className="flex flex-wrap gap-3 sm:justify-start justify-center">
                         <div className="flex items-center text-slate-500 bg-slate-50 px-4 py-2 rounded-full text-sm">
                           <MessageSquare className="w-4 h-4 mr-2" />
-                          {comments.length} отзывов
+                          {comments.length} {grammar}
                         </div>
                         <div className="flex items-center text-red-500 bg-red-50 px-4 py-2 rounded-full text-sm font-bold">
                           <Heart className="w-4 h-4 mr-2 fill-red-500" />
@@ -147,10 +144,14 @@ export default async function TeacherProfilePage({
 
             <section className="bg-white rounded-3xl md:rounded-[2.5rem] p-6 md:p-10 border border-slate-200 shadow-sm">
               <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <Award className="text-blue-500 w-6 h-6 md:w-7 md:h-7" />О преподавателе
+                <Award className="text-blue-500 w-6 h-6 md:w-7 md:h-7" />О
+                преподавателе
               </h2>
               <p className="text-slate-600 text-base md:text-lg leading-relaxed whitespace-pre-line italic">
-                &quot;{teacher?.description || "Преподаватель пока не добавил описание..."}&quot;
+                &quot;
+                {teacher?.description ||
+                  "Преподаватель пока не добавил описание..."}
+                &quot;
               </p>
             </section>
           </div>
@@ -159,15 +160,18 @@ export default async function TeacherProfilePage({
           <div className="lg:col-span-4">
             <div className="sticky top-24 space-y-6 bg-white rounded-3xl md:rounded-[2.5rem] p-6 md:p-8 border border-slate-200 shadow-xl">
               <div className="mb-8">
-                <span className="text-slate-400 font-bold text-xs uppercase tracking-widest block mb-2">Стоимость часа</span>
+                <span className="text-slate-400 font-bold text-xs uppercase tracking-widest block mb-2">
+                  Стоимость часа
+                </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl md:text-5xl font-black text-slate-900">{teacher?.price}</span>
+                  <span className="text-4xl md:text-5xl font-black text-slate-900">
+                    {teacher?.price}
+                  </span>
                   <span className="text-slate-500 font-bold text-lg">UZS</span>
                 </div>
               </div>
 
-              {/* Ссылка-якорь для скролла к форме */}
-              <a 
+              <a
                 href="#reviews"
                 className="w-full bg-[#0f172a] hover:bg-slate-800 flex items-center justify-center cursor-pointer text-white font-bold py-4 md:py-5 rounded-2xl md:rounded-3xl transition-all active:scale-95 shadow-lg"
               >
@@ -193,28 +197,19 @@ export default async function TeacherProfilePage({
           </div>
         </div>
 
-        {/* СЕКЦИЯ ОТЗЫВОВ */}
-        <section id="reviews" className="bg-white lg:col-span-8 mt-6 rounded-3xl md:rounded-[2.5rem] p-6 md:p-10 border border-slate-200 shadow-sm space-y-8">
+        <section
+          id="reviews"
+          className="bg-white lg:col-span-8 mt-6 rounded-3xl md:rounded-[2.5rem] p-4 sm:p-6 md:p-10 border border-slate-200 shadow-sm space-y-8"
+        >
           <div className="flex items-center justify-between">
             <h2 className="text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-3">
-              <MessageSquare className="text-blue-500 w-6 h-6 md:w-7 md:h-7" /> Отзывы учеников
+              <MessageSquare className="text-blue-500 w-6 h-6 md:w-7 md:h-7" />{" "}
+              Отзывы учеников
             </h2>
           </div>
-
-          {/* ФОРМА */}
-          {hasCommented ? (
-            <div className="p-6 bg-slate-50 rounded-2xl border border-dashed border-slate-300 text-center text-slate-500">
-              Вы уже оставили отзыв к этому объявлению
-            </div>
-          ) : (
-            <CommentForm adId={adData.id} userId={user?.id} />
-          )}
-
+          <CommentForm adId={adData.id} comments={comments} />
           <hr className="border-slate-100" />
-
-          {/* КЛИЕНТСКИЙ СПИСОК С ПАГИНАЦИЕЙ */}
           <CommentsList comments={comments} />
-          
         </section>
       </div>
     </main>

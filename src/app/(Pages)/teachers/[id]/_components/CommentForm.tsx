@@ -1,21 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { createClient } from "../../../../../utils/supabase/client";
 import { useUser } from "../../../../../context/UserContext";
 import { Check, XCircle } from "lucide-react";
 
 export default function CommentForm({
   adId,
-  userId,
+  comments,
 }: {
   adId: number;
-  userId: string | undefined;
+  comments: any[];
 }) {
   const [commentContent, setCommentContent] = useState("");
   const [publishing, setPublishing] = useState(false);
-  const supabase = createClient();
+  const [alert, setAlert] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+  const [hasCommented, setHasCommented] = useState(false);
 
+  const supabase = createClient();
   const { user } = useUser();
 
   const showAlert = (type: "success" | "error" | "info", message: string) => {
@@ -23,8 +28,60 @@ export default function CommentForm({
     setTimeout(() => setAlert(null), 3000);
   };
 
+  useEffect(() => {
+    if (!user?.id || !adId) return;
+
+    const checkComment = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("comments")
+          .select("id")
+          .eq("ad_id", adId)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        setHasCommented(!!data);
+      } catch (err) {
+        console.error("Ошибка при проверке комментария:", err);
+      }
+    };
+
+    checkComment();
+  }, [adId, user?.id]);
+
+  const [isBanned, setIsBanned] = useState(false);
+
+  useEffect(() => {
+    // Нам нужен только user.id, adId тут не при чем
+    if (!user?.id) return;
+
+    const checkBanList = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profiles") // ЗАПРАШИВАЕМ ПРОФИЛИ
+          .select("is_banned")
+          .eq("id", user.id) // Ищем по ID текущего юзера
+          .maybeSingle();
+
+        if (error) throw error;
+
+        // Если в базе стоит true, сетим в стейт
+        if (data?.is_banned) {
+          setIsBanned(true);
+        } else {
+          setIsBanned(false);
+        }
+      } catch (err) {
+        console.error("Ошибка при проверке статуса блокировки:", err);
+        setIsBanned(false);
+      }
+    };
+
+    checkBanList();
+  }, [user?.id]); // Следим только за сменой юзера
+
   const postComment = async () => {
-    // 1. Базовые проверки
     if (!user?.id) {
       showAlert("error", "Войдите, чтобы оставить отзыв");
       return;
@@ -38,14 +95,13 @@ export default function CommentForm({
 
     try {
       const { error } = await supabase.from("comments").insert({
-        user_data: user.name + " " + user.surname,
         user_id: user.id,
         ad_id: adId,
         content: commentContent.trim(),
       });
 
       if (error) {
-        setPublishing(false); // Снимаем загрузку сразу, если ошибка
+        setPublishing(false);
         if (error.code === "23505") {
           showAlert("error", "Вы уже оставили отзыв к этому объявлению!");
         } else {
@@ -54,66 +110,65 @@ export default function CommentForm({
         return;
       }
 
-      // --- УСПЕШНЫЙ СЦЕНАРИЙ ---
-      // setCommentContent("");
-
-      // Ждем 3 секунды, пока крутится анимация, а потом показываем алерт и релоад
       setTimeout(() => {
         setCommentContent("");
         setPublishing(false);
         showAlert("success", "Отзыв успешно отправлен");
-
-        // Перезагружаем чуть позже после алерта, чтобы юзер успел его увидеть
-        setTimeout(() => {
-          location.reload();
-        }, 1500);
-      }, 3000);
-
+        setTimeout(() => location.reload(), 1500);
+      }, 2000);
     } catch (err) {
       setPublishing(false);
       showAlert("error", "Произошла непредвиденная ошибка");
-      console.error(err);
     }
   };
 
-  const [alert, setAlert] = useState<{
-    type: "success" | "error" | "info";
-    message: string;
-  } | null>(null);
+  // --- ЛОГИКА ОТОБРАЖЕНИЯ ---
 
+  // 1. Если пользователь забанен
+  if (isBanned) {
+    return (
+      <div className="bg-red-50/50 p-4 md:p-6 rounded-[2rem] border border-red-200">
+        <h3 className="text-sm font-bold text-red-700 mb-2 uppercase tracking-wider">
+          Доступ ограничен
+        </h3>
+        <p className="text-red-600 text-sm">
+          Вы не можете оставить отзыв, так как ваш аккаунт заблокирован.
+        </p>
+      </div>
+    );
+  }
+
+  // 2. Если уже оставлял отзыв (скрываем форму)
+  if (hasCommented) {
+    return null;
+  }
+
+  // 3. Стандартная форма для активного пользователя
   return (
     <div className="bg-slate-50/50 p-4 md:p-6 rounded-[2rem] border border-slate-200">
       {alert && (
         <div className="fixed top-6 left-0 right-0 z-[9999] flex justify-center px-4 pointer-events-none">
           <div
-            className={`
-        pointer-events-auto
-        flex items-center gap-3
-        px-6 py-4 rounded-2xl shadow-2xl border
-        animate-in fade-in slide-in-from-top-4 duration-300
-        ${alert.type === "success"
+            className={`pointer-events-auto flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border animate-in fade-in slide-in-from-top-4 duration-300 ${
+              alert.type === "success"
                 ? "bg-white border-green-100 text-green-800"
-                : alert.type === "error"
-                  ? "bg-white border-red-100 text-red-800"
-                  : "bg-white border-blue-100 text-blue-800"
-              }
-      `}
+                : "bg-white border-red-100 text-red-800"
+            }`}
           >
-            {/* Иконки для красоты (опционально) */}
-            {alert.type === "success" && (
+            {alert.type === "success" ? (
               <Check className="h-5 w-5 text-green-500" />
-            )}
-            {alert.type === "error" && (
+            ) : (
               <XCircle className="h-5 w-5 text-red-500" />
             )}
-
             <span className="font-bold text-sm">{alert.message}</span>
           </div>
         </div>
       )}
+
       <h3 className="text-sm font-bold text-slate-700 mb-4 px-1 uppercase tracking-wider">
         Оставить свой отзыв
       </h3>
+
       <div className="space-y-4">
         <textarea
           value={commentContent}
@@ -121,16 +176,14 @@ export default function CommentForm({
           placeholder="Поделитесь вашим впечатлением от обучения..."
           className="w-full min-h-[120px] p-5 rounded-2xl border border-slate-200 bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all outline-none text-slate-700 resize-none"
         />
-        <div className="flex flex-col sm:flex-row items-center justify-end gap-4">
+        <div className="flex justify-end">
           <button
             onClick={postComment}
             disabled={publishing}
-            className="  flex justify-center w-[200px] py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-200 cursor-pointer disabled:opacity-50"
+            className="flex items-center justify-center w-[200px] h-[46px] bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-200 disabled:opacity-50"
           >
             {publishing ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              </>
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               "Отправить отзыв"
             )}
