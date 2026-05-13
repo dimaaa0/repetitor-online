@@ -73,9 +73,7 @@ const Announcements = () => {
     fetchTeachers();
   }, []);
 
-  useEffect(() => {
-    console.log("PAGE:", announcements[0], );
-  }, [students[0]]);
+
 
 
 

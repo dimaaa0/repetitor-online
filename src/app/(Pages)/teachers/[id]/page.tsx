@@ -52,7 +52,9 @@ export default async function TeacherProfilePage({
   const { data: adData, error: adError }: { data: adType | null; error: any } =
     await supabase.rpc("find_ad_by_short_id", { short_id: shortId }).single();
 
-  if (adError || !adData) notFound();
+  if (adError || !adData) {
+    notFound();
+  }
 
   // 2. Профиль учителя
   const { data: profileData }: { data: any } = await supabase

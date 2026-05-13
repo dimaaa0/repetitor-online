@@ -132,9 +132,6 @@ export default function CommentsList({
 
   const remainingCount = comments.length - visibleCount;
 
-  console.log();
-
-
   return (
     <div className="space-y-3">
       {alert && (

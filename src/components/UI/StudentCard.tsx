@@ -1,6 +1,7 @@
 "use client";
 
 import { useUser } from "@/src/context/UserContext";
+import Link from "next/link";
 import React, { useEffect } from "react";
 import { BookOpen, MessageCircle, Wallet } from "lucide-react";
 import StudentSkeleton from "./StudentSkeletonLoader";
@@ -18,9 +19,7 @@ const StudentCard = ({
 
   const { user, loading } = useUser();
 
-  // useEffect(() => {
-  //   console.log("CARD:", student);
-  // }, [student]);
+  const displayId = student.id ? String(student.id).slice(0, 8) : "";
 
   return (
     <div className="relative bg-white rounded-3xl border border-slate-200 p-3 pb-4 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.05)] hover:-translate-y-1 group">
@@ -30,7 +29,7 @@ const StudentCard = ({
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">
               {student?.name?.[0] ?? "?"}
             </div>
-            
+
             <div className="flex flex-col"> {/* Добавили контейнер для инфо */}
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-slate-700 leading-none">
@@ -49,7 +48,8 @@ const StudentCard = ({
               </div>
 
               <span className="text-[11px] text-slate-400 font-medium">
-                {
+                Создано:
+                {" "}{
                   new Date(student.postedAt)
                     .toLocaleString("ru-RU", {
                       year: "numeric",
@@ -65,11 +65,11 @@ const StudentCard = ({
             </div>
           </div>
 
-          <h3 className="text-xl md:text-2xl wrap-break-word leading-relaxed line-clamp-1  hyphens-auto font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
+          <h3 className="text-xl md:text-2xl wrap-break-word leading-relaxed line-clamp-2  hyphens-auto font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
             {student.title}
           </h3>
 
-          <p className="text-slate-600 wrap-break-word leading-relaxed line-clamp-2  hyphens-auto text-justify mb-6 max-w-full">
+          <p className="text-slate-600 wrap-break-word leading-relaxed line-clamp-3  hyphens-auto text-justify mb-6 max-w-full">
             {student.description}
           </p>
 
@@ -105,17 +105,16 @@ const StudentCard = ({
               </div>
             </div>
 
-
             <div className="flex flex-row md:flex-col justify-end md:justify-center items-center gap-3">
-              <button className="flex-1 md:flex-none w-full md:w-auto px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                <MessageCircle size={18} />
-                Откликнуться
-              </button>
+              <Link href={`/announcements/${displayId}`} className="text-white no-underline">
+                <button className="flex-1 md:flex-none w-full md:w-auto px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                  <MessageCircle size={18} />
+                  Откликнуться
+                </button>
+              </Link>
             </div>
-
           </div>
         </div>
-
       </div>
     </div>
   );

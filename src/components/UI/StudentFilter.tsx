@@ -50,9 +50,9 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
     let result = originalAnnouncements.filter((ad: any) => {
       const matchSubject = debouncedFilters.subject
         ? ad.subject
-            ?.toLowerCase()
-            .trim()
-            .includes(debouncedFilters.subject.toLowerCase().trim())
+          ?.toLowerCase()
+          .trim()
+          .includes(debouncedFilters.subject.toLowerCase().trim())
         : true;
       const matchPrice = parsePrice(ad.price) <= debouncedFilters.maxPrice;
       return matchSubject && matchPrice;
