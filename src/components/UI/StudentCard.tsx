@@ -4,63 +4,42 @@ import { useUser } from "@/src/context/UserContext";
 import Link from "next/link";
 import { BookOpen, MessageCircle, Wallet } from "lucide-react";
 import StudentSkeleton from "./StudentSkeletonLoader";
-import BecomeTeacherModal from "../UI/BecomeTeacherModal";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const StudentCard = ({
   student,
   isLoading,
+  onOpenModal,
 }: {
   student: any;
   isLoading?: boolean;
+  onOpenModal?: () => void;
 }) => {
   if (isLoading) {
     return <StudentSkeleton />;
   }
 
-  const router = useRouter();
-  const [becomeTeacher, setBecomeTeacher] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
 
-  const openBecomeTeacherModal = () => {
-    setIsClosing(false);
-    setBecomeTeacher(true);
-  };
-
-  const closeBecomeTeacherModal = () => {
-    setIsClosing(true);
-
-    setTimeout(() => {
-      setBecomeTeacher(false);
-      setIsClosing(false);
-    }, 300);
-  };
 
   const { user, loading } = useUser();
 
   const isSubscribed = user?.is_subscribed === true;
 
   const displayId = student.id ? String(student.id).slice(0, 8) : "";
+  const router = useRouter();
 
-  // const handleAction = (e: React.MouseEvent) => {
-  //   if (isSubscribed) {
-  //     // Если подписан, переходим на страницу
-  //     router.push(`/announcements/${displayId}`);
-  //   } else {
-  //     // Если нет, открываем модалку
-  //     openBecomeTeacherModal();
-  //   }
-  // }; !//ЭТО
+  const handleAction = (e: React.MouseEvent) => {
+    if (isSubscribed) {
+      // Если подписан, переходим на страницу
+      router.push(`/announcements/${displayId}`);
+    } else {
+      // Если нет, открываем модалку
+      onOpenModal?.();
+    }
+  };
 
   return (
     <div className="relative bg-white rounded-3xl border border-slate-200 p-3 pb-4 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.05)] hover:-translate-y-1 group">
-      {becomeTeacher && (
-        <BecomeTeacherModal
-          onClose={closeBecomeTeacherModal}
-          isClosing={isClosing}
-        />
-      )}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-3">
@@ -106,7 +85,7 @@ const StudentCard = ({
             </div>
           </div>
 
-          <h3 className="text-xl md:text-2xl wrap-break-word leading-relaxed line-clamp-2  hyphens-auto font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
+          <h3 className="text-xl md:text-2xl wrap-break-word line-clamp-2  hyphens-auto font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
             {student.title}
           </h3>
 
@@ -148,6 +127,7 @@ const StudentCard = ({
             <div className="flex flex-row md:flex-col justify-end md:justify-center items-center gap-3">
               <button
                 className="flex-1 md:flex-none w-full md:w-auto px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                onClick={handleAction}
               >
                 <MessageCircle size={18} />
                 Откликнуться

@@ -7,6 +7,8 @@ import StudentCard from "@/src/components/UI/StudentCard";
 import FilterPanel from "../../../components/UI/StudentFilter";
 import { useStudentAnnouncement } from "../../../context/StudentAnnouncementContext";
 import { useUser } from "@/src/context/UserContext";
+import BecomeTeacherModal from "@/src/components/UI/BecomeTeacherModal";
+import { useRouter } from "next/navigation";
 
 const Announcements = () => {
   const [dataLoading, setDataLoading] = useState(false);
@@ -73,10 +75,34 @@ const Announcements = () => {
     fetchTeachers();
   }, []);
 
+  const router = useRouter();
+  const [becomeTeacher, setBecomeTeacher] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const openBecomeTeacherModal = () => {
+    setIsClosing(false);
+    setBecomeTeacher(true);
+  };
+
+  const closeBecomeTeacherModal = () => {
+    setIsClosing(true);
+
+    setTimeout(() => {
+      setBecomeTeacher(false);
+      setIsClosing(false);
+    }, 300);
+  };
+
   return (
     <div className="min-h-screen   bg-[#FBFDFF] pb-20">
+      {becomeTeacher && (
+        <BecomeTeacherModal
+          onClose={closeBecomeTeacherModal}
+          isClosing={isClosing}
+        />
+      )}
       {/* Декоративный фон шапки */}
-      <div className="bg-white border-b  border-slate-100  py-12 mb-8">
+      <div className="bg-white border-b  border-slate-100 py-6 sm:py-12 mb-8">
         <div className="max-w-[1250] mx-auto px-2 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
@@ -84,8 +110,9 @@ const Announcements = () => {
                 Лента <span className="text-blue-600">объявлений</span>
               </h1>
               <p className="text-slate-500 mt-2 font-medium">
-                Свежие запросы от учеников, которым нужна ваша помощь
+                Свежие запросы от учеников, которым нужна ваша помощь. <br />
               </p>
+
             </div>
             <div className="flex gap-3 relative">
               <button
@@ -117,15 +144,16 @@ const Announcements = () => {
         <div className="grid grid-cols-1 pb-4 gap-8">
           {announcementsLoading && announcements.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
-                <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
-              ))
+              <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
+            ))
             : announcements.map((student: any, key: number) => (
-                <StudentCard
-                  key={student.id || key}
-                  student={student}
-                  isLoading={!student.name || !student.subject}
-                />
-              ))}
+              <StudentCard
+                key={student.id || key}
+                student={student}
+                isLoading={!student.name || !student.subject}
+                onOpenModal={openBecomeTeacherModal}
+              />
+            ))}
         </div>
       </div>
     </div>

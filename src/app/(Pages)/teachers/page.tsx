@@ -35,7 +35,7 @@ const TutorsPageWithAnimation = () => {
 
   return (
     <div className="min-h-screen bg-[#FBFDFF] pb-20 relative ">
-      <div className="bg-white border-b border-slate-100 py-12 mb-8">
+      <div className="bg-white border-b border-slate-100 py-6 sm:py-12 mb-8">
         <div className="max-w-[1250px] mx-auto px-2 sm:px-6">
           {" "}
           {/* Исправил max-w-[1250] на [1250px] */}
