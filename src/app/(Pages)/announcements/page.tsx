@@ -73,10 +73,6 @@ const Announcements = () => {
     fetchTeachers();
   }, []);
 
-
-
-
-
   return (
     <div className="min-h-screen   bg-[#FBFDFF] pb-20">
       {/* Декоративный фон шапки */}
@@ -121,15 +117,15 @@ const Announcements = () => {
         <div className="grid grid-cols-1 pb-4 gap-8">
           {announcementsLoading && announcements.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
-              <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
-            ))
+                <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
+              ))
             : announcements.map((student: any, key: number) => (
-              <StudentCard
-                key={student.id || key}
-                student={student}
-                isLoading={!student.name || !student.subject}
-              />
-            ))}
+                <StudentCard
+                  key={student.id || key}
+                  student={student}
+                  isLoading={!student.name || !student.subject}
+                />
+              ))}
         </div>
       </div>
     </div>
