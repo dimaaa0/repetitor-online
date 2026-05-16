@@ -78,7 +78,7 @@ export async function GET(request: Request) {
 
       // Считаем чистую календарную разницу между днями
       const diffTime = expiresAt.getTime() - cleanToday.getTime();
-      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = Math.floor (diffTime / (1000 * 60 * 60 * 24));
 
       // Сохраняем данные для дебага
       debugLogs.push({
