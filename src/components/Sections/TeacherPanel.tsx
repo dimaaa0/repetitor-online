@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PaymentInstructionsModal from "../UI/PaymentInstructionsModal";
 import SubscriptionSkeleton from "../UI/SubscriptionSkeleton";
-
+import Planner from "../UI/Planner"
 import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/TeacherSubjectContext";
 
@@ -26,6 +26,13 @@ import {
 import CopyButton from "@/src/components/UI/HandleCopyButton";
 import AddAvatar from "@/src/components/UI/AddAvatar";
 import SubjectPicker from "@/src/components/UI/TeacherSubjectPicker";
+
+export interface TimeSlot {
+  s: string; // Start "09:00"
+  e: string; // End "09:30"
+}
+
+export type WeeklyAvailability = Record<string, TimeSlot[]>;
 
 const TeacherPanel = () => {
   const { user } = useUser();
@@ -139,6 +146,35 @@ const TeacherPanel = () => {
     fetchAd();
   }, [user, supabase]);
 
+  // 1. Укажи правильный тип для состояния (чтобы не было undefined)
+  const [availability, setAvailability] = useState<WeeklyAvailability>({});
+
+  useEffect(() => {
+    const fetchInitialSchedule = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("availability")
+          .eq("id", user.id)
+          .single();
+
+        if (error) throw error;
+
+        // data — это { availability: { ... } }. Нам нужна только внутренность.
+        if (data && data.availability) {
+          setAvailability(data.availability as WeeklyAvailability);
+        }
+      } catch (err) {
+        console.error("Ошибка при загрузке расписания:", err);
+      }
+    };
+
+    fetchInitialSchedule();
+  }, [user?.id, supabase]); // Обязательно добавь зависимости
+
+
   //* ОБРАБОТКА ПУБЛИКАЦИИ/ОБНОВЛЕНИЯ ОБЪЯВЛЕНИЯ
   const handlePublishAd = async () => {
     setIsPublishing(true);
@@ -155,24 +191,20 @@ const TeacherPanel = () => {
       contacts: contacts,
     };
 
-    let response;
+    // СОХРАНЯЕМ ОБЪЯВЛЕНИЕ И РАСПИСАНИЕ ПАРАЛЛЕЛЬНО
+    const [adRes, profileRes] = await Promise.all([
+      hasAd
+        ? supabase.from("ads").update(payload).eq("user_id", user.id)
+        : supabase.from("ads").insert({ ...payload, user_id: user.id }),
 
-    if (hasAd) {
-      response = await supabase
-        .from("ads")
-        .update(payload)
-        .eq("user_id", user.id);
-    } else {
-      response = await supabase
-        .from("ads")
-        .insert({ ...payload, user_id: user.id });
-    }
+      supabase.from("profiles").update({ availability }).eq("id", user.id)
+    ]);
 
-    if (response?.error) {
-      showAlert("error", response.error.message);
+    if (adRes.error || profileRes.error) {
+      showAlert("error", "Ошибка при сохранении данных");
     } else {
       setHasAd(true);
-      showAlert("success", "Готово!");
+      showAlert("success", "Все данные успешно сохранены!");
     }
 
     setIsPublishing(false);
@@ -285,13 +317,12 @@ const TeacherPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                ? "bg-white border-green-100 text-green-800"
+                : alert.type === "error"
+                  ? "bg-white border-red-100 text-red-800"
+                  : "bg-white border-blue-100 text-blue-800"
+              }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -330,11 +361,10 @@ const TeacherPanel = () => {
                 <CreditCard className="h-4 w-4" /> Тарифный план
               </h3>
               <span
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
-                  isSubscribed
-                    ? "bg-green-50 text-green-600 border-green-100"
-                    : "bg-red-50 text-red-600 border-red-100"
-                }`}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${isSubscribed
+                  ? "bg-green-50 text-green-600 border-green-100"
+                  : "bg-red-50 text-red-600 border-red-100"
+                  }`}
               >
                 {isSubscribed ? "Активен" : "Не активен"}
               </span>
@@ -473,6 +503,12 @@ const TeacherPanel = () => {
             </div>
           </div>
         </div>
+
+        <Planner
+          userId={user.id}
+          initialSchedule={availability}
+          editAvailability={setAvailability}
+        />
 
         <div className="pt-2">
           {isSubscribed ? (
