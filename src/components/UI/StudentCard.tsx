@@ -19,8 +19,6 @@ const StudentCard = ({
     return <StudentSkeleton />;
   }
 
-
-
   const { user, loading } = useUser();
 
   const isSubscribed = user?.is_subscribed === true;

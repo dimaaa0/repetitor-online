@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PaymentInstructionsModal from "../UI/PaymentInstructionsModal";
 import SubscriptionSkeleton from "../UI/SubscriptionSkeleton";
-
+import Planner from "../UI/Planner";
 import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/TeacherSubjectContext";
 
@@ -26,6 +26,13 @@ import {
 import CopyButton from "@/src/components/UI/HandleCopyButton";
 import AddAvatar from "@/src/components/UI/AddAvatar";
 import SubjectPicker from "@/src/components/UI/TeacherSubjectPicker";
+
+export interface TimeSlot {
+  s: string; // Start "09:00"
+  e: string; // End "09:30"
+}
+
+export type WeeklyAvailability = Record<string, TimeSlot[]>;
 
 const TeacherPanel = () => {
   const { user } = useUser();
@@ -139,6 +146,34 @@ const TeacherPanel = () => {
     fetchAd();
   }, [user, supabase]);
 
+  // 1. Укажи правильный тип для состояния (чтобы не было undefined)
+  const [availability, setAvailability] = useState<WeeklyAvailability>({});
+
+  useEffect(() => {
+    const fetchInitialSchedule = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("availability")
+          .eq("id", user.id)
+          .single();
+
+        if (error) throw error;
+
+        // data — это { availability: { ... } }. Нам нужна только внутренность.
+        if (data && data.availability) {
+          setAvailability(data.availability as WeeklyAvailability);
+        }
+      } catch (err) {
+        console.error("Ошибка при загрузке расписания:", err);
+      }
+    };
+
+    fetchInitialSchedule();
+  }, [user?.id, supabase]); // Обязательно добавь зависимости
+
   //* ОБРАБОТКА ПУБЛИКАЦИИ/ОБНОВЛЕНИЯ ОБЪЯВЛЕНИЯ
   const handlePublishAd = async () => {
     setIsPublishing(true);
@@ -155,24 +190,20 @@ const TeacherPanel = () => {
       contacts: contacts,
     };
 
-    let response;
+    // СОХРАНЯЕМ ОБЪЯВЛЕНИЕ И РАСПИСАНИЕ ПАРАЛЛЕЛЬНО
+    const [adRes, profileRes] = await Promise.all([
+      hasAd
+        ? supabase.from("ads").update(payload).eq("user_id", user.id)
+        : supabase.from("ads").insert({ ...payload, user_id: user.id }),
 
-    if (hasAd) {
-      response = await supabase
-        .from("ads")
-        .update(payload)
-        .eq("user_id", user.id);
-    } else {
-      response = await supabase
-        .from("ads")
-        .insert({ ...payload, user_id: user.id });
-    }
+      supabase.from("profiles").update({ availability }).eq("id", user.id),
+    ]);
 
-    if (response?.error) {
-      showAlert("error", response.error.message);
+    if (adRes.error || profileRes.error) {
+      showAlert("error", "Ошибка при сохранении данных");
     } else {
       setHasAd(true);
-      showAlert("success", "Готово!");
+      showAlert("success", "Все данные успешно сохранены!");
     }
 
     setIsPublishing(false);
@@ -473,6 +504,12 @@ const TeacherPanel = () => {
             </div>
           </div>
         </div>
+
+        <Planner
+          userId={user.id}
+          initialSchedule={availability}
+          editAvailability={setAvailability}
+        />
 
         <div className="pt-2">
           {isSubscribed ? (
