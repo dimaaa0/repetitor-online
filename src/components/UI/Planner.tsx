@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { createClient } from "../../../src/utils/supabase/client";
 
 export interface TimeSlot {
   s: string;
@@ -40,35 +39,35 @@ export default function Planner({
     if (initialSchedule) setAvailability(initialSchedule);
   }, [initialSchedule]);
 
-  useEffect(() => {
-    editAvailability(availability);
-  }, [availability]);
-
   const toggleSlot = (dayIndex: number, time: string) => {
     const dayKey = String(dayIndex);
-    const newAvailability = { ...availability };
-    if (!newAvailability[dayKey]) newAvailability[dayKey] = [];
+    const currentDaySlots = availability[dayKey]
+      ? [...availability[dayKey]]
+      : [];
 
-    const slotIndex = newAvailability[dayKey].findIndex(
-      (slot) => slot.s === time,
-    );
+    const slotIndex = currentDaySlots.findIndex((slot) => slot.s === time);
+    let updatedDaySlots;
+
     if (slotIndex > -1) {
-      newAvailability[dayKey] = newAvailability[dayKey].filter(
-        (slot) => slot.s !== time,
-      );
+      updatedDaySlots = currentDaySlots.filter((slot) => slot.s !== time);
     } else {
       const [hours] = time.split(":").map(Number);
       const endTime = `${String(hours + 1).padStart(2, "0")}:00`;
-      newAvailability[dayKey] = [
-        ...newAvailability[dayKey],
-        { s: time, e: endTime },
-      ];
+      updatedDaySlots = [...currentDaySlots, { s: time, e: endTime }];
     }
+
+    const newAvailability = {
+      ...availability,
+      [dayKey]: updatedDaySlots,
+    };
+
     setAvailability(newAvailability);
+    editAvailability(newAvailability);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
+      {/* Шапка */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] flex items-center gap-2">
           <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
@@ -82,56 +81,29 @@ export default function Planner({
         </div>
       </div>
 
-      <div className="w-full overflow-hidden border-2 border-gray-100 rounded-[28px] bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table
-            style={{
-              minWidth: "750px",
-              width: "100%",
-              borderCollapse: "collapse",
-              tableLayout: "fixed",
-            }}
-          >
+      {/* Контейнер со скроллом и сеткой */}
+      <div className="w-full border-2 border-gray-100 rounded-[28px] bg-white shadow-sm overflow-hidden">
+        <div className="w-full overflow-x-auto block">
+          <table className="w-full border-collapse table-fixed min-w-[420px]">
             <thead>
-              <tr>
-                <th
-                  style={{
-                    width: "80px",
-                    padding: "12px 8px",
-                    borderBottom: "2px solid #f1f5f9",
-                    background: "#f8fafc",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "10px",
-                      fontWeight: 900,
-                      color: "#94a3b8",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                    }}
-                  >
+              <tr className="border-b-2 border-gray-100">
+                {/* Фиксированная ширина для колонки времени */}
+                <th className="w-[20px] sm:w-[45px] py-2.5 sm:py-3 bg-slate-50 border-r-2 border-gray-100 text-center">
+                  <span className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-wider block">
                     Время
                   </span>
                 </th>
-                {days.map((day) => (
+                {days.map((day, idx) => (
                   <th
                     key={day}
-                    style={{
-                      padding: "12px 8px",
-                      borderBottom: "2px solid #f1f5f9",
-                      borderLeft: "2px solid #f1f5f9",
-                      background: "#f8fafc",
-                    }}
+                    // Задали одинаковую компактную ширину для дней недели
+                    className={`px-0.5 py-2.5 sm:py-3 bg-slate-50 text-center sm:w-[20px] ${
+                      idx !== days.length - 1
+                        ? "border-r-2 border-gray-100"
+                        : ""
+                    }`}
                   >
-                    <span
-                      style={{
-                        fontSize: "11px",
-                        fontWeight: 900,
-                        color: "#6b7280",
-                        textTransform: "uppercase",
-                      }}
-                    >
+                    <span className="text-[10px] font-black text-gray-500 uppercase block">
                       {day}
                     </span>
                   </th>
@@ -140,78 +112,44 @@ export default function Planner({
             </thead>
             <tbody>
               {timeSlots.map((time) => (
-                <tr key={time}>
-                  <td
-                    style={{
-                      padding: "0 8px",
-                      height: "56px",
-                      borderBottom: "2px solid #f1f5f9",
-                      background: "#f8fafc",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: 700,
-                        color: "#94a3b8",
-                      }}
-                    >
-                      {time}
-                    </span>
-                  </td>
+                <tr
+                  key={time}
+                  className="border-b-2 border-gray-100 last:border-b-0"
+                >
+                  {/* Ячейка времени */}
+                  <td className="h-9 sm:h-11 bg-slate-50 border-r-2 border-gray-100 text-center">
+  <span className="text-[8px] sm:text-[10px] font-bold text-slate-400">
+    {time}
+  </span>
+</td>
+                  {/* Ячейки дней недели */}
                   {days.map((_, index) => {
-                    const dayKey = String(index + 1);
+                    const dayIndex = index + 1;
+                    const dayKey = String(dayIndex);
                     const isSelected = availability[dayKey]?.some(
                       (slot: any) => slot.s === time,
                     );
                     return (
                       <td
                         key={index}
-                        style={{
-                          height: "56px",
-                          borderBottom: "2px solid #f1f5f9",
-                          borderLeft: "2px solid #f1f5f9",
-                          padding: 0,
-                        }}
+                        // Высоту строк (h-10) тоже сделали чуть компактнее (была h-12)
+                        className={`h-10  p-0 ${
+                          index !== days.length - 1
+                            ? "border-r-2 border-gray-100"
+                            : ""
+                        }`}
                       >
                         <button
                           type="button"
-                          onClick={() => toggleSlot(index + 1, time)}
+                          onClick={() => toggleSlot(dayIndex, time)}
                           style={{
-                            width: "100%",
-                            height: "100%",
                             background: isSelected ? "#3b82f6" : "white",
-                            border: "none",
-                            cursor: "pointer",
-                            transition: "background 0.2s",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
                           }}
-                          onMouseEnter={(e) => {
-                            if (!isSelected)
-                              (
-                                e.currentTarget as HTMLButtonElement
-                              ).style.background = "#eff6ff";
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isSelected)
-                              (
-                                e.currentTarget as HTMLButtonElement
-                              ).style.background = "white";
-                          }}
+                          className="w-full h-full border-none cursor-pointer transition-colors duration-200 flex items-center justify-center hover:bg-blue-50 data-[selected=true]:hover:bg-blue-600"
+                          data-selected={isSelected}
                         >
                           {isSelected && (
-                            <div
-                              style={{
-                                width: "4px",
-                                height: "4px",
-                                background: "white",
-                                borderRadius: "50%",
-                                opacity: 0.5,
-                              }}
-                            />
+                            <div className="w-1 h-1 bg-white rounded-full opacity-50" />
                           )}
                         </button>
                       </td>
