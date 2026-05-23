@@ -1,4 +1,5 @@
 import { CreditCard, Send, Copy, X } from "lucide-react";
+import Link from "next/link";
 
 interface PaymentInstructionsModalProps {
   onClose: () => void;
@@ -93,7 +94,7 @@ const PaymentInstructionsModal = ({
                 <p className="text-[11px] sm:text-sm text-slate-600 mt-3 leading-normal">
                   Для мгновенной активации перейдите в поддержку:
                 </p>
-                <a
+                <Link
                   href="https://t.me/dimaaa_o"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -101,7 +102,7 @@ const PaymentInstructionsModal = ({
                 >
                   <Send size={16} />
                   <span>Отправить в Telegram</span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -1,94 +1,76 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { createClient } from "../../../src/utils/supabase/client";
+import React, { useState, useEffect } from "react";
 
 export interface TimeSlot {
-    s: string; // Start "09:00"
-    e: string; // End "09:30"
+    s: string;
+    e: string;
 }
 
 export type WeeklyAvailability = Record<string, TimeSlot[]>;
 
 interface PlannerProps {
-    initialSchedule: WeeklyAvailability; // Начальные данные из базы
-    userId: string; // ID пользователя для сохранения
-    // editAvailability: void
+    initialSchedule: WeeklyAvailability;
     editAvailability: (availability: WeeklyAvailability) => void;
 }
 
-export default function Planner({ initialSchedule, userId, editAvailability }: PlannerProps) {
-    const supabase = createClient();
-
-    const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+export default function Planner({
+    initialSchedule,
+    editAvailability,
+}: PlannerProps) {
+    const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
     const generateTimeSlots = (startHour = 7) => {
         const slots = [];
-        // Начинаем с часа, который ты передашь (7, 8 или 9)
-        // Заканчиваем, например, в 22:00
         for (let hour = startHour; hour <= 22; hour++) {
-            slots.push(`${String(hour).padStart(2, '0')}:00`);
+            slots.push(`${String(hour).padStart(2, "0")}:00`);
         }
         return slots;
     };
 
-    // Использование:
-    const timeSlots = generateTimeSlots(7); // Начнет с 07:00, 08:00, 09:00...
+    const timeSlots = generateTimeSlots(7);
+    const [availability, setAvailability] = useState<WeeklyAvailability>(
+        initialSchedule || {},
+    );
 
-    // Используем состояние, инициализируя его данными из пропсов
-    const [availability, setAvailability] = useState<WeeklyAvailability>(initialSchedule || {});
-
-    // Синхронизируем состояние, если пропсы изменились
     useEffect(() => {
-        if (initialSchedule) {
-            setAvailability(initialSchedule);
-        }
+        if (initialSchedule) setAvailability(initialSchedule);
     }, [initialSchedule]);
 
     const toggleSlot = (dayIndex: number, time: string) => {
         const dayKey = String(dayIndex);
-        const newAvailability = { ...availability };
+        const currentDaySlots = availability[dayKey]
+            ? [...availability[dayKey]]
+            : [];
 
-        if (!newAvailability[dayKey]) {
-            newAvailability[dayKey] = [];
-        }
-
-        const slotIndex = newAvailability[dayKey].findIndex(slot => slot.s === time);
+        const slotIndex = currentDaySlots.findIndex((slot) => slot.s === time);
+        let updatedDaySlots;
 
         if (slotIndex > -1) {
-            // Удаляем (снимаем выделение)
-            newAvailability[dayKey] = newAvailability[dayKey].filter(slot => slot.s !== time);
+            updatedDaySlots = currentDaySlots.filter((slot) => slot.s !== time);
         } else {
-            // Рассчитываем время конца (+1 час)
-            const [hours] = time.split(':').map(Number);
-            const endHours = hours + 1;
-            // Форматируем в строку, например из "07" получаем "08:00"
-            const endTime = `${String(endHours).padStart(2, '0')}:00`;
-
-            newAvailability[dayKey] = [
-                ...newAvailability[dayKey],
-                { s: time, e: endTime }
-            ];
+            const [hours] = time.split(":").map(Number);
+            const endTime = `${String(hours + 1).padStart(2, "0")}:00`;
+            updatedDaySlots = [...currentDaySlots, { s: time, e: endTime }];
         }
 
+        const newAvailability = {
+            ...availability,
+            [dayKey]: updatedDaySlots,
+        };
+
         setAvailability(newAvailability);
+        editAvailability(newAvailability);
     };
 
-    useEffect(() => {
-        editAvailability(availability)
-    }, [availability])
-
-
     return (
-        <div className="space-y-6">
-            {/* Заголовок в стиле основного блока "Ваше объявление" */}
+        <div className="w-full space-y-6">
+            {/* Шапка */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h2 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                    График занятий
+                    Свободное время
                 </h2>
-
-                {/* Бейдж-подсказка */}
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-xl">
                     <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                     <span className="text-[10px] font-bold text-blue-700 uppercase tracking-tight">
@@ -97,87 +79,84 @@ export default function Planner({ initialSchedule, userId, editAvailability }: P
                 </div>
             </div>
 
-            {/* Контейнер таблицы */}
-            <div className="w-full overflow-hidden border-2 border-gray-100 rounded-[28px] bg-white shadow-sm">
-                <div className="overflow-x-auto custom-scrollbar">
-                    <div className="min-w-[750px] grid grid-cols-8 divide-x-2 divide-gray-50">
-
-                        {/* Колонка времени */}
-                        <div className="flex flex-col bg-gray-50/50">
-                            <div className="h-12 border-b-2 border-gray-50 flex items-center justify-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                Время
-                            </div>
-                            {timeSlots.map((time) => (
-                                <div
-                                    key={time}
-                                    className="h-14 flex items-center justify-center text-[12px] font-bold text-gray-400 border-b-2 border-gray-50 last:border-0"
-                                >
-                                    {time}
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Колонки дней недели */}
-                        {days.map((dayName, index) => {
-                            const dayKey = String(index + 1);
-                            return (
-                                <div key={dayName} className="flex flex-col">
-                                    <div className="h-12 border-b-2 border-gray-50 bg-gray-50/50 flex items-center justify-center">
-                                        <span className="text-[11px] font-black text-gray-500 uppercase tracking-tight">
-                                            {dayName}
+            {/* Контейнер со скроллом и сеткой */}
+            <div className="w-full border-2 border-gray-100 rounded-[18px] bg-white shadow-sm overflow-hidden">
+                <div className="w-full overflow-x-auto block">
+                    <table className="w-full border-collapse table-fixed min-w-[420px]">
+                        <thead>
+                            <tr className="border-b-2 border-gray-100">
+                                {/* Фиксированная ширина для колонки времени */}
+                                <th className="w-[50px] sm:w-[45px] py-2.5 sm:py-3 bg-slate-50 border-r-2 border-gray-100 text-center">
+                                    <span className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-wider block">
+                                        Время
+                                    </span>
+                                </th>
+                                {days.map((day, idx) => (
+                                    <th
+                                        key={day}
+                                        // Задали одинаковую компактную ширину для дней недели
+                                        className={`px-0.5 py-2.5 sm:py-3 bg-slate-50 text-center sm:w-[20px] ${idx !== days.length - 1
+                                            ? "border-r-2 border-gray-100"
+                                            : ""
+                                            }`}
+                                    >
+                                        <span className="text-[10px] font-black text-gray-500 uppercase block">
+                                            {day}
                                         </span>
-                                    </div>
-
-                                    {timeSlots.map((time) => {
-                                        const isSelected = availability[dayKey]?.some((slot: any) => slot.s === time);
-
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {timeSlots.map((time) => (
+                                <tr
+                                    key={time}
+                                    className="border-b-2 border-gray-100 last:border-b-0"
+                                >
+                                    {/* Ячейка времени */}
+                                    <td className="h-9 sm:h-11 bg-slate-50 border-r-2 border-gray-100 text-center">
+                                        <span className="text-[8px] sm:text-[10px] font-bold text-slate-400">
+                                            {time}
+                                        </span>
+                                    </td>
+                                    {/* Ячейки дней недели */}
+                                    {days.map((_, index) => {
+                                        const dayIndex = index + 1;
+                                        const dayKey = String(dayIndex);
+                                        const isSelected = availability[dayKey]?.some(
+                                            (slot: any) => slot.s === time,
+                                        );
                                         return (
-                                            <button
-                                                key={time}
-                                                type="button"
-                                                onClick={() => toggleSlot(index + 1, time)}
-                                                className={`
-                      h-14 border-b-2 border-gray-50 last:border-0 transition-all duration-200 relative group
-                      ${isSelected
-                                                        ? 'bg-blue-500 hover:bg-blue-600'
-                                                        : 'hover:bg-blue-50/50 bg-white'}
-                    `}
+                                            <td
+                                                key={index}
+                                                // Высоту строк (h-10) тоже сделали чуть компактнее (была h-12)
+                                                className={`h-10  p-0 ${index !== days.length - 1
+                                                    ? "border-r-2 border-gray-100"
+                                                    : ""
+                                                    }`}
                                             >
-                                                {/* Индикатор выбора */}
-                                                {isSelected ? (
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <div className="w-1 h-1 bg-white rounded-full opacity-50 shadow-[0_0_8px_white]"></div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                        <div className="w-2 h-2 border-2 border-blue-200 rounded-full"></div>
-                                                    </div>
-                                                )}
-                                            </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleSlot(dayIndex, time)}
+                                                    style={{
+                                                        background: isSelected ? "#3b82f6" : "white",
+                                                    }}
+                                                    className="w-full h-full border-none cursor-pointer transition-colors duration-200 flex items-center justify-center hover:bg-blue-50 data-[selected=true]:hover:bg-blue-600"
+                                                    data-selected={isSelected}
+                                                >
+                                                    {isSelected && (
+                                                        <div className="w-1 h-1 bg-white rounded-full opacity-50" />
+                                                    )}
+                                                </button>
+                                            </td>
                                         );
                                     })}
-                                </div>
-                            );
-                        })}
-                    </div>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            <style jsx global>{`
-    .custom-scrollbar::-webkit-scrollbar {
-      height: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f8fafc;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #e2e8f0;
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #cbd5e1;
-    }
-  `}</style>
         </div>
     );
 }

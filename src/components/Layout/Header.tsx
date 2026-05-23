@@ -9,21 +9,25 @@ import Registration from "../UI/RegistrationModal";
 import { useModal } from "../../context/ModalContext";
 import { useUser } from "../../context/UserContext";
 import { createClient } from "../../utils/supabase/client";
-import link from "next/link";
+import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 function Header() {
+  const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { openModal } = useModal();
+
+  const t = useTranslations('Header');
 
   // 2. Достаем юзера и состояние загрузки из контекста
   const { user, loading } = useUser();
   const supabase = createClient();
 
   const navLinks = [
-    { name: "Учителя", href: "/teachers" },
-    { name: "Объявления", href: "/announcements" },
+    { name: t('navTeachers'), href: `/${locale}/teachers` },
+    { name: t('navAds'), href: `/${locale}/announcements` },
   ];
 
   // 3. Функция для выхода из системы
@@ -55,11 +59,10 @@ function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={`relative px-4 py-2 text-[15px] font-semibold transition-all duration-300 rounded-lg ${
-                isLinkActive(link.href)
-                  ? "text-blue-600 bg-blue-50"
-                  : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
-              }`}
+              className={`relative px-4 py-2 text-[15px] font-semibold transition-all duration-300 rounded-lg ${isLinkActive(link.href)
+                ? "text-blue-600 bg-blue-50"
+                : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
+                }`}
             >
               {link.name}
             </Link>
@@ -79,12 +82,12 @@ function Header() {
               onClick={openModal}
             >
               <User className="w-4 h-4" strokeWidth={2.5} />
-              <span>Войти</span>
+              <span>{t('loginBtn')}</span>
             </button>
           ) : (
             <div className="flex items-center gap-2">
               <Link
-                href="/profile"
+                href={`/${locale}/profile`}
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-50 transition-all group"
               >
                 {avatarUrl ? (
@@ -122,24 +125,23 @@ function Header() {
       {isMenuOpen && (
         <div className="md:hidden absolute w-full bg-white border-b border-gray-100 p-6 space-y-4 shadow-xl">
           {/* ... контент мобильного меню ... */}
-            <>
-              <div className=" flex flex-col items-center gap-4">
-                {navLinks.map((link) => (
-                  <Link
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    key={link.href}
-                    href={link.href}
-                    className={`flex items-center justify-center gap-2 w-full py-3.5 bg-red-50 text-blue-600 rounded-xl font-bold transition-all duration-300 rounded-lg ${
-                      isLinkActive(link.href)
-                        ? "text-blue-600 bg-blue-50"
-                        : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
+          <>
+            <div className=" flex flex-col items-center gap-4">
+              {navLinks.map((link) => (
+                <Link
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center justify-center gap-2 w-full py-3.5 bg-red-50 text-blue-600 rounded-xl font-bold transition-all duration-300 rounded-lg ${isLinkActive(link.href)
+                    ? "text-blue-600 bg-blue-50"
+                    : "text-slate-600 hover:text-blue-600 hover:bg-gray-50"
                     }`}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-              </div>
-            </>
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </>
         </div>
       )}
     </header>

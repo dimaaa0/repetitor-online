@@ -22,7 +22,7 @@
     -webkit-font-smoothing: antialiased;
     background-color: white;
     color: black;
-    
+
   }
 
 
@@ -59,28 +59,55 @@
 }
 
 .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 /* Скрывает для IE, Edge и Firefox */
 .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 @layer utilities {
   .mobile-nav-hidden {
     @apply hidden min-[940px]:flex;
   }
+  .scrollbar-none::-webkit-scrollbar {
+    height: 6px; /* Делаем полоску очень тонкой (всего 5 пикселей в высоту) */
+  }
+
+  .scrollbar-none::-webkit-scrollbar-track {
+    background: transparent; /* Полностью прозрачный трек (фон под полоской) */
+  }
+
+  .scrollbar-none::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* Красивый пастельный цвет (slate-300 из Tailwind) */
+    border-radius: 100px; /* Делаем края полоски идеально круглыми */
+  }
+
+  .scrollbar-none::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* Чуть темнеет при наведении (slate-400) */
+  }
+
+  /* Настройки для Firefox (к сожалению, Firefox поддерживает только тонкий дефолтный скролл) */
+  .scrollbar-none {
+    scrollbar-color: #cbd5e1 transparent;
+  }
 }
 
 @layer base {
+
   /* Скрываем полосу для всех браузеров */
-  html, body {
+  html,
+  body {
+
     /* Для Chrome, Safari и Opera */
     &::-webkit-scrollbar {
       display: none;
     }
+
     /* Для IE, Edge и Firefox */
     -ms-overflow-style: none;
     scrollbar-width: none;

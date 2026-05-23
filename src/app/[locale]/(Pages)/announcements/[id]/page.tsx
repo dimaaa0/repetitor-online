@@ -1,8 +1,8 @@
 import react from "react";
-import { createClient } from "../../../../utils/supabase/client";
+import { createClient } from "../../../../../utils/supabase/client";
 import { BookOpen, Globe, Heart, MessageCircle, Phone, User } from "lucide-react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import FreeTimeBar from "../../../../../components/UI/FreeTimeBar"
 
 interface StudentProfilePageProps {
     params: Promise<{ id: string }>;
@@ -41,7 +41,11 @@ export default async function StudentProfilePage({
 
     const student = { ...adData, profiles: profileData };
 
-
+    const { data: availability } = await supabase
+        .from("profiles")
+        .select("availability")
+        .eq("id", adData.user_id)
+        .single();
 
     return (
         <div className="min-h-screen bg-slate-50/50 p-4 md:p-8 font-sans">
@@ -130,6 +134,9 @@ export default async function StudentProfilePage({
                                 <Globe className="absolute -bottom-4 -right-4 w-20 h-20 text-blue-100 opacity-40 group-hover:rotate-12 transition-transform" />
                             </div>
                         </div>
+                        <FreeTimeBar
+                            initialSchedule={availability}
+                        />
                     </div>
                 </div>
             </div>

@@ -1,0 +1,37 @@
+{
+  "HomePage": {
+    "Hero": {
+      "titlePart1": "Find your perfect ",
+      "titleHighlight": "tutor",
+      "titlePart2": "",
+      "subtitle": "A platform for finding tutors and students throughout Uzbekistan. Convenient filtering by schedule and subjects.",
+      "findTeacher": "Find a teacher",
+      "becomeTeacher": "Become a teacher"
+    },
+    "HowItWorks": {
+      "heading": "How It Works",
+      "step1Title": "Sign up",
+      "step1Desc": "Create a student or teacher profile",
+      "step2Title": "Set schedule",
+      "step2Desc": "Add your available free time slots",
+      "step3Title": "Find matches",
+      "step3Desc": "The system will match teachers or students by schedule",
+      "step4Title": "Start learning",
+      "step4Desc": "Get in touch and start your lessons right now"
+    },
+    "CTA": {
+      "heading": "Ready to start your learning journey?",
+      "subtitle": "Join a community of professionals and driven students. Your perfect tutor is just a click away.",
+      "loginBtn": "Log in to account"
+    }
+  },
+  "Footer": {
+    "contactUs": "Contact me:",
+    "telegramAriaLabel": "Write on Telegram"
+  },
+  "Header": {
+    "navTeachers": "Teachers",
+    "navAds": "Announcements",
+    "loginBtn": "Login"
+  }
+}

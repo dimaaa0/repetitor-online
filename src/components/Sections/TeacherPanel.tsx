@@ -4,7 +4,6 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { createClient } from "../../utils/supabase/client";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import PaymentInstructionsModal from "../UI/PaymentInstructionsModal";
 import SubscriptionSkeleton from "../UI/SubscriptionSkeleton";
 import Planner from "../UI/Planner"
@@ -162,7 +161,6 @@ const TeacherPanel = () => {
 
         if (error) throw error;
 
-        // data — это { availability: { ... } }. Нам нужна только внутренность.
         if (data && data.availability) {
           setAvailability(data.availability as WeeklyAvailability);
         }
@@ -505,7 +503,6 @@ const TeacherPanel = () => {
         </div>
 
         <Planner
-          userId={user.id}
           initialSchedule={availability}
           editAvailability={setAvailability}
         />

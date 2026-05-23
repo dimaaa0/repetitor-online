@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "../../../utils/supabase/client";
+import { createClient } from "../../../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import TeacherPanel from "@/src/components/Sections/TeacherPanel";
 import StudentPanel from "@/src/components/Sections/StudentPanel";
 import AdminPanel from "@/src/components/Sections/AdminPanel";
 
-import { useUser } from "../../../context/UserContext";
-import { useSubject } from "../../../context/TeacherSubjectContext";
+import { useUser } from "../../../../context/UserContext";
+import { useSubject } from "../../../../context/TeacherSubjectContext";
 
 import {
   Mail,

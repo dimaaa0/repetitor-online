@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { createClient } from "../../../utils/supabase/client"; // проверь путь к своему клиенту
+import { createClient } from "../../../../utils/supabase/client"; // проверь путь к своему клиенту
 import { useRouter } from "next/navigation";
 
 export default function ResetPasswordPage() {

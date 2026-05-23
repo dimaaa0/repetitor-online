@@ -37,27 +37,37 @@ export const StudentAnnouncementProvider = ({
 
   // Загружаем данные один раз при монтировании провайдера
   useEffect(() => {
-    const fetchAllAnnouncements = async () => {
-      setAnnouncementsLoading(true);
-      const { data, error } = await supabase.from("student_ads").select(`
+  const fetchAllAnnouncements = async () => {
+    setAnnouncementsLoading(true);
+    
+    const { data, error } = await supabase.from("student_ads").select(`
+          id,
+          title,
+          subject,
+          description,
+          price,
+          created_at,
+          profiles (
             id,
-            title,
-            subject,
-            description,
-            price,
-            created_at,
-            profiles (
-              id,
-              name,
-              surname,
-              avatar_url
-            )
-          `);
+            name,
+            surname,
+            avatar_url,
+            is_banned
+          )
+        `);
 
-      if (error) {
-        console.error("Ошибка загрузки:", error);
-      } else {
-        const formattedData = data.map((ad: any) => ({
+    if (error) {
+      console.error("Ошибка загрузки:", error);
+    } else {
+      // Используем reduce вместо map, чтобы одновременно фильтровать и форматировать
+      const formattedData = data.reduce((acc: any[], ad: any) => {
+        // ЕСЛИ профиль забанен — просто пропускаем это объявление
+        if (ad.profiles?.is_banned === true) {
+          return acc; 
+        }
+
+        // Иначе — форматируем и добавляем в итоговый массив
+        acc.push({
           id: ad.id,
           title: ad.title,
           name: ad.profiles?.name,
@@ -69,15 +79,20 @@ export const StudentAnnouncementProvider = ({
           likes: 0,
           postedAt: ad.created_at,
           user_id: ad.profiles?.id,
-        }));
-        setAnnouncements(formattedData);
-        setOriginalAnnouncements(formattedData);
-      }
-      setAnnouncementsLoading(false);
-    };
+          is_banned: ad.profiles?.is_banned
+        });
 
-    fetchAllAnnouncements();
-  }, []);
+        return acc;
+      }, []); // Начальное значение — пустой массив
+
+      setAnnouncements(formattedData);
+      setOriginalAnnouncements(formattedData);
+    }
+    setAnnouncementsLoading(false);
+  };
+
+  fetchAllAnnouncements();
+}, []);
 
   return (
     <StudentAnnouncementContext.Provider

@@ -6,6 +6,15 @@ import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/StudentSubjectContext";
 import StudentSubjectPicker from "../UI/StudentSubjectPicker";
 import { Check, CircleUser, Loader2, Search, XCircle } from "lucide-react";
+import Planner from "../../components/UI/Planner";
+
+export interface TimeSlot {
+  s: string; // Start "09:00"
+  e: string; // End "09:30"
+}
+
+export type WeeklyAvailability = Record<string, TimeSlot[]>;
+
 
 const StudentPanel = () => {
   const { user } = useUser();
@@ -83,13 +92,13 @@ const StudentPanel = () => {
           if (error.code === "PGRST116") {
             setAnnounceStatus(false);
           } else {
-            console.error("Ошибка при проверке:", error);
+            console.error("Ошибка при проверке:", error.details);
           }
           return;
         }
 
-        // Если данные пришли без ошибки — объявление существует
         setAnnounceStatus(!!data);
+
       } catch (err) {
         console.error("Непредвиденная ошибка:", err);
       }
@@ -97,6 +106,33 @@ const StudentPanel = () => {
 
     checkAnnouncement();
   }, [user?.id, supabase]);
+
+  const [isBanned, setIsBanned] = useState(false)
+
+  useEffect(() => {
+    const checkBanStatus = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_banned')
+          .eq("id", user.id)
+          .single();
+
+        if (error) throw error;
+
+        // Успешный исход — профиль найден, записываем статус
+        setIsBanned(data.is_banned);
+
+      } catch (error) {
+        console.error("Критическая ошибка при проверке бана:", error.message);
+        setIsBanned(false);
+      }
+    };
+
+    checkBanStatus();
+  }, [user?.id]);
 
   const deleteAnnouncement = async () => {
     if (!user?.id) return;
@@ -173,12 +209,12 @@ const StudentPanel = () => {
 
     const response = hasAd
       ? await supabase
-          .from("student_ads")
-          .update(payload)
-          .eq("user_id", user?.id)
+        .from("student_ads")
+        .update(payload)
+        .eq("user_id", user?.id)
       : await supabase
-          .from("student_ads")
-          .insert({ ...payload, user_id: user?.id });
+        .from("student_ads")
+        .insert({ ...payload, user_id: user?.id });
 
     if (response?.error) {
       showAlert("error", response.error.message);
@@ -189,6 +225,33 @@ const StudentPanel = () => {
 
     setIsPublishing(false);
   };
+
+  const [availability, setAvailability] = useState<WeeklyAvailability>({});
+
+  useEffect(() => {
+    const fetchInitialSchedule = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("availability")
+          .eq("id", user.id)
+          .single();
+
+        if (error) throw error;
+
+        // data — это { availability: { ... } }. Нам нужна только внутренность.
+        if (data && data.availability) {
+          setAvailability(data.availability as WeeklyAvailability);
+        }
+      } catch (err) {
+        console.error("Ошибка при загрузке расписания:", err);
+      }
+    };
+
+    fetchInitialSchedule();
+  }, [user?.id, supabase]);
 
   return (
     <div>
@@ -201,12 +264,11 @@ const StudentPanel = () => {
                 flex items-center gap-3
                 px-6 py-4 rounded-2xl shadow-2xl border
                 animate-in fade-in slide-in-from-top-4 duration-300
-                ${
-                  alert.type === "success"
-                    ? "bg-white border-green-100 text-green-800"
-                    : alert.type === "error"
-                      ? "bg-white border-red-100 text-red-800"
-                      : "bg-white border-blue-100 text-blue-800"
+                ${alert.type === "success"
+                  ? "bg-white border-green-100 text-green-800"
+                  : alert.type === "error"
+                    ? "bg-white border-red-100 text-red-800"
+                    : "bg-white border-blue-100 text-blue-800"
                 }
               `}
             >
@@ -301,7 +363,14 @@ const StudentPanel = () => {
             </div>
           </div>
         </div>
-        {announceStatus && (
+
+        <Planner
+          userId={user.id}
+          initialSchedule={availability}
+          editAvailability={setAvailability}
+        />
+
+        {announceStatus && !isBanned && (
           <button
             onClick={deleteAnnouncement}
             className="w-full cursor-pointer translate-y-4 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
@@ -310,22 +379,40 @@ const StudentPanel = () => {
           </button>
         )}
 
-        <button
-          onClick={handlePublishAd}
-          disabled={isPublishing}
-          className="w-full bg-blue-600 cursor-pointer  hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
-        >
-          {isPublishing ? (
-            <>
-              <Loader2 className="h-5 w-5 animate-spin" />
-              Загрузка...
-            </>
-          ) : hasAd ? (
-            "Обновить заявку"
+        <div className="w-full flex flex-col gap-2">
+          {isBanned ? (
+            // UI для забаненного пользователя
+            <div className="w-full flex  bg-red-50 border border-red-200 text-red-700 py-4 px-5 rounded-[20px] flex items-center justify-center gap-3 shadow-sm">
+              <div className="bg-red-100 p-2 rounded-full text-red-600">
+                {/* Иконка щита/внимания, если есть lucide-react, иначе можно поставить обычный ⚠️ */}
+                <span className="text-lg font-bold leading-none">⚠️</span>
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="font-bold text-sm uppercase tracking-wider text-red-800">Аккаунт заблокирован</span>
+                <span className="text-xs text-red-600/90 mt-0.5">Создание и обновление заявок ограничено администрацией.</span>
+              </div>
+            </div>
           ) : (
-            "Разместить заявку"
+            // Ваш исходный UI кнопки для обычного пользователя
+            <button
+              onClick={handlePublishAd}
+              disabled={isPublishing}
+              className="w-full bg-blue-600 cursor-pointer hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
+            >
+              {isPublishing ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Загрузка...
+                </>
+              ) : hasAd ? (
+                "Обновить заявку"
+              ) : (
+                "Разместить заявку"
+              )}
+            </button>
           )}
-        </button>
+        </div>
+
       </div>
     </div>
   );

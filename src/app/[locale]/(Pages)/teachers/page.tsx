@@ -2,8 +2,8 @@
 
 import { Heart, Filter, X, Clock } from "lucide-react"; // Добавил X и Clock
 import React, { useState, useEffect } from "react";
-import { useTeacherAnnouncement } from "../../../context/TeacherAnnouncementContext";
-import TeacherCard from "../../../components/UI/TeacherCard";
+import { useTeacherAnnouncement } from "../../../../context/TeacherAnnouncementContext";
+import TeacherCard from "../../../../components/UI/TeacherCard";
 import FilterPanel from "@/src/components/UI/TeacherFilter";
 
 const TutorsPageWithAnimation = () => {
@@ -21,18 +21,7 @@ const TutorsPageWithAnimation = () => {
   const [showNotify, setShowNotify] = useState(false);
 
   const toggleFilter = () => setOpenFilter(!openFilter);
-
-  // Логика уведомления для репетитора
-  useEffect(() => {
-    // Вставьте сюда вашу проверку роли (например, profile?.role === "Tutor")
-    // Для примера оставил закомментированным, пока не привяжете к своему AuthContext
-    /* if (profile?.role === "Tutor") {
-      const timer = setTimeout(() => setShowNotify(true), 1500);
-      return () => clearTimeout(timer);
-    } 
-    */
-  }, []); // Зависимость от profile?.role
-
+  
   return (
     <div className="min-h-screen bg-[#FBFDFF] pb-20 relative ">
       <div className="bg-white border-b border-slate-100 py-6 sm:py-12 mb-8">
@@ -95,39 +84,6 @@ const TutorsPageWithAnimation = () => {
         </div>
       </div>
 
-      {/* Уведомление для репетитора */}
-      {/* {showNotify && (
-        <div className="fixed bottom-6 right-6 z-[100] animate-in fade-in slide-in-from-bottom-10 duration-500">
-          <div className="bg-white border-l-4 border-blue-600 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-2xl p-5 max-w-[320px] relative group">
-            <button
-              onClick={() => setShowNotify(false)}
-              className="absolute top-2 right-2 text-slate-300 hover:text-slate-600 transition-colors"
-            >
-              <X size={18} />
-            </button>
-
-            <div className="flex gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                <Clock className="text-blue-600 animate-pulse" size={24} />
-              </div>
-              <div>
-                <h4 className="font-bold text-slate-900 text-sm">
-                  Обновите расписание!
-                </h4>
-                <p className="text-xs text-slate-500 mt-1 leading-snug">
-                  Чтобы быть выше в поиске, держите календарь актуальным.
-                </p>
-                <button
-                  className="mt-3 text-xs font-bold text-blue-600 hover:text-blue-700 underline decoration-2 underline-offset-4"
-                  onClick={() => (window.location.href = "/profile")} // Пример ссылки
-                >
-                  Перейти в календарь →
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 };

@@ -5,15 +5,24 @@ import { UserPlus, Calendar, Search, BookOpen } from "lucide-react";
 import { useModal } from "../../context/ModalContext";
 import { useUser } from "../../context/UserContext";
 import BecomeTeacherModal from "../UI/BecomeTeacherModal";
+// Импортируем хук локализации
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useLocale } from 'next-intl';
 
 export default function HomePage() {
   const { openModal } = useModal();
   const { user } = useUser();
   const [becomeTeacher, setBecomeTeacher] = useState(false);
-  // Стейт для запуска анимации
   const [isClosing, setIsClosing] = useState(false);
 
-  // Функция открытия
+  const locale = useLocale();
+
+  // Инициализируем переводы для разных секций страницы
+  const tHero = useTranslations("HomePage.Hero");
+  const tSteps = useTranslations("HomePage.HowItWorks");
+  const tCta = useTranslations("HomePage.CTA");
+
   const openBecomeTeacherModal = () => {
     setIsClosing(false);
     setBecomeTeacher(true);
@@ -21,12 +30,12 @@ export default function HomePage() {
 
   const closeBecomeTeacherModal = () => {
     setIsClosing(true);
-
     setTimeout(() => {
       setBecomeTeacher(false);
       setIsClosing(false);
     }, 300);
   };
+
   return (
     <div className="font-sans overflow-hidden">
       {becomeTeacher && (
@@ -35,9 +44,9 @@ export default function HomePage() {
           isClosing={isClosing}
         />
       )}
-      {/* Hero Section с "живым" фоном */}
+
+      {/* Hero Section */}
       <section className="relative py-24 px-4 text-center bg-white overflow-hidden">
-        {/* Декоративные анимированные круги на фоне */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none">
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[60%] bg-blue-50 rounded-full blur-3xl opacity-60 animate-pulse" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[50%] bg-indigo-50 rounded-full blur-3xl opacity-60 animate-pulse [animation-delay:2s]" />
@@ -45,39 +54,38 @@ export default function HomePage() {
 
         <div className="relative z-10">
           <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">
-            Найдите идеального <span className="text-blue-600">репетитора</span>{" "}
-            для вас
+            {tHero("titlePart1")}
+            <span className="text-blue-600">{tHero("titleHighlight")}</span>
+            {tHero("titlePart2")}
           </h1>
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-500 mb-10 leading-relaxed">
-            Платформа для поиска репетиторов и учеников во всем Узбекистане.
-            Удобный подбор по расписанию и предметам.
+            {tHero("subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="/teachers"
-              className="px-8 py-4 w-[250px] bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700  shadow-lg shadow-blue-200"
+            <Link
+              href={`/${locale}/teachers`}
+              className="px-8 py-4 w-[250px] bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200"
             >
-              Найти учителя
-            </a>
-            <a
-              onClick={() => {
-                setBecomeTeacher(!becomeTeacher);
-              }}
+              {tHero("findTeacher")}
+            </Link>
+            <button
+              onClick={() => setBecomeTeacher(!becomeTeacher)}
               className="px-4 py-4 cursor-pointer border-2 w-[250px] border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all"
             >
-              Стать учителем
-            </a>
+              {tHero("becomeTeacher")} 
+            </button>
           </div>
         </div>
       </section>
 
       {!user && (
         <>
+          {/* How It Works Section */}
           <section className="py-24 px-4 bg-gradient-to-b from-blue-50/50 to-white">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                  Как это работает
+                  {tSteps("heading")}
                 </h2>
                 <div className="w-20 h-1.5 bg-blue-600 mx-auto rounded-full" />
               </div>
@@ -86,23 +94,23 @@ export default function HomePage() {
                 {[
                   {
                     icon: UserPlus,
-                    title: "Зарегистрируйтесь",
-                    desc: "Создайте профиль ученика или учителя",
+                    title: tSteps("step1Title"),
+                    desc: tSteps("step1Desc"),
                   },
                   {
                     icon: Calendar,
-                    title: "Укажите расписание",
-                    desc: "Добавьте ваше свободное время",
+                    title: tSteps("step2Title"),
+                    desc: tSteps("step2Desc"),
                   },
                   {
                     icon: Search,
-                    title: "Найдите совпадения",
-                    desc: "Система подберет учителей или учеников по графику",
+                    title: tSteps("step3Title"),
+                    desc: tSteps("step3Desc"),
                   },
                   {
                     icon: BookOpen,
-                    title: "Начните обучение",
-                    desc: "Свяжитесь и начните заниматься уже сейчас",
+                    title: tSteps("step4Title"),
+                    desc: tSteps("step4Desc"),
                   },
                 ].map((step, idx) => (
                   <div
@@ -122,7 +130,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* CTA Секция с фоновым паттерном */}
+          {/* CTA Section */}
           <section className="relative py-28 px-4 text-center overflow-hidden">
             <div
               className="absolute inset-0 -z-10 opacity-[0.03]"
@@ -133,17 +141,16 @@ export default function HomePage() {
 
             <div className="max-w-3xl mx-auto">
               <h2 className="text-4xl font-bold mb-6 text-slate-900">
-                Готовы начать путь к знаниям?
+                {tCta("heading")}
               </h2>
               <p className="text-gray-600 mb-10 text-lg">
-                Присоединяйтесь к сообществу профессионалов и целеустремленных
-                учеников. Ваш идеальный репетитор всего в одном клике.
+                {tCta("subtitle")}
               </p>
               <button
                 className="inline-block px-12 py-5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 cursor-pointer transition-all shadow-2xl hover:shadow-blue-200 active:scale-95"
                 onClick={openModal}
               >
-                Войти в аккаунт
+                {tCta("loginBtn")}
               </button>
             </div>
           </section>

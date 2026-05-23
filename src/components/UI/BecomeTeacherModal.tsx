@@ -1,4 +1,5 @@
 import { MessageCircle } from "lucide-react";
+import Link from "next/link";
 
 interface BecomeTeacherModalProps {
   onClose: () => void;
@@ -79,7 +80,7 @@ const BecomeTeacherModal = ({
                 <p className="text-[11px] sm:text-sm text-slate-600 mt-1 leading-normal">
                   Для активации отправьте чек и ваш ID пользователя в поддержку:
                 </p>
-                <a
+                <Link
                   href="https://t.me/dimaaa_o"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -87,7 +88,7 @@ const BecomeTeacherModal = ({
                 >
                   <MessageCircle size={16} className="sm:w-[18px]" />
                   <span>В Telegram</span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>

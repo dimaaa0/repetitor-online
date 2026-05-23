@@ -1,8 +1,8 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { createClient } from "../../../../../utils/supabase/client";
-import { useUser } from "../../../../../context/UserContext";
+import { createClient } from "../../../../../../utils/supabase/client";
+import { useUser } from "../../../../../../context/UserContext";
 import { Check, XCircle } from "lucide-react";
 
 export default function CommentForm({

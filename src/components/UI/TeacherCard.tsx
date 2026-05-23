@@ -4,6 +4,7 @@ import { Check, Heart, XCircle } from "lucide-react";
 import { createClient } from "../../../src/utils/supabase/client";
 import Link from "next/link";
 import { useModal } from "../../../src/context/ModalContext";
+import { useLocale } from 'next-intl';
 
 const supabase = createClient();
 
@@ -28,6 +29,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
   teacher,
   isLoading = false,
 }) => {
+  const locale = useLocale();
   const [imgLoaded, setImgLoaded] = useState(false);
 
   const { openModal } = useModal();
@@ -74,11 +76,6 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
     if (teacher.id) fetchCurrentStatus();
   }, [teacher.id]);
 
-  const showAlert = (type: "success" | "error" | "info", message: string) => {
-    setAlert({ type, message });
-    setTimeout(() => setAlert(null), 3000);
-  };
-
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (isProcessing) return;
@@ -86,11 +83,10 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return  openModal();
+    if (!user) return openModal();
 
     setIsProcessing(true);
 
-    // Optimistic UI
     const prevLiked = isLiked;
     const prevCount = likesCount;
     setIsLiked(!isLiked);
@@ -130,13 +126,12 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${
-          alert.type === "success"
-            ? "bg-white border-green-100 text-green-800"
-            : alert.type === "error"
-              ? "bg-white border-red-100 text-red-800"
-              : "bg-white border-blue-100 text-blue-800"
-        }
+        ${alert.type === "success"
+                ? "bg-white border-green-100 text-green-800"
+                : alert.type === "error"
+                  ? "bg-white border-red-100 text-red-800"
+                  : "bg-white border-blue-100 text-blue-800"
+              }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -155,14 +150,12 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
         <button
           onClick={handleLike}
           disabled={isProcessing}
-          className={`flex items-center cursor-pointer gap-1 mb-2 p-2 rounded-xl transition duration-300 ${
-            isLiked ? "bg-rose-50" : "bg-slate-50 hover:bg-blue-50"
-          }`}
+          className={`flex items-center cursor-pointer gap-1 mb-2 p-2 rounded-xl transition duration-300 ${isLiked ? "bg-rose-50" : "bg-slate-50 hover:bg-blue-50"
+            }`}
         >
           <Heart
-            className={`w-5 h-5 transition-colors ${
-              isLiked ? "text-rose-500 fill-rose-500" : "text-slate-400"
-            }`}
+            className={`w-5 h-5 transition-all ${isLiked ? "text-rose-500 fill-rose-500" : "text-slate-400"
+              } ${isProcessing ? "animate-pulse scale-95 opacity-70" : ""}`}
           />
           <span
             className={`text-xs font-bold ${isLiked ? "text-rose-600" : "text-slate-600"}`}
@@ -222,7 +215,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
             за 60 минут
           </span>
         </div>
-        <Link href={`/teachers/${displayId}`}>
+        <Link href={`/${locale}/teachers/${displayId}`}>
           <button className="bg-[#0f172a] cursor-pointer text-white px-8 py-3 rounded-2xl font-semibold hover:bg-slate-800 transition-colors">
             Выбрать
           </button>

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "../../../../../utils/supabase/client"; // Укажите ваш путь к клиенту
+import { createClient } from "../../../../../../utils/supabase/client"; // Укажите ваш путь к клиенту
 import { Check, Pencil, X, Save, Trash2, XCircle } from "lucide-react";
-import { useUser } from "../../../../../context/UserContext";
+import { useUser } from "../../../../../../context/UserContext";
 import { Router } from "next/router";
 
 interface Profile {

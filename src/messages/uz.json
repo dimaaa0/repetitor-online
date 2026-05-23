@@ -1,0 +1,37 @@
+{
+  "HomePage": {
+    "Hero": {
+      "titlePart1": "O'zingiz uchun ideal ",
+      "titleHighlight": "repetitorni",
+      "titlePart2": " toping",
+      "subtitle": "Butun O'zbekiston bo'ylab repetitorlar va o'quvchilarni izlash platformasi. Dars jadvali va fanlar bo'yicha qulay tanlov.",
+      "findTeacher": "O'qituvchi topish",
+      "becomeTeacher": "O'qituvchi bo'lish"
+    },
+    "HowItWorks": {
+      "heading": "Bu qanday ishlaydi",
+      "step1Title": "Ro'yxatdan o'ting",
+      "step1Desc": "O'quvchi yoki o'qituvchi profilini yarating",
+      "step2Title": "Dars jadvalini ko'rsating",
+      "step2Desc": "Bo'sh vaqtlaringizni qo'shing",
+      "step3Title": "Mos keluvchilarni toping",
+      "step3Desc": "Tizim dars jadvaliga qarab o'qituvchi yoki o'quvchilarni tanlab beradi",
+      "step4Title": "Ta'limni boshlang",
+      "step4Desc": "Bog'laning va hoziroq darslarni boshlang"
+    },
+    "CTA": {
+      "heading": "Bilimlar sari yo'l olishga tayyormisiz?",
+      "subtitle": "Professionallar va maqsad sari intiluvchan o'quvchilar hamjamiyatiga qo'shiling. Sizning ideal repetitoringiz bor-yo'g'i bir klik masofasida.",
+      "loginBtn": "Hisobga kirish"
+    }
+  },
+  "Footer": {
+    "contactUs": "Men bilan bogʻlanish:",
+    "telegramAriaLabel": "Telegramda yozish"
+  },
+  "Header": {
+    "navTeachers": "Oʻqituvchilar",
+    "navAds": "Eʼlonlar",
+    "loginBtn": "Kirish"
+  }
+}

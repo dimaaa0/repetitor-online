@@ -1,10 +1,10 @@
 "use client";
 
 import { useUser } from "@/src/context/UserContext";
-import Link from "next/link";
 import { BookOpen, MessageCircle, Wallet } from "lucide-react";
 import StudentSkeleton from "./StudentSkeletonLoader";
 import { useRouter } from "next/navigation";
+import { useLocale } from 'next-intl';
 
 const StudentCard = ({
   student,
@@ -19,7 +19,7 @@ const StudentCard = ({
     return <StudentSkeleton />;
   }
 
-
+  const locale = useLocale();
 
   const { user, loading } = useUser();
 
@@ -31,7 +31,7 @@ const StudentCard = ({
   const handleAction = (e: React.MouseEvent) => {
     if (isSubscribed) {
       // Если подписан, переходим на страницу
-      router.push(`/announcements/${displayId}`);
+      router.push(`/${locale}/announcements/${displayId}`);
     } else {
       // Если нет, открываем модалку
       onOpenModal?.();

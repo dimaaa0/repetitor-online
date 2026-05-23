@@ -1,4 +1,4 @@
-import { createClient } from "../../../../utils/supabase/client";
+import { createClient } from "../../../../../utils/supabase/client";
 import { notFound } from "next/navigation";
 import {
   ChevronLeft,
@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import CommentForm from "./_components/CommentForm";
 import CommentsList from "./_components/CommentsList"; // Импортируем новый клиентский компонент
+import Link from "next/link";
+import FreeTimeBar from "@/src/components/UI/FreeTimeBar";
+import { useUser } from "../../../../../context/UserContext";
 
 interface TeacherProfilePageProps {
   params: Promise<{ id: string }>;
@@ -42,11 +45,17 @@ export interface commentType {
   };
 }
 
+export interface TimeSlot {
+  s: string;
+  e: string;
+}
+
 export default async function TeacherProfilePage({
   params,
 }: TeacherProfilePageProps) {
   const supabase = await createClient();
   const { id: shortId } = await params;
+
 
   // 1. Данные объявления
   const { data: adData, error: adError }: { data: adType | null; error: any } =
@@ -84,8 +93,17 @@ export default async function TeacherProfilePage({
     .order("created_at", { ascending: false });
 
   const teacher = { ...adData, profiles: profileData };
-  const comments: commentType[] = (commentsData as any) || [];
+  const comments: commentType[] = ((commentsData as any[]) || []).reduce((acc: commentType[], comment: any) => {
+    // Если автор комментария забанен — игнорируем этот комментарий
+    if (comment.profiles?.is_banned === true) {
+      return acc;
+    }
 
+    // Если автор не забанен — добавляем комментарий в итоговый массив
+    acc.push(comment); // Если нужно отформатировать поля, делайте это прямо здесь (как в случае с объявлениями)
+
+    return acc;
+  }, []);
   let grammar = "отзывов";
 
   if (comments.length === 1) {
@@ -94,6 +112,11 @@ export default async function TeacherProfilePage({
     grammar = "отзыва";
   }
 
+  const { data: availability } = await supabase
+    .from("profiles")
+    .select("availability")
+    .eq("id", adData.user_id)
+    .single();
 
   return (
     <main className="min-h-screen bg-[#f8fafc] pb-20">
@@ -144,10 +167,10 @@ export default async function TeacherProfilePage({
               </div>
             </section>
 
-            <section className="bg-white rounded-3xl md:rounded-[2.5rem] p-6 md:p-10 border border-slate-200 shadow-sm">
+            <section className="bg-white rounded-3xl min-h-83 md:rounded-[2.5rem] p-6 md:p-10 border border-slate-200 shadow-sm">
               <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <Award className="text-blue-500 w-6 h-6 md:w-7 md:h-7" />О
-                преподавателе
+                <Award className="text-blue-500 w-6 h-6 md:w-7 md:h-7" />
+                О преподавателе
               </h2>
               <p className="text-slate-600 text-base md:text-lg leading-relaxed whitespace-pre-line italic">
                 &quot;
@@ -173,13 +196,6 @@ export default async function TeacherProfilePage({
                 </div>
               </div>
 
-              <a
-                href="#reviews"
-                className="w-full bg-[#0f172a] hover:bg-slate-800 flex items-center justify-center cursor-pointer text-white font-bold py-4 md:py-5 rounded-2xl md:rounded-3xl transition-all active:scale-95 shadow-lg"
-              >
-                Оставить отзыв
-              </a>
-
               <hr className="my-8 border-slate-100" />
 
               <div className="space-y-6">
@@ -195,6 +211,20 @@ export default async function TeacherProfilePage({
                   <Globe className="absolute -bottom-4 -right-4 w-20 h-20 text-blue-100 opacity-40 group-hover:rotate-12 transition-transform" />
                 </div>
               </div>
+
+              {/* РАЗДЕЛИТЕЛЬ И БЛОК СВОБОДНОГО ВРЕМЕНИ */}
+              <hr className="my-6 border-slate-100" />
+
+              <div className="space-y-4">
+                {/* <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-blue-500" /> Свободное время
+                </h3> */}
+                {/* Передаем ID пользователя (учителя), чтобы внутри компонента загрузить его расписание */}
+                <FreeTimeBar
+                  initialSchedule={availability}
+                />
+              </div>
+
             </div>
           </div>
         </div>

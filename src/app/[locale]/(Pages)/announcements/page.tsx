@@ -2,13 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { Wallet, BookOpen, MessageCircle, Filter } from "lucide-react";
-import { createClient } from "../../../../src/utils/supabase/client";
+import { createClient } from "../../../../utils/supabase/client";
 import StudentCard from "@/src/components/UI/StudentCard";
-import FilterPanel from "../../../components/UI/StudentFilter";
-import { useStudentAnnouncement } from "../../../context/StudentAnnouncementContext";
+import FilterPanel from "../../../../components/UI/StudentFilter";
+import { useStudentAnnouncement } from "../../../../context/StudentAnnouncementContext";
 import { useUser } from "@/src/context/UserContext";
 import BecomeTeacherModal from "@/src/components/UI/BecomeTeacherModal";
-import { useRouter } from "next/navigation";
 
 const Announcements = () => {
   const [dataLoading, setDataLoading] = useState(false);
@@ -29,53 +28,6 @@ const Announcements = () => {
 
   const toggleFilter = () => setOpenFilter(!openFilter);
 
-  useEffect(() => {
-    const fetchTeachers = async () => {
-      setDataLoading(true);
-      const { data, error } = await supabase.from("student_ads").select(`
-            id,
-            title,
-            subject,
-            description,
-            price,
-            created_at,
-            profiles (
-              id,
-              name,
-              surname,
-              avatar_url
-            )
-          `);
-
-      if (error) {
-        console.error("Ошибка загрузки:", error);
-      } else {
-        const formattedData = data.map((ad: any) => ({
-          id: ad.id,
-          title: ad.title,
-          name: ad.profiles?.name,
-          surname: ad.profiles?.surname,
-          avatar: ad.profiles?.avatar_url,
-          subject: ad.subject,
-          description: ad.description,
-          price: ad.price + " UZS",
-          likes: 0,
-          user_id: ad.profiles?.id,
-          postedAt: new Date(ad.created_at).toLocaleDateString("ru-RU", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          }),
-        }));
-        setStudents(formattedData);
-      }
-      setDataLoading(false);
-    };
-
-    fetchTeachers();
-  }, []);
-
-  const router = useRouter();
   const [becomeTeacher, setBecomeTeacher] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -137,7 +89,7 @@ const Announcements = () => {
       <div className="max-w-[1250] mx-auto px-2 sm:px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
-            Актуальные заявки: {students.length}
+            Актуальные заявки: {announcements.length}
           </span>
         </div>
 
