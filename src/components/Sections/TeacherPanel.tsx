@@ -6,7 +6,7 @@ import { createClient } from "../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import PaymentInstructionsModal from "../UI/PaymentInstructionsModal";
 import SubscriptionSkeleton from "../UI/SubscriptionSkeleton";
-import Planner from "../UI/Planner"
+import Planner from "../UI/Planner";
 import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/TeacherSubjectContext";
 
@@ -172,7 +172,6 @@ const TeacherPanel = () => {
     fetchInitialSchedule();
   }, [user?.id, supabase]); // Обязательно добавь зависимости
 
-
   //* ОБРАБОТКА ПУБЛИКАЦИИ/ОБНОВЛЕНИЯ ОБЪЯВЛЕНИЯ
   const handlePublishAd = async () => {
     setIsPublishing(true);
@@ -195,7 +194,7 @@ const TeacherPanel = () => {
         ? supabase.from("ads").update(payload).eq("user_id", user.id)
         : supabase.from("ads").insert({ ...payload, user_id: user.id }),
 
-      supabase.from("profiles").update({ availability }).eq("id", user.id)
+      supabase.from("profiles").update({ availability }).eq("id", user.id),
     ]);
 
     if (adRes.error || profileRes.error) {
@@ -315,12 +314,13 @@ const TeacherPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${alert.type === "success"
-                ? "bg-white border-green-100 text-green-800"
-                : alert.type === "error"
-                  ? "bg-white border-red-100 text-red-800"
-                  : "bg-white border-blue-100 text-blue-800"
-              }
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -359,10 +359,11 @@ const TeacherPanel = () => {
                 <CreditCard className="h-4 w-4" /> Тарифный план
               </h3>
               <span
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${isSubscribed
-                  ? "bg-green-50 text-green-600 border-green-100"
-                  : "bg-red-50 text-red-600 border-red-100"
-                  }`}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
+                  isSubscribed
+                    ? "bg-green-50 text-green-600 border-green-100"
+                    : "bg-red-50 text-red-600 border-red-100"
+                }`}
               >
                 {isSubscribed ? "Активен" : "Не активен"}
               </span>
@@ -443,7 +444,7 @@ const TeacherPanel = () => {
         )}
       </div>
 
-      <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">
+      <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100 w-full max-w-full overflow-hidden block">
         <h1 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] mb-8 flex items-center gap-2">
           <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Ваше
           объявление
