@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 
 import React, { useState, useEffect } from "react";
 
@@ -32,6 +33,8 @@ export default function Planner({
   const [availability, setAvailability] = useState<WeeklyAvailability>(
     initialSchedule || {},
   );
+
+    const t = useTranslations("profiles");
 
   useEffect(() => {
     if (initialSchedule) setAvailability(initialSchedule);
@@ -69,12 +72,12 @@ export default function Planner({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] flex items-center gap-2">
           <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-          Свободное время
+           {t("title_free_time")}
         </h2>
         <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-xl">
           <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
           <span className="text-[10px] font-bold text-blue-700 uppercase tracking-tight">
-            Нажмите на часы, когда вы свободны
+            {t("btn_select_free_time")}
           </span>
         </div>
       </div>
@@ -87,7 +90,7 @@ export default function Planner({
               <tr className="border-b-2 border-gray-100">
                 <th className="w-[50px] sm:w-[45px] py-2.5 sm:py-3 bg-slate-50 border-r-2 border-gray-100 text-center">
                   <span className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-wider block">
-                    Время
+                    {t("schedule_time")}
                   </span>
                 </th>
                 {days.map((day, idx) => (

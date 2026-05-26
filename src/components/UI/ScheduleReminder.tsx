@@ -40,7 +40,6 @@ export default function scheduleReminder() {
         if (diffDays >= 4) {
           setShowReminder(true);
         }
-
       } catch (error) {
         console.error("Ошибка при проверке актуальности расписания:", error);
       }
@@ -48,10 +47,6 @@ export default function scheduleReminder() {
 
     checkReminderInterval();
   }, [user?.id, loading]);
-
-  const closeReminder = () => {
-    setShowReminder(false);
-  }
 
   const handleConfirmSchedule = async () => {
     if (!user?.id) return;
@@ -65,21 +60,22 @@ export default function scheduleReminder() {
 
       if (error) throw error;
 
-      // Прячем уведомление
       setShowReminder(false);
     } catch (error) {
-      console.error("Ошибка обновления даты напоминания:", error);
+      console.error("Ошибка обновления даты напоминания:", error.message || error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  console.log(user?.id);
+  
 
   if (!showReminder) return null;
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] max-w-md p-2 z-[9999] animate-fadeIn sm:left-auto sm:right-6 sm:translate-x-0">
       <div className="w-full relative bg-white border border-slate-100 text-slate-800 py-5 px-6 rounded-[24px] flex flex-col gap-4 shadow-2xl shadow-slate-200/80">
-
         {/* Иконка и текст */}
         <div className="flex items-start gap-3.5">
           <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600 shrink-0">
@@ -90,7 +86,8 @@ export default function scheduleReminder() {
               Актуально ли ваше свободное время?
             </span>
             <span className="text-xs text-slate-500 mt-1 leading-relaxed">
-              Пожалуйста, убедитесь, что ваше расписание в планнере верно. Это помогает ученикам записываться на свободные уроки.
+              Пожалуйста, убедитесь, что ваше расписание в планнере верно. Это
+              помогает ученикам записываться на свободные уроки.
             </span>
           </div>
         </div>
@@ -104,7 +101,6 @@ export default function scheduleReminder() {
           <CheckCircle size={15} />
           {isSubmitting ? "Обновление..." : "Да, всё актуально"}
         </button>
-
       </div>
     </div>
   );

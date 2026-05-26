@@ -30,8 +30,42 @@
     "telegramAriaLabel": "Write on Telegram"
   },
   "Header": {
+    "title_part1": "Tutor online",
     "navTeachers": "Teachers",
     "navAds": "Announcements",
     "loginBtn": "Login"
+  },
+  "TeacherAnnouncements": {
+    "Search": {
+      "title": "Find a",
+      "titleAccent": "teacher",
+      "subtitle": "find your ideal tutor by subject, level, and price",
+      "filters": "Filters",
+      "activeApplications": "ACTIVE APPLICATIONS:"
+    }
+  },
+  "profiles": {
+    "role_student": "STUDENT",
+    "role_tutor": "TUTOR",
+    "btn_configure_profile": "Configure profile",
+    "title_your_advertisement": "YOUR ADVERTISEMENT",
+    "label_who_looking_for": "WHO ARE YOU LOOKING FOR?",
+    "label_your_budget": "YOUR BUDGET (UP TO)",
+    "label_desired_subjects": "DESIRED SUBJECTS",
+    "label_learning_goals": "LEARNING GOALS AND WISHES",
+    "label_contact_data": "CONTACT INFORMATION",
+    "title_free_time": "FREE TIME",
+    "btn_select_free_time": "CLICK ON THE HOURS WHEN YOU ARE FREE",
+    "unit_min": "MIN",
+    "btn_save": "Save",
+    "btn_cancel": "Cancel",
+    "schedule_time": "TIME",
+    "day_mon": "MON",
+    "day_tue": "TUE",
+    "day_wed": "WED",
+    "day_thu": "THU",
+    "day_fri": "FRI",
+    "day_sat": "SAT",
+    "day_sun": "SUN"
   }
 }

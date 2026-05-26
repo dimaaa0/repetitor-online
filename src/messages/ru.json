@@ -30,8 +30,42 @@
     "telegramAriaLabel": "Написать в Telegram"
   },
   "Header": {
+    "title_part1": "Репетитор онлайн",
     "navTeachers": "Учителя",
     "navAds": "Объявления",
     "loginBtn": "Войти"
+  },
+  "TeacherAnnouncements": {
+    "Search": {
+      "title": "Поиск",
+      "titleAccent": "учителя",
+      "subtitle": "найдите своего идеального репетитора по предмету, уровню и цене",
+      "filters": "Фильтры",
+      "activeApplications": "АКТУАЛЬНЫЕ ЗАЯВКИ:"
+    }
+  },
+  "profiles": {
+    "role_student": "УЧЕНИК",
+    "role_tutor": "УЧИТЕЛЬ",
+    "btn_configure_profile": "Настроить профиль",
+    "title_your_advertisement": "ВАШЕ ОБЪЯВЛЕНИЕ",
+    "label_who_looking_for": "КОГО ВЫ ИЩЕТЕ?",
+    "label_your_budget": "ВАШ БЮДЖЕТ (ДО)",
+    "label_desired_subjects": "ЖЕЛАЕМЫЕ ПРЕДМЕТЫ",
+    "label_learning_goals": "ЦЕЛИ ОБУЧЕНИЯ И ПОЖЕЛАНИЯ",
+    "label_contact_data": "КОНТАКТНЫЕ ДАННЫЕ",
+    "title_free_time": "СВОБОДНОЕ ВРЕМЯ",
+    "btn_select_free_time": "НАЖМИТЕ НА ЧАСЫ, КОГДА ВЫ СВОБОДНЫ",
+    "unit_min": "МИН",
+    "btn_save": "Сохранить",
+    "btn_cancel": "Отмена",
+    "schedule_time": "ВРЕМЯ",
+    "day_mon": "ПН",
+    "day_tue": "ВТ",
+    "day_wed": "СР",
+    "day_thu": "ЧТ",
+    "day_fri": "ПТ",
+    "day_sat": "СБ",
+    "day_sun": "ВС"
   }
 }

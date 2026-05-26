@@ -7,6 +7,7 @@ import Link from "next/link";
 import TeacherPanel from "@/src/components/Sections/TeacherPanel";
 import StudentPanel from "@/src/components/Sections/StudentPanel";
 import AdminPanel from "@/src/components/Sections/AdminPanel";
+import { useTranslations } from "next-intl";
 
 import { useUser } from "../../../../context/UserContext";
 import { useSubject } from "../../../../context/TeacherSubjectContext";
@@ -32,6 +33,8 @@ const Profile = () => {
   const { selectedSubjects, setSelectedSubjects } = useSubject();
   const supabase = createClient();
   const router = useRouter();
+
+  const t = useTranslations("profiles");
 
   // Состояния
   const [isEditing, setIsEditing] = useState(false);
@@ -465,7 +468,7 @@ const Profile = () => {
                     ) : (
                       <Check className="h-4 w-4" />
                     )}
-                    Сохранить
+                    {t("btn_save")}
                   </button>
                   <button
                     onClick={() => {
@@ -474,7 +477,7 @@ const Profile = () => {
                     }}
                     className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-bold text-sm sm:text-xs transition-all shadow-sm active:scale-95 bg-gray-100 text-gray-600 hover:bg-gray-200 w-full sm:w-auto"
                   >
-                    <XCircle className="h-4 w-4" /> Отмена
+                    <XCircle className="h-4 w-4" /> {t("btn_cancel")}
                   </button>
                 </>
               ) : (
@@ -482,7 +485,7 @@ const Profile = () => {
                   onClick={() => setIsEditing(true)}
                   className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl font-bold text-sm sm:text-xs transition-all duration-300 shadow-sm active:scale-95 bg-white text-slate-600 border border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/10 w-full sm:w-auto"
                 >
-                  Настроить профиль
+                  {t("btn_configure_profile")}
                 </button>
               )}
             </div>

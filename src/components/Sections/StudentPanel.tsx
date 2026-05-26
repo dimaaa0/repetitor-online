@@ -7,6 +7,7 @@ import { useSubject } from "../../context/StudentSubjectContext";
 import StudentSubjectPicker from "../UI/StudentSubjectPicker";
 import { Check, CircleUser, Loader2, Search, XCircle } from "lucide-react";
 import Planner from "../../components/UI/Planner";
+import { useTranslations } from "next-intl";
 
 export interface TimeSlot {
   s: string; // Start "09:00"
@@ -15,11 +16,12 @@ export interface TimeSlot {
 
 export type WeeklyAvailability = Record<string, TimeSlot[]>;
 
-
 const StudentPanel = () => {
   const { user } = useUser();
   const { selectedSubjects, setSelectedSubjects } = useSubject();
   const supabase = createClient();
+
+  const t = useTranslations("profiles");
 
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
@@ -98,7 +100,6 @@ const StudentPanel = () => {
         }
 
         setAnnounceStatus(!!data);
-
       } catch (err) {
         console.error("Непредвиденная ошибка:", err);
       }
@@ -107,7 +108,7 @@ const StudentPanel = () => {
     checkAnnouncement();
   }, [user?.id, supabase]);
 
-  const [isBanned, setIsBanned] = useState(false)
+  const [isBanned, setIsBanned] = useState(false);
 
   useEffect(() => {
     const checkBanStatus = async () => {
@@ -115,8 +116,8 @@ const StudentPanel = () => {
 
       try {
         const { data, error } = await supabase
-          .from('profiles')
-          .select('is_banned')
+          .from("profiles")
+          .select("is_banned")
           .eq("id", user.id)
           .single();
 
@@ -124,7 +125,6 @@ const StudentPanel = () => {
 
         // Успешный исход — профиль найден, записываем статус
         setIsBanned(data.is_banned);
-
       } catch (error) {
         console.error("Критическая ошибка при проверке бана:", error.message);
         setIsBanned(false);
@@ -190,8 +190,15 @@ const StudentPanel = () => {
   }, [user, supabase]);
 
   const handlePublishAd = async () => {
+    // 1. Проверяем авторизацию сразу, чтобы избежать падения на user.id
+    if (!user?.id) {
+      showAlert("error", "Пользователь не авторизован");
+      return;
+    }
+
     setIsPublishing(true);
 
+    // 2. Проверяем пустые поля
     if (
       !checkEmptyFields(title, selectedSubjects, price, description, contacts)
     ) {
@@ -199,6 +206,7 @@ const StudentPanel = () => {
       return;
     }
 
+    // 3. Формируем данные для отправки
     const payload = {
       price: price,
       title: title,
@@ -207,23 +215,36 @@ const StudentPanel = () => {
       subject: selectedSubjects.join(", "),
     };
 
-    const response = hasAd
-      ? await supabase
-        .from("student_ads")
-        .update(payload)
-        .eq("user_id", user?.id)
-      : await supabase
-        .from("student_ads")
-        .insert({ ...payload, user_id: user?.id });
+    try {
+      const [adResponse, profileResponse] = await Promise.all([
+        hasAd
+          ? supabase.from("student_ads").update(payload).eq("user_id", user.id)
+          : supabase
+              .from("student_ads")
+              .insert({ ...payload, user_id: user.id }),
 
-    if (response?.error) {
-      showAlert("error", response.error.message);
-    } else {
+        supabase.from("profiles").update({ availability }).eq("id", user.id),
+      ]);
+
+      // 5. Проверяем, не возникло ли ошибок в каком-либо из запросов
+      if (adResponse.error) throw adResponse.error;
+      if (profileResponse.error) throw profileResponse.error;
+
+      // 6. Если всё прошло успешно:
       setHasAd(true);
-      showAlert("success", hasAd ? "Заявка обновлена" : "Заявка опубликована");
+      showAlert(
+        "success",
+        hasAd
+          ? "Данные успешно обновлены!"
+          : "Объявление успешно опубликовано!",
+      );
+    } catch (error: any) {
+      // 7. Ловим любую ошибку из Supabase и выводим её пользователю
+      console.error("Ошибка при публикации:", error);
+      showAlert("error", error.message || "Ошибка при сохранении данных");
+    } finally {
+      setIsPublishing(false);
     }
-
-    setIsPublishing(false);
   };
 
   const [availability, setAvailability] = useState<WeeklyAvailability>({});
@@ -264,11 +285,12 @@ const StudentPanel = () => {
                 flex items-center gap-3
                 px-6 py-4 rounded-2xl shadow-2xl border
                 animate-in fade-in slide-in-from-top-4 duration-300
-                ${alert.type === "success"
-                  ? "bg-white border-green-100 text-green-800"
-                  : alert.type === "error"
-                    ? "bg-white border-red-100 text-red-800"
-                    : "bg-white border-blue-100 text-blue-800"
+                ${
+                  alert.type === "success"
+                    ? "bg-white border-green-100 text-green-800"
+                    : alert.type === "error"
+                      ? "bg-white border-red-100 text-red-800"
+                      : "bg-white border-blue-100 text-blue-800"
                 }
               `}
             >
@@ -286,14 +308,13 @@ const StudentPanel = () => {
         )}
 
         <h1 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] flex items-center gap-2">
-          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span> Ваше
-          объявление
+          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span> {t("title_your_advertisement")}
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2 ">
             <label className="text-[11px]  flex items-center font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-              Кого вы ищете?
+              {t("label_who_looking_for")}
             </label>
             <div className="relative">
               <input
@@ -308,7 +329,7 @@ const StudentPanel = () => {
 
           <div>
             <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-              Ваш бюджет (до)
+              {t("label_your_budget")}
             </label>
             <div className="relative">
               <input
@@ -325,7 +346,7 @@ const StudentPanel = () => {
                 placeholder="100,000"
               />
               <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
-                UZS / 60 МИН
+                UZS / 60 {t("unit_min")}
               </span>
             </div>
           </div>
@@ -335,7 +356,7 @@ const StudentPanel = () => {
 
         <div>
           <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-            Цели обучения и пожелания
+             {t("label_learning_goals")}
           </label>
           <div className="bg-gray-100 rounded-[24px] p-5 border-2 border-transparent focus-within:border-orange-500/10 focus-within:bg-white transition-all">
             <textarea
@@ -350,7 +371,7 @@ const StudentPanel = () => {
         <div className="md:col-span-2">
           <div className=" flex-col  items-center gap-2 text-sm text-gray-500">
             <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-              Контактные данные
+               {t("label_contact_data")}
             </label>
             <div className="relative">
               <input
@@ -388,8 +409,12 @@ const StudentPanel = () => {
                 <span className="text-lg font-bold leading-none">⚠️</span>
               </div>
               <div className="flex flex-col text-left">
-                <span className="font-bold text-sm uppercase tracking-wider text-red-800">Аккаунт заблокирован</span>
-                <span className="text-xs text-red-600/90 mt-0.5">Создание и обновление заявок ограничено администрацией.</span>
+                <span className="font-bold text-sm uppercase tracking-wider text-red-800">
+                  Аккаунт заблокирован
+                </span>
+                <span className="text-xs text-red-600/90 mt-0.5">
+                  Создание и обновление заявок ограничено администрацией.
+                </span>
               </div>
             </div>
           ) : (
@@ -412,7 +437,6 @@ const StudentPanel = () => {
             </button>
           )}
         </div>
-
       </div>
     </div>
   );

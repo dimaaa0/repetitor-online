@@ -5,7 +5,6 @@ import { UserPlus, Calendar, Search, BookOpen } from "lucide-react";
 import { useModal } from "../../context/ModalContext";
 import { useUser } from "../../context/UserContext";
 import BecomeTeacherModal from "../UI/BecomeTeacherModal";
-// Импортируем хук локализации
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useLocale } from 'next-intl';

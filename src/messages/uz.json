@@ -30,8 +30,43 @@
     "telegramAriaLabel": "Telegramda yozish"
   },
   "Header": {
+    "title_part1": "Onlayn repetitor",
     "navTeachers": "Oʻqituvchilar",
     "navAds": "Eʼlonlar",
     "loginBtn": "Kirish"
+  },
+  "TeacherAnnouncements": {
+    "Search": {
+      "title": "O'qituvchi",
+      "titleAccent": "qidiruvi",
+      "subtitle": "fan, daraja va narx bo'yicha o'zingizga mos ideal repetitorni toping",
+      "filters": "Filtrlar",
+      "activeApplications": "DOLZARB ARIZALAR:"
+    }
+  },
+  "profiles": {
+    "role_student": "O'QUVCHI",
+    "role_tutor": "O'QITUVCHI",
+    "btn_configure_profile": "Profilni sozlash",
+    "title_your_advertisement": "SIZNING E'LONINGIZ",
+    "label_who_looking_for": "KIMNI QIDIRYAPSIZ?",
+    "label_your_budget": "SIZNING BYUDJETINGIZ (GACHA)",
+    "label_desired_subjects": "ISTALGAN FANLAR",
+    "label_learning_goals": "O'QISH MAQSADLARI VA ISTAKLAR",
+    "label_contact_data": "BOG'LANISH MA'LUMOTLARI",
+    "title_free_time": "BO'SH VAQT",
+    "btn_select_free_time": "BO'SH VAQTINGIZNI BELGILASH UCHUN SOATNI BOSING",
+    "unit_min": "MIN",
+    "btn_save": "Saqlash",
+    "btn_cancel": "Bekor qilish",
+    "schedule_time": "VAQT",
+    "day_mon": "DS",
+    "day_tue": "SE",
+    "day_wed": "CH",
+    "day_thu": "PA",
+    "day_fri": "JU",
+    "day_sat": "SH",
+    "day_sun": "YK"
+  }
   }
 }

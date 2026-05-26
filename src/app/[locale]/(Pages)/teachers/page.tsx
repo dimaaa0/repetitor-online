@@ -1,14 +1,17 @@
 "use client";
 
-import { Heart, Filter, X, Clock } from "lucide-react"; // Добавил X и Clock
+import { Heart, Filter, X, Clock } from "lucide-react"; 
 import React, { useState, useEffect } from "react";
 import { useTeacherAnnouncement } from "../../../../context/TeacherAnnouncementContext";
 import TeacherCard from "../../../../components/UI/TeacherCard";
 import FilterPanel from "@/src/components/UI/TeacherFilter";
+import { useTranslations } from "next-intl";
+
 
 const TutorsPageWithAnimation = () => {
   const { announcements, announcementsLoading } = useTeacherAnnouncement();
-
+  
+  const tSearch = useTranslations("TeacherAnnouncements.Search");
   const [filters, setFilters] = useState({
     subject: "",
     maxPrice: 500000,
@@ -31,10 +34,10 @@ const TutorsPageWithAnimation = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
-                Поиск <span className="text-blue-600">учителя</span>
+                {tSearch("title")} <span className="text-blue-600">{tSearch("titleAccent")}</span>
               </h1>
               <p className="text-slate-500 mt-2 font-medium">
-                найдите своего идеального репетитора по предмету, уровню и цене
+                {tSearch("subtitle")}
               </p>
             </div>
             <div className="flex gap-3 relative">
@@ -43,7 +46,7 @@ const TutorsPageWithAnimation = () => {
                 onClick={toggleFilter}
               >
                 <Filter size={18} className="text-blue-600" />
-                Фильтры
+                {tSearch("filters")}
               </button>
               {openFilter && (
                 <FilterPanel
@@ -60,7 +63,7 @@ const TutorsPageWithAnimation = () => {
       <div className="max-w-[1250px] mx-auto px-2 sm:px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
-            Актуальные заявки: {announcements?.length || 0}
+            {tSearch("activeApplications")} {announcements?.length || 0}
           </span>
         </div>
 

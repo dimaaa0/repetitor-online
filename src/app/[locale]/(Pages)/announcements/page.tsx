@@ -8,6 +8,7 @@ import FilterPanel from "../../../../components/UI/StudentFilter";
 import { useStudentAnnouncement } from "../../../../context/StudentAnnouncementContext";
 import { useUser } from "@/src/context/UserContext";
 import BecomeTeacherModal from "@/src/components/UI/BecomeTeacherModal";
+import { useTranslations } from "next-intl";
 
 const Announcements = () => {
   const [dataLoading, setDataLoading] = useState(false);
@@ -15,6 +16,8 @@ const Announcements = () => {
   const { user, loading } = useUser();
   const { announcements, announcementsLoading } = useStudentAnnouncement();
   const supabase = createClient();
+
+  const t = useTranslations("TeacherAnnouncements.Search");
 
   const [filters, setFilters] = useState({
     subject: "",
@@ -59,12 +62,12 @@ const Announcements = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl  md:text-4xl font-black text-slate-900 tracking-tight">
-                Лента <span className="text-blue-600">объявлений</span>
+                {t("title")}{" "}
+                <span className="text-blue-600">{t("titleAccent")}</span>
               </h1>
               <p className="text-slate-500 mt-2 font-medium">
-                Свежие запросы от учеников, которым нужна ваша помощь. <br />
+                {t("subtitle")} <br />
               </p>
-
             </div>
             <div className="flex gap-3 relative">
               <button
@@ -72,7 +75,7 @@ const Announcements = () => {
                 onClick={toggleFilter}
               >
                 <Filter size={18} className="text-blue-600" />
-                Фильтры
+                {t("filters")}
               </button>
               {openFilter && (
                 <FilterPanel
@@ -89,23 +92,23 @@ const Announcements = () => {
       <div className="max-w-[1250] mx-auto px-2 sm:px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
-            Актуальные заявки: {announcements.length}
+            {t("activeApplications")} {announcements.length}
           </span>
         </div>
 
         <div className="grid grid-cols-1 pb-4 gap-8">
           {announcementsLoading && announcements.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
-              <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
-            ))
+                <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
+              ))
             : announcements.map((student: any, key: number) => (
-              <StudentCard
-                key={student.id || key}
-                student={student}
-                isLoading={!student.name || !student.subject}
-                onOpenModal={openBecomeTeacherModal}
-              />
-            ))}
+                <StudentCard
+                  key={student.id || key}
+                  student={student}
+                  isLoading={!student.name || !student.subject}
+                  onOpenModal={openBecomeTeacherModal}
+                />
+              ))}
         </div>
       </div>
     </div>
