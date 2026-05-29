@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSubject } from "../../context/TeacherSubjectContext";
 import { useUser } from "../../context/UserContext";
 import { createClient } from "../../utils/supabase/client";
+import { useTranslations } from "next-intl";
 
 const SubjectPicker = () => {
   const { selectedSubjects, addSubject, removeSubject } = useSubject();
@@ -10,6 +11,8 @@ const SubjectPicker = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const supabase = createClient();
+
+  const t = useTranslations("profiles");
 
   const { user, loading, refreshUser } = useUser();
 
@@ -88,7 +91,7 @@ const SubjectPicker = () => {
     <div className="flex-1 space-y-4" ref={containerRef}>
       <div className="relative">
         <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-          Предметы преподавания
+          {t("label_desired_subjects")}
         </label>
 
         <div

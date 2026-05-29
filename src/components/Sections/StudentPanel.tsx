@@ -8,6 +8,7 @@ import StudentSubjectPicker from "../UI/StudentSubjectPicker";
 import { Check, CircleUser, Loader2, Search, XCircle } from "lucide-react";
 import Planner from "../../components/UI/Planner";
 import { useTranslations } from "next-intl";
+import { p } from "framer-motion/client";
 
 export interface TimeSlot {
   s: string; // Start "09:00"
@@ -220,8 +221,8 @@ const StudentPanel = () => {
         hasAd
           ? supabase.from("student_ads").update(payload).eq("user_id", user.id)
           : supabase
-              .from("student_ads")
-              .insert({ ...payload, user_id: user.id }),
+            .from("student_ads")
+            .insert({ ...payload, user_id: user.id }),
 
         supabase.from("profiles").update({ availability }).eq("id", user.id),
       ]);
@@ -285,12 +286,11 @@ const StudentPanel = () => {
                 flex items-center gap-3
                 px-6 py-4 rounded-2xl shadow-2xl border
                 animate-in fade-in slide-in-from-top-4 duration-300
-                ${
-                  alert.type === "success"
-                    ? "bg-white border-green-100 text-green-800"
-                    : alert.type === "error"
-                      ? "bg-white border-red-100 text-red-800"
-                      : "bg-white border-blue-100 text-blue-800"
+                ${alert.type === "success"
+                  ? "bg-white border-green-100 text-green-800"
+                  : alert.type === "error"
+                    ? "bg-white border-red-100 text-red-800"
+                    : "bg-white border-blue-100 text-blue-800"
                 }
               `}
             >
@@ -322,7 +322,7 @@ const StudentPanel = () => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full bg-gray-100  border-2 border-transparent focus:border-orange-500/10 focus:bg-white rounded-2xl px-5 py-4 font-bold text-gray-800 outline-none transition-all"
-                placeholder="Например: Ищу репетитора по физике для подготовки к вузу"
+                placeholder={t("placeholder_who_looking_for")}
               />
             </div>
           </div>
@@ -356,12 +356,12 @@ const StudentPanel = () => {
 
         <div>
           <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-             {t("label_learning_goals")}
+            {t("label_learning_goals")}
           </label>
           <div className="bg-gray-100 rounded-[24px] p-5 border-2 border-transparent focus-within:border-orange-500/10 focus-within:bg-white transition-all">
             <textarea
               className="w-full bg-transparent border-none focus:ring-0 p-0 text-[15px] font-medium text-gray-700 placeholder:text-gray-400 resize-none h-32 leading-relaxed"
-              placeholder="Опишите ваш текущий уровень, цель занятий и удобное время..."
+              placeholder={t("placeholder_learning_goals")}
               onChange={(e) => setDescription(e.target.value)}
               value={description}
             />
@@ -371,7 +371,7 @@ const StudentPanel = () => {
         <div className="md:col-span-2">
           <div className=" flex-col  items-center gap-2 text-sm text-gray-500">
             <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-               {t("label_contact_data")}
+              {t("label_contact_data")}
             </label>
             <div className="relative">
               <input
@@ -379,7 +379,7 @@ const StudentPanel = () => {
                 value={contacts}
                 onChange={(e) => setContacts(e.target.value)}
                 className="w-full bg-gray-100 border-2 border-transparent focus:border-orange-500/10 focus:bg-white rounded-2xl px-5 py-4 font-bold text-gray-800 outline-none transition-all"
-                placeholder="Например: Номер телефона, Telegram, WhatsApp или email"
+                placeholder={t("placeholder_contact_info")}
               />
             </div>
           </div>
@@ -396,7 +396,7 @@ const StudentPanel = () => {
             onClick={deleteAnnouncement}
             className="w-full cursor-pointer translate-y-4 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
           >
-            Удалить объявление
+            {t("btn_delete_advertisement")}
           </button>
         )}
 
@@ -430,9 +430,13 @@ const StudentPanel = () => {
                   Загрузка...
                 </>
               ) : hasAd ? (
-                "Обновить заявку"
+                <p>
+                  {t("btn_update_request")}
+                </p>
               ) : (
-                "Разместить заявку"
+                <p>
+                  {t("btn_place_request")}
+                </p>
               )}
             </button>
           )}

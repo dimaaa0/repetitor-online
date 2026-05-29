@@ -50,6 +50,7 @@
     "btn_configure_profile": "Profilni sozlash",
     "title_your_advertisement": "SIZNING E'LONINGIZ",
     "label_who_looking_for": "KIMNI QIDIRYAPSIZ?",
+    "placeholder_who_looking_for": "Masalan: Oliy o'quv yurtiga tayyorlanish uchun fizikadan repetitor qidiryapman",
     "label_your_budget": "SIZNING BYUDJETINGIZ (GACHA)",
     "label_desired_subjects": "ISTALGAN FANLAR",
     "label_learning_goals": "O'QISH MAQSADLARI VA ISTAKLAR",
@@ -66,7 +67,18 @@
     "day_thu": "PA",
     "day_fri": "JU",
     "day_sat": "SH",
-    "day_sun": "YK"
-  }
+    "day_sun": "YK",
+    "btn_delete_advertisement": "E'LONNI O'CHIRISH",
+    "btn_update_request": "ARIZANI YANGILASH",
+    "btn_place_request": "Ariza joylashtirish",
+    "placeholder_write_or_select": "Yozing yoki tanlang...",
+    "placeholder_contact_info": "Masalan: Telefon raqami, Telegram, WhatsApp yoki email",
+    "placeholder_learning_goals": "Joriy darajangiz, darslardan maqsad va qulay vaqtni tavsiflang...",
+    "loading": "Yuklanmoqda...",
+    "label_role": "Rol:",
+    "label_last_name": "Familiya",
+    "label_first_name": "Ism",
+    "btn_confirm": "Tasdiqlash",
+    "btn_logout": "Hisobdan chiqish"
   }
 }

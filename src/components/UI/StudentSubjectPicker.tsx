@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSubject } from "../../context/StudentSubjectContext";
 import { createClient } from '../../../src/utils/supabase/client';
 import { useUser } from "../../context/UserContext";
+import { useTranslations } from "next-intl";
 
 const supabase = createClient();
 
@@ -10,6 +11,8 @@ const SubjectPicker = () => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const t = useTranslations("profiles");
 
   const supabase = createClient();
 
@@ -90,7 +93,7 @@ const SubjectPicker = () => {
     <div className="flex-1 space-y-4" ref={containerRef}>
       <div className="relative">
         <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-          Желаемые предметы
+          {t("label_desired_subjects")}
         </label>
 
         <div
@@ -137,9 +140,7 @@ const SubjectPicker = () => {
             }}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
-            placeholder={
-              selectedSubjects.length === 0 ? "Напишите или выберите..." : ""
-            }
+            placeholder={selectedSubjects.length === 0 ? t("placeholder_write_or_select") : ""}
             className="flex-1   min-w-[150px] bg-transparent border-none focus:ring-0 outline-none text-blue-700 font-bold placeholder:text-blue-300 px-2"
           />
         </div>
@@ -175,7 +176,7 @@ const SubjectPicker = () => {
 
               {filteredSubjects.length === 0 && !query && (
                 <div className="px-4 py-4 text-center animate-pulse text-gray-400 text-sm">
-                  Загрузка...
+                  {t("loading")}
                 </div>
               )}
             </div>

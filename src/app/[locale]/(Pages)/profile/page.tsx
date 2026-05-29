@@ -324,7 +324,7 @@ const Profile = () => {
                   className="w-full sm:w-1/2 px-4 py-2.5 bg-[#C92222] text-white text-sm font-medium rounded-xl 
                    hover:bg-[#b01e1e] active:scale-[0.97] transition-all shadow-md shadow-red-200 cursor-pointer"
                 >
-                  Подтвердить
+                  {t("btn_confirm")} 
                 </button>
 
                 <button
@@ -334,7 +334,7 @@ const Profile = () => {
                   className="w-full sm:w-1/2 px-4 py-2.5 bg-gray-50 text-gray-700 text-sm font-medium rounded-xl 
                    hover:bg-gray-100 active:scale-[0.97] transition-all cursor-pointer border border-gray-200"
                 >
-                  Отмена
+                  {t("btn_cancel")} 
                 </button>
               </div>
             </div>
@@ -384,7 +384,7 @@ const Profile = () => {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full focus:bg-blue-50 transition-colors"
-                      placeholder="Имя"
+                      placeholder={t("label_first_name")} 
                     />
                     <input
                       type="text"
@@ -393,7 +393,7 @@ const Profile = () => {
                         setFormData({ ...formData, surname: e.target.value })
                       }
                       className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full focus:bg-blue-50 transition-colors"
-                      placeholder="Фамилия"
+                      placeholder={t("label_last_name")} 
                     />
                   </div>
                   <div className="flex justify-center sm:justify-start my-1">
@@ -408,9 +408,9 @@ const Profile = () => {
                     : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                 }`}
                     >
-                      <span className="mr-2 italic opacity-70">Роль:</span>
+                      <span className="mr-2 italic opacity-70">{t("label_role")} </span>
                       <span className="uppercase">
-                        {formData.role === "Tutor" ? "Репетитор" : "Ученик"}
+                        {formData.role === "Tutor" ? t("role_tutor") : t("role_student") }
                       </span>
                     </button>
                   </div>
@@ -442,8 +442,8 @@ const Profile = () => {
                       : user.role === "Admin"
                         ? "Администратор"
                         : user.role === "Tutor"
-                          ? "Репетитор"
-                          : "Ученик"}
+                          ? t("role_tutor") 
+                          : t("role_student") }
                   </span>
                 </div>
               )}
@@ -503,7 +503,7 @@ const Profile = () => {
              border border-red-400 bg-transparent text-red-500 hover:bg-red-400 hover:text-white hover:border-red-400 cursor-pointer"
           >
             <LogOut className="h-5 w-5" />
-            Выйти из аккаунта
+            {t("btn_logout")} 
           </button>
         </div>
       </div>

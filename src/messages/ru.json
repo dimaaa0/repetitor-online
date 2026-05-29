@@ -50,6 +50,7 @@
     "btn_configure_profile": "Настроить профиль",
     "title_your_advertisement": "ВАШЕ ОБЪЯВЛЕНИЕ",
     "label_who_looking_for": "КОГО ВЫ ИЩЕТЕ?",
+    "placeholder_who_looking_for": "Например: Ищу репетитора по физике для подготовки к вузу",
     "label_your_budget": "ВАШ БЮДЖЕТ (ДО)",
     "label_desired_subjects": "ЖЕЛАЕМЫЕ ПРЕДМЕТЫ",
     "label_learning_goals": "ЦЕЛИ ОБУЧЕНИЯ И ПОЖЕЛАНИЯ",
@@ -66,6 +67,18 @@
     "day_thu": "ЧТ",
     "day_fri": "ПТ",
     "day_sat": "СБ",
-    "day_sun": "ВС"
+    "day_sun": "ВС",
+    "btn_delete_advertisement": "УДАЛИТЬ ОБЪЯВЛЕНИЕ",
+    "btn_update_request": "ОБНОВИТЬ ЗАЯВКУ",
+    "btn_place_request": "Разместить заявку",
+    "placeholder_write_or_select": "Напишите или выберите...",
+    "placeholder_contact_info": "Например: Номер телефона, Telegram, WhatsApp или email",
+    "placeholder_learning_goals": "Опишите ваш текущий уровень, цель занятий и удобное время...",
+    "loading": "Загрузка...",
+    "label_role": "Роль:",
+    "label_last_name": "Фамилия",
+    "label_first_name": "Имя",
+    "btn_confirm": "Подтвердить",
+    "btn_logout": "Выйти из аккаунта"
   }
 }

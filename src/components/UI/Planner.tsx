@@ -19,7 +19,8 @@ export default function Planner({
   initialSchedule,
   editAvailability,
 }: PlannerProps) {
-  const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+  const t = useTranslations("profiles");
+  const days = [t("day_mon"), t("day_tue"), t("day_wed"), t("day_thu"), t("day_fri"),  t("day_sat"), t("day_sun")];
 
   const generateTimeSlots = (startHour = 7) => {
     const slots = [];
@@ -34,7 +35,6 @@ export default function Planner({
     initialSchedule || {},
   );
 
-    const t = useTranslations("profiles");
 
   useEffect(() => {
     if (initialSchedule) setAvailability(initialSchedule);
