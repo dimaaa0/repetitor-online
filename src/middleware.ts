@@ -1,17 +1,17 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
-import { createServerClient } from '@supabase/ssr'; // Стандартный подход для SSR
+import { createServerClient } from '@supabase/ssr';
 
 const intlMiddleware = createMiddleware({
     locales: ['ru', 'uz', 'en'],
     defaultLocale: 'ru'
 });
 
-export async function middleware(request: NextRequest) {
-    // 1. Сначала получаем ответ от next-intl (он управляет редиректами на /ru, /uz и т.д.)
+export default async function middleware(request: NextRequest) {
+    // Получаем базовый ответ от next-intl для локализации
     const response = intlMiddleware(request);
 
-    // 2. Передаем этот ЖЕ ответ в Supabase, чтобы он работал с его куками
+    // Подключаем Supabase с твоим рабочим ключом франкфуртского сервера
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
@@ -21,7 +21,6 @@ export async function middleware(request: NextRequest) {
                     return request.cookies.getAll();
                 },
                 setAll(cookiesToSet) {
-                    // Записываем куки и в запрос, и в ответ
                     cookiesToSet.forEach(({ name, value, options }) => {
                         request.cookies.set(name, value);
                         response.cookies.set(name, value, options);
@@ -31,14 +30,13 @@ export async function middleware(request: NextRequest) {
         }
     );
 
-    // 3. Обязательно вызываем getUser(), чтобы Supabase освежил сессию в куках
+    // Обновляем сессию пользователя, чтобы куки не протухали
     await supabase.auth.getUser();
 
-    // 4. Возвращаем единый модифицированный ответ
     return response;
 }
 
 export const config = {
-    // matcher оставляем без изменений
+    // Этот matcher идеально подходит для структуры страниц /ru/teachers, /uz/teachers и т.д.
     matcher: ['/', '/(ru|uz|en)/:path*']
 };
