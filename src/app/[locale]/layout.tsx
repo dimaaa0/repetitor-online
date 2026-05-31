@@ -13,8 +13,7 @@ import { TutorAnnouncementProvider } from "../../context/TeacherAnnouncementCont
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import React from "react";
-// Импортируем наш новый компонент-триггер
+// Убрали неиспользуемый импорт React
 import ScheduleReminder from "../../components/UI/ScheduleReminder";
 
 const geistSans = Geist({
@@ -40,15 +39,12 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
-  // Дожидаемся параметров роута, чтобы узнать текущий язык
   const { locale } = await params;
 
-  // Проверяем, поддерживается ли этот язык (ru, uz, en)
   if (!['ru', 'uz', 'en'].includes(locale)) {
     notFound();
   }
 
-  // Загружаем JSON-переводы для текущего языка на сервере
   const messages = await getMessages();
 
   return (
@@ -57,27 +53,34 @@ export default async function LocaleLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/* 1. Сначала самый главный инфраструктурный кэш */}
         <QueryProvider>
+          {/* 2. Затем локализация — теперь переводы доступны во всех контекстах ниже! */}
           <NextIntlClientProvider messages={messages}>
-            <TeacherSubjectProvider>
-              <StudentSubjectProvider>
-                <TutorAnnouncementProvider>
-                  <ModalProvider>
-                    <UserProvider>
-                      <StudentAnnouncementProvider>
+            <UserProvider>
+              <TeacherSubjectProvider>
+                <StudentSubjectProvider>
+                  <TutorAnnouncementProvider>
+                    <StudentAnnouncementProvider>
+                      <ModalProvider>
+                        
                         <Header />
-
-                        {/* 🔔 Вставляем триггер внутрь UserProvider, чтобы он имел доступ к контексту юзера */}
+                        
+                        {/* Теперь у напоминалки есть доступ и к UserContext, и к локализации */}
                         <ScheduleReminder />
 
-                        <main className="flex-grow">{children}</main>
+                        <main className="flex-grow">
+                          {children}
+                        </main>
+                        
                         <Footer />
-                      </StudentAnnouncementProvider>
-                    </UserProvider>
-                  </ModalProvider>
-                </TutorAnnouncementProvider>
-              </StudentSubjectProvider>
-            </TeacherSubjectProvider>
+
+                      </ModalProvider>
+                    </StudentAnnouncementProvider>
+                  </TutorAnnouncementProvider>
+                </StudentSubjectProvider>
+              </TeacherSubjectProvider>
+            </UserProvider>
           </NextIntlClientProvider>
         </QueryProvider>
       </body>
