@@ -63,15 +63,19 @@ export default function scheduleReminder() {
       if (error) throw error;
 
       setShowReminder(false);
-    } catch (error) {
-      console.error("Ошибка обновления даты напоминания:", error.message || error);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Ошибка при обновлении расписания:", err.message);
+      } else {
+        console.error("Неизвестная ошибка:", err);
+      }
     } finally {
+      // Блок finally пишется сразу после закрывающей скобки catch
       setIsSubmitting(false);
     }
   };
 
   console.log(user?.id);
-  
 
   if (!showReminder) return null;
 
@@ -85,10 +89,10 @@ export default function scheduleReminder() {
           </div>
           <div className="flex flex-col text-left">
             <span className="font-bold text-sm text-slate-900">
-              {t('title')}
+              {t("title")}
             </span>
             <span className="text-xs text-slate-500 mt-1 leading-relaxed">
-              {t('description')}
+              {t("description")}
             </span>
           </div>
         </div>
@@ -100,7 +104,7 @@ export default function scheduleReminder() {
           className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 cursor-pointer text-white px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
         >
           <CheckCircle size={15} />
-          {isSubmitting ? t('updating') : t('btn_confirm')}
+          {isSubmitting ? t("updating") : t("btn_confirm")}
         </button>
       </div>
     </div>

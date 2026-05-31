@@ -387,7 +387,6 @@ const StudentPanel = () => {
         </div>
 
         <Planner
-          userId={user.id}
           initialSchedule={availability}
           editAvailability={setAvailability}
         />

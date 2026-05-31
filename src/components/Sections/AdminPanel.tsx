@@ -142,14 +142,17 @@ const AdminPanel = () => {
         setNumberOfUsers(totalRes.count || 0);
         setSubscribedUsers(subRes.count || 0);
       } catch (err) {
-        console.error("Ошибка при загрузке статистики:", err.message);
+        if (err instanceof Error) {
+          console.error("Ошибка при загрузке статистики:", err.message);
+        } else {
+          console.error("Неизвестная ошибка при загрузке статистики:", err);
+        }
       }
     };
 
     fetchStats();
     // В зависимостях только user, чтобы запрос шел один раз при логине
   }, []);
-
 
   useEffect(() => {
     fetchStats(selectedDate);
@@ -246,7 +249,6 @@ const AdminPanel = () => {
     const { error } = await supabase.from("ban_history").insert({
       user_uuid: uuid,
       reason: reason || "Без указания причины",
-
     });
 
     if (error) {
@@ -256,7 +258,7 @@ const AdminPanel = () => {
       setUuid("");
       setReason("");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-2 ">
@@ -268,12 +270,13 @@ const AdminPanel = () => {
         flex items-center gap-3
         px-6 py-4 rounded-2xl shadow-2xl border
         animate-in fade-in slide-in-from-top-4 duration-300
-        ${alert.type === "success"
-                ? "bg-white border-green-100 text-green-800"
-                : alert.type === "error"
-                  ? "bg-white border-red-100 text-red-800"
-                  : "bg-white border-blue-100 text-blue-800"
-              }
+        ${
+          alert.type === "success"
+            ? "bg-white border-green-100 text-green-800"
+            : alert.type === "error"
+              ? "bg-white border-red-100 text-red-800"
+              : "bg-white border-blue-100 text-blue-800"
+        }
       `}
           >
             {/* Иконки для красоты (опционально) */}
@@ -512,13 +515,17 @@ const AdminPanel = () => {
       <div className="max-w-full mt-6 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center gap-2">
           <ShieldAlert size={18} className="text-red-500" />
-          <span className="font-semibold text-slate-700 text-sm uppercase tracking-wider">Управление доступом</span>
+          <span className="font-semibold text-slate-700 text-sm uppercase tracking-wider">
+            Управление доступом
+          </span>
         </div>
 
         <div className="p-5 space-y-4">
           {/* Поле ввода UUID */}
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1 ml-1">UUID ПОЛЬЗОВАТЕЛЯ</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1 ml-1">
+              UUID ПОЛЬЗОВАТЕЛЯ
+            </label>
             <div className="relative">
               <input
                 type="text"
@@ -526,12 +533,17 @@ const AdminPanel = () => {
                 onChange={(e) => setUuid(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-mono"
               />
-              <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
+              <Search
+                className="absolute left-3 top-2.5 text-slate-400"
+                size={16}
+              />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1 ml-1">ПРИЧИНА (ОПЦИОНАЛЬНО)</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1 ml-1">
+              ПРИЧИНА (ОПЦИОНАЛЬНО)
+            </label>
             <textarea
               rows="2"
               value={reason}
@@ -554,7 +566,6 @@ const AdminPanel = () => {
           </button>
         </div>
       </div>
-
     </div>
   );
 };
