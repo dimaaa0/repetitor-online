@@ -3,15 +3,22 @@ import { createContext, useContext, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "../utils/supabase/client";
 
-const UserContext = createContext<any>(null);
+const supabase = createClient();
+
+interface UserContextType {
+  user: any;
+  loading: boolean;
+  refreshUser: () => void;
+}
+
+const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const supabase = createClient();
   const queryClient = useQueryClient();
 
   // Основной запрос данных профиля
   const {
-    data: user,
+    data: user = null,
     isLoading,
     refetch,
   } = useQuery({
@@ -20,6 +27,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const {
         data: { user: authUser },
       } = await supabase.auth.getUser();
+
       if (!authUser) return null;
 
       const { data: profile } = await supabase
@@ -30,9 +38,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       return { ...authUser, ...profile };
     },
+    staleTime: 1000 * 60 * 10,
   });
 
-  // Слушаем изменения сессии (логин/логаут)
   useEffect(() => {
     const {
       data: { subscription },
@@ -41,7 +49,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase, queryClient]);
+  }, [queryClient]);
 
   return (
     <UserContext.Provider
@@ -52,4 +60,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useUser = () => useContext(UserContext);
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser должен использоваться строго внутри UserProvider");
+  }
+  return context;
+};

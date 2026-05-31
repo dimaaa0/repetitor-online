@@ -126,7 +126,7 @@ const StudentPanel = () => {
         // Успешный исход — профиль найден, записываем статус
         setIsBanned(data.is_banned);
       } catch (error) {
-        console.error("Критическая ошибка при проверке бана:", error.message);
+        console.error("Критическая ошибка при проверке бана:", error);
         setIsBanned(false);
       }
     };
