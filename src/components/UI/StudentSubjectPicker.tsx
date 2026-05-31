@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSubject } from "../../context/StudentSubjectContext";
-import { createClient } from '../../../src/utils/supabase/client';
+import { createClient } from "../../../src/utils/supabase/client";
 import { useUser } from "../../context/UserContext";
 import { useTranslations } from "next-intl";
 
+// Оставляем один вызов клиента Supabase вне компонента
 const supabase = createClient();
 
 const SubjectPicker = () => {
@@ -13,24 +14,27 @@ const SubjectPicker = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const t = useTranslations("profiles");
-
-  const supabase = createClient();
+  const tSubjects = useTranslations("subjects_list");
 
   const { user, loading, refreshUser } = useUser();
-
   const [subjects, setSubjects] = useState<string[]>([]);
-
   const [isLoading, setIsLoading] = useState(true);
+
+  // Безопасная функция перевода (если ключа нет в JSON, вернет сам ключ)
+  const getTranslation = (key: string) => {
+    return tSubjects.has(key) ? tSubjects(key) : key;
+  };
 
   useEffect(() => {
     const fetchSubjects = async () => {
-      setIsLoading(true); // Начали загрузку
+      setIsLoading(true);
       const { data, error } = await supabase.from("subjects").select("subject");
       if (error) {
         console.error("Ошибка загрузки предметов:", error);
       } else {
-        const subjectNames = data.map((item) => item.subject);
-        setSubjects(subjectNames);
+        // Храним в стейте чистые ключи из базы (math, physics...)
+        const subjectKeys = data.map((item) => item.subject);
+        setSubjects(subjectKeys);
       }
       setIsLoading(false);
     };
@@ -38,30 +42,43 @@ const SubjectPicker = () => {
     fetchSubjects();
   }, []);
 
+  // Фильтруем предметы по их ПЕРЕВЕДЕННОМУ значению
   const filteredSubjects = useMemo(() => {
     return subjects
-      .filter((s) => !selectedSubjects.includes(s))
-      .filter((s) => s.toLowerCase().includes(query.toLowerCase()));
+      .filter((key) => !selectedSubjects.includes(key))
+      .filter((key) => {
+        const translatedName = getTranslation(key).toLowerCase();
+        return translatedName.includes(query.toLowerCase());
+      });
   }, [subjects, query, selectedSubjects]);
 
-  const addSubjectLocal = (subject: string) => {
-    const trimmed = subject.trim();
+  const addSubjectLocal = (subjectKey: string) => {
+    const trimmed = subjectKey.trim();
     if (trimmed && !selectedSubjects.includes(trimmed)) {
       addSubject(trimmed);
     }
     setQuery("");
   };
 
-  const removeSubjectLocal = (subjectToRemove: string) => {
-    removeSubject(subjectToRemove);
+  const removeSubjectLocal = (subjectKeyToRemove: string) => {
+    removeSubject(subjectKeyToRemove);
   };
 
-  // Обработка нажатия клавиш
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // Чтобы форма не отправилась случайно
-      if (query.trim() !== "") {
-        addSubjectLocal(query);
+      e.preventDefault();
+      // Если пользователь жмет Enter, ищем точное совпадение по переводу
+      const matchedSubject = filteredSubjects.find(
+        (key) =>
+          getTranslation(key).toLowerCase() === query.trim().toLowerCase(),
+      );
+
+      if (matchedSubject) {
+        addSubjectLocal(matchedSubject);
+        setIsOpen(false);
+      } else if (filteredSubjects.length > 0) {
+        // Если точного совпадения нет, но есть отфильтрованный список — берем первый
+        addSubjectLocal(filteredSubjects[0]);
         setIsOpen(false);
       }
     } else if (
@@ -69,7 +86,6 @@ const SubjectPicker = () => {
       query === "" &&
       selectedSubjects.length > 0
     ) {
-      // Удаление последнего тега при пустом инпуте через Backspace
       removeSubjectLocal(selectedSubjects[selectedSubjects.length - 1]);
     }
   };
@@ -87,8 +103,6 @@ const SubjectPicker = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
-
   return (
     <div className="flex-1 space-y-4" ref={containerRef}>
       <div className="relative">
@@ -97,20 +111,22 @@ const SubjectPicker = () => {
         </label>
 
         <div
-          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
-            }`}
+          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${
+            isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
+          }`}
           onClick={() => setIsOpen(true)}
         >
-          {selectedSubjects.map((subject) => (
+          {/* Рендерим выбранные теги с переводом */}
+          {selectedSubjects.map((subjectKey) => (
             <span
-              key={subject}
+              key={subjectKey}
               className="flex items-center gap-1.5 bg-blue-600 text-white pl-3 pr-2 py-1.5 rounded-xl text-sm font-bold animate-in zoom-in-95 duration-200"
             >
-              {subject}
+              {getTranslation(subjectKey)}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  removeSubjectLocal(subject);
+                  removeSubjectLocal(subjectKey);
                 }}
                 className="hover:bg-blue-500 rounded-lg p-0.5 transition-colors"
               >
@@ -140,43 +156,41 @@ const SubjectPicker = () => {
             }}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
-            placeholder={selectedSubjects.length === 0 ? t("placeholder_write_or_select") : ""}
-            className="flex-1   min-w-[150px] bg-transparent border-none focus:ring-0 outline-none text-blue-700 font-bold placeholder:text-blue-300 px-2"
+            placeholder={
+              selectedSubjects.length === 0
+                ? t("placeholder_write_or_select")
+                : ""
+            }
+            className="flex-1 min-w-[150px] bg-transparent border-none focus:ring-0 outline-none text-blue-700 font-bold placeholder:text-blue-300 px-2"
           />
         </div>
 
         {isOpen && (
           <div className="absolute z-20 w-full mt-2 bg-white border border-blue-100 rounded-2xl shadow-2xl max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 overflow-x-hidden animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="p-2">
-              {/* Если пользователь что-то ввел, чего нет в списке, показываем подсказку */}
-              {query && !subjects.includes(query) && (
+              {/* Выпадающий список отфильтрованных предметов */}
+              {filteredSubjects.map((subjectKey) => (
                 <button
-                  onClick={() => {
-                    addSubjectLocal(query);
-                    setIsOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-3 text-blue-500 hover:bg-blue-50 rounded-xl transition-colors font-bold flex items-center gap-2"
-                >
-                  <span className="text-lg">+</span> Добавить "{query}"
-                </button>
-              )}
-
-              {filteredSubjects.map((subject) => (
-                <button
-                  key={subject}
+                  key={subjectKey}
                   onClick={(e) => {
                     e.stopPropagation();
-                    addSubjectLocal(subject);
+                    addSubjectLocal(subjectKey);
                   }}
                   className="w-full text-left px-4 py-3 text-blue-700 hover:bg-blue-50 rounded-xl transition-colors font-semibold flex items-center justify-between group"
                 >
-                  {subject}
+                  {getTranslation(subjectKey)}
                 </button>
               ))}
 
-              {filteredSubjects.length === 0 && !query && (
+              {filteredSubjects.length === 0 && !query && isLoading && (
                 <div className="px-4 py-4 text-center animate-pulse text-gray-400 text-sm">
                   {t("loading")}
+                </div>
+              )}
+
+              {filteredSubjects.length === 0 && query && (
+                <div className="px-4 py-4 text-center text-gray-400 text-sm">
+                  Ничего не найдено
                 </div>
               )}
             </div>

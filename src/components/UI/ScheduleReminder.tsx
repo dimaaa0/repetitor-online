@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { Clock, CheckCircle, X } from "lucide-react";
 import { createClient } from "../../../src/utils/supabase/client"; // Проверьте этот путь под свой проект
+import { useTranslations } from "next-intl";
 import { useUser } from "@/src/context/UserContext";
 
 export default function scheduleReminder() {
   const { user, loading } = useUser();
+  const t = useTranslations("ScheduleReminder");
   const supabase = createClient();
 
   const [showReminder, setShowReminder] = useState(false);
@@ -83,11 +85,10 @@ export default function scheduleReminder() {
           </div>
           <div className="flex flex-col text-left">
             <span className="font-bold text-sm text-slate-900">
-              Актуально ли ваше свободное время?
+              {t('title')}
             </span>
             <span className="text-xs text-slate-500 mt-1 leading-relaxed">
-              Пожалуйста, убедитесь, что ваше расписание в планнере верно. Это
-              помогает ученикам записываться на свободные уроки.
+              {t('description')}
             </span>
           </div>
         </div>
@@ -99,7 +100,7 @@ export default function scheduleReminder() {
           className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 cursor-pointer text-white px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
         >
           <CheckCircle size={15} />
-          {isSubmitting ? "Обновление..." : "Да, всё актуально"}
+          {isSubmitting ? t('updating') : t('btn_confirm')}
         </button>
       </div>
     </div>

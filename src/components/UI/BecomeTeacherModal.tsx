@@ -1,5 +1,6 @@
 import { MessageCircle } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface BecomeTeacherModalProps {
   onClose: () => void;
@@ -10,6 +11,8 @@ const BecomeTeacherModal = ({
   onClose,
   isClosing,
 }: BecomeTeacherModalProps) => {
+  const t = useTranslations("howToBecomeTeacherModal");
+
   return (
     <div
       onClick={onClose}
@@ -19,18 +22,19 @@ const BecomeTeacherModal = ({
       <div
         onClick={(e) => e.stopPropagation()}
         className={`bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-lg border border-slate-100 flex flex-col max-h-[95vh] overflow-hidden
-                    ${isClosing
-            ? "animate-[slideDown_0.3s_ease-in_forwards] sm:animate-[zoomOut_0.2s_ease-in_forwards]"
-            : "animate-[slideUp_0.8s_cubic-bezier(0.16,1,0.3,1)] sm:animate-[zoomIn_0.3s_ease-out]"
-          }`}
+                    ${
+                      isClosing
+                        ? "animate-[slideDown_0.3s_ease-in_forwards] sm:animate-[zoomOut_0.2s_ease-in_forwards]"
+                        : "animate-[slideUp_0.8s_cubic-bezier(0.16,1,0.3,1)] sm:animate-[zoomIn_0.3s_ease-out]"
+                    }`}
       >
         <div className="p-5 sm:p-8 overflow-y-auto custom-scrollbar">
           <div className="text-center mb-6">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-800 px-2">
-              Как стать учителем?
+              {t("link_become_tutor")}
             </h2>
             <p className="text-slate-500 mt-1 text-xs sm:text-base px-4">
-              4 простых шага к преподаванию
+              {t("title_four_steps")}
             </p>
           </div>
 
@@ -39,18 +43,18 @@ const BecomeTeacherModal = ({
             {[
               {
                 n: 1,
-                t: "Зарегистрируйтесь",
-                d: "Создайте личный профиль преподавателя.",
+                t: t("step_1_title"),
+                d:  t("step_1_desc"),
               },
               {
                 n: 2,
-                t: "Создайте объявление",
-                d: "Опишите ваши навыки и предметы.",
+                t: t("step_2_title"),
+                d: t("step_2_desc"),
               },
               {
                 n: 3,
-                t: "Оплатите ежемесячную подписку",
-                d: "20 000 UZS / месяц",
+                t: t("step_3_title"),
+                d:  t("step_3_desc"),
               },
             ].map((s) => (
               <div key={s.n} className="flex gap-3 sm:gap-4">
@@ -75,10 +79,10 @@ const BecomeTeacherModal = ({
               </div>
               <div className="bg-slate-100 p-3 sm:p-4 rounded-2xl border border-slate-100 w-full min-w-0">
                 <h4 className="font-semibold text-slate-800 text-sm sm:text-base">
-                  Отправьте чек
+                  {t("btn_send_receipt")}
                 </h4>
                 <p className="text-[11px] sm:text-sm text-slate-600 mt-1 leading-normal">
-                  Для активации отправьте чек и ваш ID пользователя в поддержку:
+                  {t("text_activation_instruction")}
                 </p>
                 <Link
                   href="https://t.me/dimaaa_o"
@@ -87,7 +91,7 @@ const BecomeTeacherModal = ({
                   className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 bg-[#229ED9] hover:bg-[#1e8dbf] text-white rounded-xl text-xs sm:text-sm font-medium transition-all active:scale-95 shadow-sm"
                 >
                   <MessageCircle size={16} className="sm:w-[18px]" />
-                  <span>В Telegram</span>
+                  <span>{t("btn_in_telegram")}</span>
                 </Link>
               </div>
             </div>
@@ -99,7 +103,7 @@ const BecomeTeacherModal = ({
             onClick={onClose}
             className="w-full py-3 bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-700 font-semibold rounded-xl border border-slate-200 transition-colors text-sm"
           >
-            Понятно
+            {t("btn_got_it")}
           </button>
         </div>
       </div>

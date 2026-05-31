@@ -4,7 +4,7 @@ import { Check, Heart, XCircle } from "lucide-react";
 import { createClient } from "../../../src/utils/supabase/client";
 import Link from "next/link";
 import { useModal } from "../../../src/context/ModalContext";
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 const supabase = createClient();
 
@@ -30,6 +30,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
   isLoading = false,
 }) => {
   const locale = useLocale();
+  const t = useTranslations('TeacherCard');
   const [imgLoaded, setImgLoaded] = useState(false);
 
   const { openModal } = useModal();
@@ -190,10 +191,10 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
         </div>
         <div className="flex-1">
           <h3 className="font-bold text-slate-900 text-lg leading-tight">
-            {teacher.name ?? "Преподаватель"} {teacher.surname ?? ""}
+            {teacher.name ?? t('default_teacher')} {teacher.surname ?? ""}
           </h3>
           <p className="text-blue-600 text-sm font-semibold mt-1 inline-block bg-blue-50 px-2 py-0.5 rounded-md">
-            {teacher.subject ?? "Предмет не указан"}
+            {teacher.subject ?? t('subject_not_specified')}
           </p>
         </div>
       </div>
@@ -201,7 +202,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
       <div className="p-4 bg-slate-100 rounded-2xl mb-6 grow">
         <div className="p-2 bg-slate-100 rounded-2xl mb-2 grow overflow-hidden">
           <p className="text-sm text-slate-600 leading-relaxed hyphens-auto text-justify italic min-h-[107px] wrap-break-word line-clamp-4 md:line-clamp-5">
-            &quot;{teacher.description ?? "Описание пока недоступно."}&quot;
+            &quot;{teacher.description ?? t('description_unavailable')}&quot;
           </p>
         </div>
       </div>
@@ -212,12 +213,12 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
             {teacher.price ?? "—"}
           </span>
           <span className="text-xs font-bold text-slate-400 block uppercase tracking-tighter">
-            за 60 минут
+            {t('per_lesson')}
           </span>
         </div>
         <Link href={`/${locale}/teachers/${displayId}`}>
           <button className="bg-[#0f172a] cursor-pointer text-white px-8 py-3 rounded-2xl font-semibold hover:bg-slate-800 transition-colors">
-            Выбрать
+            {t('btn_select')}
           </button>
         </Link>
       </div>

@@ -1,5 +1,6 @@
-import { CreditCard, Send, Copy, X } from "lucide-react";
+import { CreditCard, Send, Copy } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface PaymentInstructionsModalProps {
   onClose: () => void;
@@ -12,6 +13,7 @@ const PaymentInstructionsModal = ({
   isClosing,
   userId,
 }: PaymentInstructionsModalProps) => {
+  const t = useTranslations("PaymentInstructionsModal");
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -40,10 +42,10 @@ const PaymentInstructionsModal = ({
               <CreditCard className="text-blue-600" size={32} />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-slate-800 px-2">
-              Активация подписки
+              {t("title")}
             </h2>
             <p className="text-slate-500 mt-1 text-xs sm:text-base px-4">
-              Оплатите доступ в 2 простых шага
+              {t("subtitle")}
             </p>
           </div>
 
@@ -55,10 +57,10 @@ const PaymentInstructionsModal = ({
               </div>
               <div className="flex-1">
                 <h4 className="font-semibold text-slate-800 text-sm sm:text-base leading-tight">
-                  Переведите 20 000 UZS / Месяц
+                  {t("step_1_title")}
                 </h4>
                 <p className="text-[11px] sm:text-sm text-slate-500 mt-1">
-                  На карту (Uzcard/Humo) или через Payme/Click:
+                  {t("step_1_desc")}
                 </p>
                 <div className="mt-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center group">
                   <span className="font-mono font-bold text-slate-700 tracking-wider text-sm sm:text-base">
@@ -81,18 +83,18 @@ const PaymentInstructionsModal = ({
               </div>
               <div className="flex-1 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                 <h4 className="font-semibold text-slate-800 text-sm sm:text-base">
-                  Отправьте чек и ID
+                  {t("step_2_title")}
                 </h4>
                 <div className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-100 mt-2">
                   <code className="text-xs font-mono text-blue-600 font-bold block truncate max-w-[150px] sm:max-w-[280px]">
-                    ID: {userId || "загрузка..."}
+                    {t("user_id", { id: userId || t("loading") })}
                   </code>
                   <button onClick={() => copyToClipboard(userId)} className="cursor-pointer text-slate-400 hover:text-blue-600">
                     <Copy size={14} />
                   </button>
                 </div>
                 <p className="text-[11px] sm:text-sm text-slate-600 mt-3 leading-normal">
-                  Для мгновенной активации перейдите в поддержку:
+                  {t("step_2_desc")}
                 </p>
                 <Link
                   href="https://t.me/dimaaa_o"
@@ -101,7 +103,7 @@ const PaymentInstructionsModal = ({
                   className="mt-3 flex items-center justify-center gap-2 w-full py-3 bg-[#229ED9] hover:bg-[#1e8dbf] text-white rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-95 shadow-sm"
                 >
                   <Send size={16} />
-                  <span>Отправить в Telegram</span>
+                  <span>{t("send_in_telegram")}</span>
                 </Link>
               </div>
             </div>
@@ -113,7 +115,7 @@ const PaymentInstructionsModal = ({
             onClick={onClose}
             className="w-full py-3 cursor-pointer bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-700 font-semibold rounded-xl border border-slate-200 transition-colors text-sm"
           >
-            Понятно
+            {t("btn_okay")}
           </button>
         </div>
       </div>

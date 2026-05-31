@@ -139,7 +139,7 @@ const Profile = () => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        showAlert("error", "Файл слишком большой (макс. 2МБ)");
+        showAlert("error", t("error_file_too_large"));
         return;
       }
       setSelectedFile(file);
@@ -215,10 +215,10 @@ const Profile = () => {
       await refreshUser();
       setIsEditing(false);
       setSelectedFile(null);
-      showAlert("success", "Профиль обновлен успешно!");
+      showAlert("success", t("alert_profile_updated"));
     } catch (error) {
       console.error(error);
-      showAlert("error", "Ошибка при обновлении профиля");
+      showAlert("error", t("alert_profile_update_error"));
     } finally {
       setIsSaving(false);
     }
@@ -242,9 +242,9 @@ const Profile = () => {
   if (!user) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4">
-        <p className="text-gray-500 text-lg">Пользователь не найден</p>
+        <p className="text-gray-500 text-lg">{t("user_not_found")}</p>
         <Link href="/" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-          Войти
+          {t("btn_login")}
         </Link>
       </div>
     );
@@ -309,11 +309,10 @@ const Profile = () => {
                 </div>
 
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Выход из аккаунта
+                  {t("title_logout")}
                 </h3>
                 <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-                  Вы уверены, что хотите выйти? Вам придется заново вводить
-                  логин и пароль.
+                  {t("logout_confirm_description")}
                 </p>
               </div>
 
@@ -399,7 +398,7 @@ const Profile = () => {
                   <div className="flex justify-center sm:justify-start my-1">
                     <button
                       type="button"
-                      title="Сменить роль"
+                      title={t("title_change_role")}
                       onClick={toggleRole}
                       className={`cursor-pointer flex items-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border-2 transition-all duration-300 active:scale-95 shadow-sm
                 ${
@@ -418,7 +417,7 @@ const Profile = () => {
               ) : (
                 <div className="flex flex-col items-center sm:flex-row sm:items-center sm:flex-wrap gap-1.5 sm:gap-3 justify-center sm:justify-start">
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate max-w-full">
-                    {user.name || "Пользователь"} {user.surname}
+                    {user.name || t("default_user")} {user.surname}
                   </h1>
                   <span
                     className={`
@@ -438,9 +437,9 @@ const Profile = () => {
                       }`}
                     />
                     {!user.role
-                      ? "User"
+                      ? t("default_user")
                       : user.role === "Admin"
-                        ? "Администратор"
+                        ? t("role_admin")
                         : user.role === "Tutor"
                           ? t("role_tutor") 
                           : t("role_student") }

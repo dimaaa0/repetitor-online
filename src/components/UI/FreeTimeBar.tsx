@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface TimeSlot {
     s: string;
@@ -13,17 +14,11 @@ interface FreeTimeBarProps {
     initialSchedule: WeeklyAvailability & { availability?: WeeklyAvailability };
 }
 
-const DAYS_MAP = [
-    { id: '1', name: 'Пн' },
-    { id: '2', name: 'Вт' },
-    { id: '3', name: 'Ср' },
-    { id: '4', name: 'Чт' },
-    { id: '5', name: 'Пт' },
-    { id: '6', name: 'Сб' },
-    { id: '7', name: 'Вс' },
-];
+const DAY_KEYS = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
 
 const FreeTimeBar = ({ initialSchedule }: FreeTimeBarProps) => {
+    const t = useTranslations('profiles');
+    const DAYS_MAP = DAY_KEYS.map((key, index) => ({ id: String(index + 1), name: t(key) }));
     // Распаковываем двойную вложенность, если база вернула { availability: { 1: [...] } }
     const schedule = initialSchedule?.availability ? initialSchedule.availability : initialSchedule;
 
@@ -47,7 +42,7 @@ const FreeTimeBar = ({ initialSchedule }: FreeTimeBarProps) => {
             <div className="bg-white rounded-3xl p-5 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-slate-100">
                 <h4 className="text-slate-900 font-bold text-base mb-4 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                    Свободное время
+                    {t('title_free_time')}
                 </h4>
 
                 {/* Дни недели */}
@@ -85,7 +80,7 @@ const FreeTimeBar = ({ initialSchedule }: FreeTimeBarProps) => {
                             {currentSlots.map((slot, index) => (
                                 <div
                                     key={index}
-                                    title={`С ${slot.s} до ${slot.e}`}
+                                    title={t('time_from_to', { start: slot.s, end: slot.e })}
                                     className="py-2 text-center bg-slate-50 border border-slate-100 hover:border-blue-500 hover:bg-blue-50/30 rounded-xl text-xs font-bold text-slate-700 transition-colors cursor-pointer"
                                 >
                                     {slot.s}
@@ -95,7 +90,7 @@ const FreeTimeBar = ({ initialSchedule }: FreeTimeBarProps) => {
                     ) : (
                         <div className="text-center py-4 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
                             <span className="text-xs text-slate-400 font-medium italic">
-                                Нет свободных слотов
+                                {t('no_free_slots')}
                             </span>
                         </div>
                     )}

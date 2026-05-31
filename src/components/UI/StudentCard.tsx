@@ -4,7 +4,7 @@ import { useUser } from "@/src/context/UserContext";
 import { BookOpen, MessageCircle, Wallet } from "lucide-react";
 import StudentSkeleton from "./StudentSkeletonLoader";
 import { useRouter } from "next/navigation";
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 const StudentCard = ({
   student,
@@ -20,6 +20,7 @@ const StudentCard = ({
   }
 
   const locale = useLocale();
+  const t = useTranslations('StudentCard');
 
   const { user, loading } = useUser();
 
@@ -61,17 +62,17 @@ const StudentCard = ({
                       navigator.clipboard.writeText(student.user_id)
                     }
                     className="text-[10px] cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded font-mono transition-colors"
-                    title="Copy ID"
+                    title={t('copy_id')}
                   >
                     #{student.user_id?.slice(0, 8)}...
                   </button>
                 )}
               </div>
               <span className="text-[11px] text-slate-400 font-medium">
-                Создано:{" "}
+                {t('created_at')}: {" "}
                 {
                   new Date(student.postedAt)
-                    .toLocaleString("ru-RU", {
+                    .toLocaleString(locale || 'ru-RU', {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
@@ -101,9 +102,9 @@ const StudentCard = ({
                 </div>
                 <div>
                   <p className="text-[10px] text-slate-400 font-bold uppercase leading-none mb-1">
-                    Предмет
+                    {t('label_subject')}
                   </p>
-                  <p className="text-sm font-bold text-slate-700">
+                  <p className="text-sm font-bold text-slate-700 capitalize ">
                     {student.subject}
                   </p>
                 </div>
@@ -115,7 +116,7 @@ const StudentCard = ({
                 </div>
                 <div>
                   <p className="text-[10px] text-slate-400 font-bold uppercase leading-none mb-1">
-                    Бюджет
+                    {t('label_budget')}
                   </p>
                   <p className="text-sm font-bold text-slate-900">
                     {student.price?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -130,7 +131,7 @@ const StudentCard = ({
                 onClick={handleAction}
               >
                 <MessageCircle size={18} />
-                Откликнуться
+                {t('btn_respond')}
               </button>
             </div>
           </div>

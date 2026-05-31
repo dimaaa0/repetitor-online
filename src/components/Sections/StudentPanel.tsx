@@ -8,7 +8,6 @@ import StudentSubjectPicker from "../UI/StudentSubjectPicker";
 import { Check, CircleUser, Loader2, Search, XCircle } from "lucide-react";
 import Planner from "../../components/UI/Planner";
 import { useTranslations } from "next-intl";
-import { p } from "framer-motion/client";
 
 export interface TimeSlot {
   s: string; // Start "09:00"
@@ -221,8 +220,8 @@ const StudentPanel = () => {
         hasAd
           ? supabase.from("student_ads").update(payload).eq("user_id", user.id)
           : supabase
-            .from("student_ads")
-            .insert({ ...payload, user_id: user.id }),
+              .from("student_ads")
+              .insert({ ...payload, user_id: user.id }),
 
         supabase.from("profiles").update({ availability }).eq("id", user.id),
       ]);
@@ -286,11 +285,12 @@ const StudentPanel = () => {
                 flex items-center gap-3
                 px-6 py-4 rounded-2xl shadow-2xl border
                 animate-in fade-in slide-in-from-top-4 duration-300
-                ${alert.type === "success"
-                  ? "bg-white border-green-100 text-green-800"
-                  : alert.type === "error"
-                    ? "bg-white border-red-100 text-red-800"
-                    : "bg-white border-blue-100 text-blue-800"
+                ${
+                  alert.type === "success"
+                    ? "bg-white border-green-100 text-green-800"
+                    : alert.type === "error"
+                      ? "bg-white border-red-100 text-red-800"
+                      : "bg-white border-blue-100 text-blue-800"
                 }
               `}
             >
@@ -308,7 +308,8 @@ const StudentPanel = () => {
         )}
 
         <h1 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] flex items-center gap-2">
-          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span> {t("title_your_advertisement")}
+          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>{" "}
+          {t("title_your_advertisement")}
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -403,17 +404,17 @@ const StudentPanel = () => {
         <div className="w-full flex flex-col gap-2">
           {isBanned ? (
             // UI для забаненного пользователя
-            <div className="w-full flex  bg-red-50 border border-red-200 text-red-700 py-4 px-5 rounded-[20px] flex items-center justify-center gap-3 shadow-sm">
+            <div className="w-full  bg-red-50 border border-red-200 text-red-700 py-4 px-5 rounded-[20px] flex items-center justify-center gap-3 shadow-sm">
               <div className="bg-red-100 p-2 rounded-full text-red-600">
                 {/* Иконка щита/внимания, если есть lucide-react, иначе можно поставить обычный ⚠️ */}
                 <span className="text-lg font-bold leading-none">⚠️</span>
               </div>
               <div className="flex flex-col text-left">
                 <span className="font-bold text-sm uppercase tracking-wider text-red-800">
-                  Аккаунт заблокирован
+                  {t("error_account_banned")}
                 </span>
                 <span className="text-xs text-red-600/90 mt-0.5">
-                  Создание и обновление заявок ограничено администрацией.
+                  {t("error_actions_restricted")}
                 </span>
               </div>
             </div>
@@ -427,16 +428,12 @@ const StudentPanel = () => {
               {isPublishing ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  Загрузка...
+                  {t("loading")}
                 </>
               ) : hasAd ? (
-                <p>
-                  {t("btn_update_request")}
-                </p>
+                <p>{t("btn_update_request")}</p>
               ) : (
-                <p>
-                  {t("btn_place_request")}
-                </p>
+                <p>{t("btn_place_request")}</p>
               )}
             </button>
           )}

@@ -7,10 +7,10 @@ import {
   Lock,
   User as UserIcon,
   GraduationCap,
-  LogOut,
   ArrowRight,
   Loader2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useModal } from "../../context/ModalContext";
 import { createClient } from "../../utils/supabase/client";
 import { Session, AuthChangeEvent } from "@supabase/supabase-js";
@@ -19,6 +19,7 @@ import getFriendlyError from "../../app/functions/errorTranslator";
 export default function SignInForm() {
   const supabase = createClient();
   const { isOpen, closeModal } = useModal();
+  const t = useTranslations("RegistrationModal");
 
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -69,7 +70,7 @@ export default function SignInForm() {
       });
       if (error) throw error;
 
-      showAlert("success", "С возвращением!");
+      showAlert("success", t("alert_welcome_back"));
       closeModal();
     } catch (error: any) {
       const errorMessage = getFriendlyError(error.message);
@@ -104,13 +105,13 @@ export default function SignInForm() {
 
     // 1. Проверка Имени
     if (!nameRegex.test(name)) {
-      showAlert("error", "Имя может содержать только буквы");
+      showAlert("error", t("alert_name_only_letters"));
       return;
     }
 
     // 2. Проверка Фамилии
     if (!nameRegex.test(surname)) {
-      showAlert("error", "Фамилия может содержать только буквы");
+      showAlert("error", t("alert_surname_only_letters"));
       return;
     }
 
@@ -129,7 +130,7 @@ export default function SignInForm() {
       if (data.user && data.user.identities?.length === 0) {
         showAlert(
           "error",
-          "Этот email уже зарегистрирован. Войдите в аккаунт.",
+          t("alert_email_already_registered"),
         );
         setIsLogin(true);
         return;
@@ -150,7 +151,7 @@ export default function SignInForm() {
       //   }
       // }
 
-      showAlert("success", "Проверьте почту для подтверждения!");
+      showAlert("success", t("alert_check_email"));
       setIsLogin(true);
     } catch (error: any) {
       const errorMessage = getFriendlyError(error.message);
@@ -167,7 +168,7 @@ export default function SignInForm() {
 
   const handleResetPassword = async () => {
     if (!email) {
-      showAlert("error", "Пожалуйста, введите email");
+      showAlert("error", t("alert_enter_email"));
       return;
     }
 
@@ -179,7 +180,7 @@ export default function SignInForm() {
     if (error) {
       showAlert("error", error.message);
     } else {
-      showAlert("success", "Ссылка для сброса отправлена на почту!");
+      showAlert("success", t("alert_password_reset_sent"));
     }
     setLoading(false);
   };
@@ -225,12 +226,10 @@ export default function SignInForm() {
         <div className="p-10 w-full">
           <div className="mb-8">
             <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-              {isLogin ? "С возвращением" : "Создать аккаунт"}
+              {isLogin ? t("title_signin") : t("title_signup")}
             </h2>
             <p className="text-slate-500 mt-2 text-sm font-medium">
-              {isLogin
-                ? "Войдите, чтобы продолжить обучение"
-                : "Присоединяйтесь к сообществу репетиторов"}
+              {isLogin ? t("desc_signin") : t("desc_signup")}
             </p>
           </div>
 
@@ -239,7 +238,7 @@ export default function SignInForm() {
               <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-2 duration-300">
                 <div className="space-y-1.5 col-span-2">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
-                    Вы — кто?
+                    {t("label_role_who")}
                   </label>
                   <div className="flex p-1 bg-slate-50 rounded-xl border border-slate-100">
                     <button
@@ -247,21 +246,21 @@ export default function SignInForm() {
                       onClick={() => setRole("Student")}
                       className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all ${role === "Student" ? "bg-white shadow-sm text-blue-600" : "text-slate-400"}`}
                     >
-                      <UserIcon size={16} /> Ученик
+                      <UserIcon size={16} /> {t("role_student")}
                     </button>
                     <button
                       type="button"
                       onClick={() => setRole("Tutor")}
                       className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all ${role === "Tutor" ? "bg-white shadow-sm text-blue-600" : "text-slate-400"}`}
                     >
-                      <GraduationCap size={16} /> Репетитор
+                      <GraduationCap size={16} /> {t("role_tutor")}
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-1.5 col-span-2">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
-                    Имя
+                    {t("label_name")}
                   </label>
                   <div className="relative">
                     <UserIcon
@@ -273,7 +272,7 @@ export default function SignInForm() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Ваше имя"
+                      placeholder={t("placeholder_name")}
                       className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-sm font-medium"
                     />
                   </div>
@@ -281,7 +280,7 @@ export default function SignInForm() {
 
                 <div className="space-y-1.5 col-span-2">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
-                    Фамилия
+                    {t("label_surname")}
                   </label>
                   <div className="relative">
                     <UserIcon
@@ -293,7 +292,7 @@ export default function SignInForm() {
                       required
                       value={surname}
                       onChange={(e) => setSurname(e.target.value)}
-                      placeholder="Ваша фамилия"
+                      placeholder={t("placeholder_surname")}
                       className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-sm font-medium"
                     />
                   </div>
@@ -303,7 +302,7 @@ export default function SignInForm() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
-                Почта
+                {t("label_email")}
               </label>
               <div className="relative">
                 <Mail
@@ -315,7 +314,7 @@ export default function SignInForm() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t("placeholder_email")}
                   className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-sm font-medium"
                 />
               </div>
@@ -324,7 +323,7 @@ export default function SignInForm() {
             <div className="space-y-1.5">
               <div className="flex justify-between items-center ml-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Пароль
+                  {t("label_password")}
                 </label>
                 {isLogin && (
                   <button
@@ -332,7 +331,7 @@ export default function SignInForm() {
                     onClick={handleResetPassword}
                     className="text-[10px] font-bold text-blue-600 uppercase cursor-pointer"
                   >
-                    Забыли?
+                    {t("btn_forgot_password")}
                   </button>
                 )}
               </div>
@@ -361,7 +360,7 @@ export default function SignInForm() {
                 <Loader2 className="animate-spin" size={20} />
               ) : (
                 <>
-                  {isLogin ? "ВОЙТИ" : "СОЗДАТЬ АККАУНТ"}
+                  {isLogin ? t("btn_login") : t("btn_create_account")}
                   <ArrowRight
                     size={18}
                     className="group-hover:translate-x-1 transition-transform"
@@ -373,12 +372,12 @@ export default function SignInForm() {
 
           <div className="mt-8 text-center pt-6 border-t border-slate-50">
             <p className="text-sm text-slate-500 font-medium">
-              {!isLogin ? "Уже есть аккаунт?" : "Впервые здесь?"}{" "}
+              {!isLogin ? t("text_have_account") : t("text_new_here")}{" "}
               <button
                 onClick={() => setIsLogin(!isLogin)}
                 className="text-blue-600 hover:text-blue-700 cursor-pointer font-bold transition-colors ml-1"
               >
-                {!isLogin ? "Войти в профиль" : "Зарегистрироваться"}
+                {!isLogin ? t("action_login") : t("action_register")}
               </button>
             </p>
           </div>

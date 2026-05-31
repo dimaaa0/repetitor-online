@@ -139,7 +139,7 @@ const SubjectPicker = () => {
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
             placeholder={
-              selectedSubjects.length === 0 ? "Напишите или выберите..." : ""
+              selectedSubjects.length === 0 ? t("placeholder_write_or_select") : ""
             }
             className="flex-1   min-w-[150px] bg-transparent border-none focus:ring-0 outline-none text-blue-700 font-bold placeholder:text-blue-300 px-2"
           />
@@ -157,7 +157,7 @@ const SubjectPicker = () => {
                   }}
                   className="w-full text-left px-4 py-3 text-blue-500 hover:bg-blue-50 rounded-xl transition-colors font-bold flex items-center gap-2"
                 >
-                  <span className="text-lg">+</span> Добавить "{query}"
+                  <span className="text-lg">+</span> {t("btn_add")} "{query}"
                 </button>
               )}
 
@@ -174,15 +174,11 @@ const SubjectPicker = () => {
                 </button>
               ))}
 
-              {isLoading ? (
-                <div className="px-4 py-4 animate-pulse text-center text-gray-400 text-sm">
-                  Загрузка списка...
+              {filteredSubjects.length === 0 && !query && (
+                <div className="px-4 py-4 text-center animate-pulse text-gray-400 text-sm">
+                  {t("loading")}
                 </div>
-              ) : filteredSubjects.length === 0 && query ? (
-                <div className="px-4 py-4 text-center text-gray-400 text-sm">
-                  Ничего не найдено
-                </div>
-              ) : null}
+              )}
             </div>
           </div>
         )}

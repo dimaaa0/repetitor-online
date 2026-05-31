@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface AddAvatarProps {
   uploadAvatar: (
@@ -19,6 +20,8 @@ const AddAvatar = ({ uploadAvatar }: AddAvatarProps) => {
       await uploadAvatar(e);
     }
   };
+
+    const t = useTranslations("profiles");
 
   return (
     <div className="flex items-start gap-6 flex-col sm:flex-row">
@@ -66,7 +69,7 @@ const AddAvatar = ({ uploadAvatar }: AddAvatarProps) => {
                 />
               </svg>
               <span className="text-[10px] font-black text-gray-400 group-hover:text-blue-600 uppercase tracking-tighter">
-                Фото
+                {t("label_photo")}
               </span>
             </>
           )}

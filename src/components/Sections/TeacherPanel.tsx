@@ -9,6 +9,7 @@ import SubscriptionSkeleton from "../UI/SubscriptionSkeleton";
 import Planner from "../UI/Planner";
 import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/TeacherSubjectContext";
+import { useTranslations } from "next-intl";
 
 import {
   ShieldCheck,
@@ -37,7 +38,8 @@ const TeacherPanel = () => {
   const { user } = useUser();
   const { selectedSubjects, setSelectedSubjects } = useSubject();
   const supabase = createClient();
-  const router = useRouter();
+
+  const t = useTranslations("profiles");
 
   const [subjects, setSubjects] = useState<string[]>([]); // Локальное состояние для отображения выбранных предметов
   const [price, setPrice] = useState("");
@@ -338,11 +340,13 @@ const TeacherPanel = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
         <div className="bg-white rounded-2xl  flex flex-col justify-between py-6 shadow-sm border border-gray-100 p-4 pb-6 sm:p-6 md:p-8">
           <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4" /> Данные аккаунта
+            <ShieldCheck className="h-4 w-4" /> {t("title_account_data")}
           </h3>
           <div className="space-y-4">
             <div>
-              <p className="text-xs text-gray-500 uppercase">ID Пользователя</p>
+              <p className="text-xs text-gray-500 uppercase">
+                {t("label_user_id")}
+              </p>
               <p className="font-medium text-gray-800 truncate">{user.id}</p>
               <CopyButton textToCopy={user.id} label="ID" />
             </div>
@@ -353,10 +357,9 @@ const TeacherPanel = () => {
           <SubscriptionSkeleton />
         ) : (
           <div className="bg-white flex flex-col justify-between rounded-2xl py-6 shadow-sm border border-gray-100 p-4 pb-6 sm:p-6 md:p-8">
-            {/* Верхняя часть: Заголовок и Статус */}
             <div className="flex justify-between items-start mb-6">
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                <CreditCard className="h-4 w-4" /> Тарифный план
+                <CreditCard className="h-4 w-4" /> {t("title_tariff_plan")}
               </h3>
               <span
                 className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter border transition-colors ${
@@ -365,7 +368,7 @@ const TeacherPanel = () => {
                     : "bg-red-50 text-red-600 border-red-100"
                 }`}
               >
-                {isSubscribed ? "Активен" : "Не активен"}
+                {isSubscribed ? t("status_active") : t("status_inactive")}
               </span>
             </div>
 
@@ -376,7 +379,7 @@ const TeacherPanel = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight leading-none mb-0.5">
-                  Стоимость в месяц
+                  {t("label_monthly_cost")}
                 </span>
                 <div className="text-xl font-medium text-gray-900 leading-none">
                   20,000 <span className="text-xl">UZS</span>
@@ -397,10 +400,10 @@ const TeacherPanel = () => {
                     </div>
                     <div className="text-left">
                       <p className="text-[11px] font-bold text-slate-500 uppercase tracking-tight leading-none mb-1">
-                        Доступ ограничен
+                        {t("title_access_denied")}
                       </p>
                       <p className="text-xs font-semibold text-slate-700">
-                        Как активировать подписку?
+                        {t("link_how_to_activate")}
                       </p>
                     </div>
                   </div>
@@ -411,7 +414,7 @@ const TeacherPanel = () => {
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-50">
                 <div className="flex flex-row items-end h-full gap-2 justify-center">
                   <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
-                    Оплачено
+                    {t("label_paid_at")}
                   </p>
                   <p className="text-sm font-medium text-gray-700">
                     {paymentDate
@@ -421,7 +424,7 @@ const TeacherPanel = () => {
                 </div>
                 <div className="flex flex-row items-end h-full gap-2 justify-center">
                   <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
-                    Истекает
+                    {t("label_expires_at")}
                   </p>
                   <p className="text-sm font-medium text-gray-700">
                     {dateOfExpiry
@@ -446,14 +449,14 @@ const TeacherPanel = () => {
 
       <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100 w-full max-w-full overflow-hidden block">
         <h1 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] mb-8 flex items-center gap-2">
-          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Ваше
-          объявление
+          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> 
+          {t("title_your_advertisement")}
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="">
             <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-              Стоимость занятия
+              {t("label_lesson_cost")}
             </label>
             <div className="relative">
               <input
@@ -464,7 +467,7 @@ const TeacherPanel = () => {
                 onChange={handlePriceChange}
               />
               <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
-                UZS / 60 МИН
+                UZS
               </span>
             </div>
           </div>
@@ -474,12 +477,12 @@ const TeacherPanel = () => {
 
         <div>
           <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-            О себе и методике
+            {t("label_about_me")}
           </label>
           <div className="bg-gray-100 rounded-[24px] p-5 border-2 border-transparent focus-within:border-blue-500/10 focus-within:bg-white transition-all">
             <textarea
               className="w-full bg-transparent border-none focus:ring-0 p-0 text-[15px] font-medium text-gray-700 placeholder:text-gray-400 resize-none h-32 leading-relaxed"
-              placeholder="Например: Ваши сертификаты, опыт работы, особенности методики и т.д."
+              placeholder={t("placeholder_about_me")}
               onChange={(e) => setDescription(e.target.value)}
               value={description}
             />
@@ -489,7 +492,7 @@ const TeacherPanel = () => {
         <div className="md:col-span-2">
           <div className=" flex-col  items-center gap-2 text-sm text-gray-500">
             <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-              Контактные данные
+              {t("label_contact_data")}
             </label>
             <div className="relative">
               <input
@@ -497,7 +500,7 @@ const TeacherPanel = () => {
                 value={contacts}
                 onChange={(e) => setContacts(e.target.value)}
                 className="w-full bg-gray-100 border-2 border-transparent focus:border-orange-500/10 focus:bg-white rounded-2xl px-5 py-4 font-bold text-gray-800 outline-none transition-all"
-                placeholder="Например: Номер телефона, Telegram, WhatsApp или email"
+                placeholder={t("placeholder_contact_info")}
               />
             </div>
           </div>
@@ -518,12 +521,12 @@ const TeacherPanel = () => {
               {isPublishing ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  Загрузка...
+                  {t("loading")}
                 </>
               ) : hasAd ? (
-                "Сохранить изменения"
+                t("btn_save_changes")
               ) : (
-                "Опубликовать объявление"
+                t("btn_publish_advertisement")
               )}
             </button>
           ) : (
@@ -533,7 +536,7 @@ const TeacherPanel = () => {
               className="w-full bg-amber-50 cursor-pointer text-amber-700 border border-amber-200 py-3 px-4 rounded-xl font-semibold hover:bg-amber-100 transition-colors flex items-center justify-center gap-2"
             >
               <Lock className="h-4 w-4" />
-              Активировать подписку
+              {t("btn_activate_subscription")}
             </button>
           )}
         </div>
