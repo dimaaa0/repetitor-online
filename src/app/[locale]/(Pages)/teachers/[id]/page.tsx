@@ -56,7 +56,6 @@ export default async function TeacherProfilePage({
   const supabase = await createClient();
   const { id: shortId } = await params;
 
-
   // 1. Данные объявления
   const { data: adData, error: adError }: { data: adType | null; error: any } =
     await supabase.rpc("find_ad_by_short_id", { short_id: shortId }).single();
@@ -93,17 +92,20 @@ export default async function TeacherProfilePage({
     .order("created_at", { ascending: false });
 
   const teacher = { ...adData, profiles: profileData };
-  const comments: commentType[] = ((commentsData as any[]) || []).reduce((acc: commentType[], comment: any) => {
-    // Если автор комментария забанен — игнорируем этот комментарий
-    if (comment.profiles?.is_banned === true) {
+  const comments: commentType[] = ((commentsData as any[]) || []).reduce(
+    (acc: commentType[], comment: any) => {
+      // Если автор комментария забанен — игнорируем этот комментарий
+      if (comment.profiles?.is_banned === true) {
+        return acc;
+      }
+
+      // Если автор не забанен — добавляем комментарий в итоговый массив
+      acc.push(comment); // Если нужно отформатировать поля, делайте это прямо здесь (как в случае с объявлениями)
+
       return acc;
-    }
-
-    // Если автор не забанен — добавляем комментарий в итоговый массив
-    acc.push(comment); // Если нужно отформатировать поля, делайте это прямо здесь (как в случае с объявлениями)
-
-    return acc;
-  }, []);
+    },
+    [],
+  );
   let grammar = "отзывов";
 
   if (comments.length === 1) {
@@ -169,8 +171,8 @@ export default async function TeacherProfilePage({
 
             <section className="bg-white rounded-3xl min-h-83 md:rounded-[2.5rem] p-6 md:p-10 border border-slate-200 shadow-sm">
               <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <Award className="text-blue-500 w-6 h-6 md:w-7 md:h-7" />
-                О преподавателе
+                <Award className="text-blue-500 w-6 h-6 md:w-7 md:h-7" />О
+                преподавателе
               </h2>
               <p className="text-slate-600 text-base md:text-lg leading-relaxed whitespace-pre-line italic">
                 &quot;
@@ -220,11 +222,8 @@ export default async function TeacherProfilePage({
                   <Clock className="w-5 h-5 text-blue-500" /> Свободное время
                 </h3> */}
                 {/* Передаем ID пользователя (учителя), чтобы внутри компонента загрузить его расписание */}
-                <FreeTimeBar
-                  initialSchedule={availability}
-                />
+                {availability && <FreeTimeBar initialSchedule={availability} />}
               </div>
-
             </div>
           </div>
         </div>
@@ -241,7 +240,7 @@ export default async function TeacherProfilePage({
           </div>
           <CommentForm adId={adData.id} comments={comments} />
           <hr className="border-slate-100" />
-          <CommentsList comments={comments} />
+          <CommentsList  comments={comments}  />
         </section>
       </div>
     </main>

@@ -145,10 +145,6 @@ export default async function StudentProfilePage({
             <hr className="my-6 border-slate-100" />
 
             <div className="space-y-4">
-              {/* <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-blue-500" /> Свободное время
-                </h3> */}
-              {/* Передаем ID пользователя (учителя), чтобы внутри компонента загрузить его расписание */}
               {availability && <FreeTimeBar initialSchedule={availability} />}
             </div>
           </div>

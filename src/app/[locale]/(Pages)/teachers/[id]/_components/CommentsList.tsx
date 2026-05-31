@@ -18,16 +18,13 @@ export interface commentType {
   created_at: string;
   content: string;
   user_id: string;
-  ad_id: string;
   profiles: Profile;
 }
 
 export default function CommentsList({
   comments,
-  adId,
 }: {
   comments: commentType[];
-  adId: string;
 }) {
   const [visibleCount, setVisibleCount] = useState(3);
   const [editingId, setEditingId] = useState<number | null>(null);
