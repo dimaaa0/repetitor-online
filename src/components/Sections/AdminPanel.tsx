@@ -545,7 +545,7 @@ const AdminPanel = () => {
               ПРИЧИНА (ОПЦИОНАЛЬНО)
             </label>
             <textarea
-              rows="2"
+              rows={2}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Нарушение правил сообщества..."
