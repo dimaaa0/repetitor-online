@@ -149,7 +149,7 @@ export default async function StudentProfilePage({
                   <Clock className="w-5 h-5 text-blue-500" /> Свободное время
                 </h3> */}
               {/* Передаем ID пользователя (учителя), чтобы внутри компонента загрузить его расписание */}
-              <FreeTimeBar initialSchedule={availability} />
+              {availability && <FreeTimeBar initialSchedule={availability} />}
             </div>
           </div>
         </div>
