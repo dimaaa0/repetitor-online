@@ -75,7 +75,6 @@ export default function scheduleReminder() {
     }
   };
 
-  console.log(user?.id);
 
   if (!showReminder) return null;
 

@@ -38,10 +38,10 @@
   "PaymentInstructionsModal": {
     "title": "Активация подписки",
     "subtitle": "Оплатите доступ в 2 простых шага",
-    "step_1_title": "Переведите 20 000 UZS / Месяц",
+    "step_1_title": "Стоимость 20 000 UZS / Месяц",
     "step_1_desc": "На карту (Uzcard/Humo) или через Payme/Click:",
     "step_2_title": "Отправьте чек и ID",
-    "step_2_desc": "Для мгновенной активации перейдите в поддержку:",
+    "step_2_desc": "Для активации перейдите в поддержку:",
     "send_in_telegram": "Отправить в Telegram",
     "user_id": "ID: {id}",
     "loading": "загрузка...",

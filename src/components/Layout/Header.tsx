@@ -70,13 +70,13 @@ function Header() {
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:block">
+        <div className="flex items-center sm:gap-3 gap-1">
+          <div className="flex transform">
             <LanguagePicker />
           </div>
 
           {loading ? (
-            <div className="w-24 h-12 bg-gray-100 animate-pulse rounded-xl" />
+            <div className="w-24 h-12  bg-gray-100 animate-pulse rounded-xl" />
           ) : !user ? (
             <button
               className="flex items-center cursor-pointer gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-100 transition-all active:scale-95 text-sm font-bold"
@@ -86,7 +86,7 @@ function Header() {
               <span>{t("loginBtn")}</span>
             </button>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex  items-center gap-2">
               <Link
                 href={`/${locale}/profile`}
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-50 transition-all group"

@@ -7,7 +7,8 @@ const intlMiddleware = createMiddleware({
     defaultLocale: 'ru'
 });
 
-export default async function middleware(request: NextRequest) {
+// 1. ИЗМЕНЕНИЕ: Next.js 16 ищет НАМЕНОВАННЫЙ экспорт `proxy`, а не default async function.
+export async function proxy(request: NextRequest) {
     // Получаем базовый ответ от next-intl для локализации
     const response = intlMiddleware(request);
 
@@ -37,6 +38,7 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    // Этот matcher идеально подходит для структуры страниц /ru/teachers, /uz/teachers и т.д.
-    matcher: ['/', '/(ru|uz|en)/:path*']
+    // 2. ИЗМЕНЕНИЕ: Корректный matcher для next-intl, который пропускает статику,
+    // но железно ловит главную '/' и все локализованные пути вроде '/ru/teachers'.
+    matcher: ['/', '/(ru|uz|en)/:path*', '/((?!_next|_vercel|.*\\..*).*)']
 };

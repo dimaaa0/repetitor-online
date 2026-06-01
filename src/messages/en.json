@@ -38,10 +38,10 @@
   "PaymentInstructionsModal": {
     "title": "Subscription activation",
     "subtitle": "Pay for access in 2 easy steps",
-    "step_1_title": "Transfer 20,000 UZS / month",
+    "step_1_title": "Cost: 20,000 UZS / month",
     "step_1_desc": "To card (Uzcard/Humo) or via Payme/Click:",
     "step_2_title": "Send receipt and ID",
-    "step_2_desc": "For instant activation, contact support:",
+    "step_2_desc": "To activate, please contact support:",
     "send_in_telegram": "Send in Telegram",
     "user_id": "ID: {id}",
     "loading": "loading...",

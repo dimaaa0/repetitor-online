@@ -38,10 +38,10 @@
   "PaymentInstructionsModal": {
     "title": "Obunani faollashtirish",
     "subtitle": "Xizmat uchun 2 oson qadamda to'lang",
-    "step_1_title": "20 000 UZS / oyni o'tkazing",
+    "step_1_title": "Narxi oyiga 20 000 UZS",
     "step_1_desc": "Kartaga (Uzcard/Humo) yoki Payme/Click orqali:",
     "step_2_title": "Chek va ID yuboring",
-    "step_2_desc": "Darhol faollashtirish uchun qo'llab-quvvatlashga o'ting:",
+    "step_2_desc": "Faollashtirish uchun qo'llab-quvvatlash xizmatiga o'ting:",
     "send_in_telegram": "Telegramga yuborish",
     "user_id": "ID: {id}",
     "loading": "yuklanmoqda...",
