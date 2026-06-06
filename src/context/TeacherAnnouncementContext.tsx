@@ -72,19 +72,28 @@ export const TutorAnnouncementProvider = ({
 
   // 2. И только теперь ПЕРЕВОДИМ и форматируем итоговый список.
   // Этот useMemo сработает мгновенно при смене языка (tSubjects) без запросов в БД!
-  const announcements = useMemo(() => {
-    return filteredRawAnnouncements.map((ad) => ({
-      id: ad.id,
-      name: ad.name,
-      surname: ad.surname,
-      avatar: ad.avatar,
-      subject: tSubjects.has(ad.subjectKey)
-        ? tSubjects(ad.subjectKey)
-        : ad.subjectKey,
-      description: ad.description,
-      price: ad.priceRaw + " UZS", // Форматирование строки переехало сюда
-      likes: ad.likes,
-    }));
+   const announcements = useMemo(() => {
+    return filteredRawAnnouncements.map((ad) => {
+      const processSubjects = (key: string) => {
+        if (typeof key !== "string") return key;
+        return key
+          .split(",")
+          .map((s) => s.trim())
+          .map((s) => (tSubjects.has(s) ? tSubjects(s) : s))
+          .join(", ");
+      };
+
+      return {
+        id: ad.id,
+        name: ad.name,
+        surname: ad.surname,
+        avatar: ad.avatar,
+        subject: processSubjects(ad.subjectKey),
+        description: ad.description,
+        price: ad.priceRaw + " UZS",
+        likes: ad.likes,
+      };
+    });
   }, [filteredRawAnnouncements, tSubjects]);
 
   return (

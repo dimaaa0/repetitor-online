@@ -1,16 +1,15 @@
 "use client";
 
-import { Heart, Filter, X, Clock } from "lucide-react"; 
+import { Heart, Filter, X, Clock } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useTeacherAnnouncement } from "../../../../context/TeacherAnnouncementContext";
 import TeacherCard from "../../../../components/UI/TeacherCard";
 import FilterPanel from "@/src/components/UI/TeacherFilter";
 import { useTranslations } from "next-intl";
 
-
 const TutorsPageWithAnimation = () => {
   const { announcements, announcementsLoading } = useTeacherAnnouncement();
-  
+
   const tSearch = useTranslations("TeacherAnnouncements.Search");
   const [filters, setFilters] = useState({
     subject: "",
@@ -24,7 +23,7 @@ const TutorsPageWithAnimation = () => {
   const [showNotify, setShowNotify] = useState(false);
 
   const toggleFilter = () => setOpenFilter(!openFilter);
-  
+
   return (
     <div className="min-h-screen bg-[#FBFDFF] pb-20 relative ">
       <div className="bg-white border-b border-slate-100 py-6 sm:py-12 mb-8">
@@ -34,7 +33,8 @@ const TutorsPageWithAnimation = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
-                {tSearch("title")} <span className="text-blue-600">{tSearch("titleAccent")}</span>
+                {tSearch("title")}{" "}
+                <span className="text-blue-600">{tSearch("titleAccent")}</span>
               </h1>
               <p className="text-slate-500 mt-2 font-medium">
                 {tSearch("subtitle")}
@@ -86,7 +86,6 @@ const TutorsPageWithAnimation = () => {
               ))}
         </div>
       </div>
-
     </div>
   );
 };

@@ -92,16 +92,16 @@ const Announcements = () => {
       <div className="max-w-[1250] mx-auto px-2 sm:px-6">
         <div className="flex items-center justify-between mb-6">
           <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
-            {t("activeApplications")} {announcements.length}
+            {t("activeApplications")} {announcements?.length}
           </span>
         </div>
 
         <div className="grid grid-cols-1 pb-4 gap-8">
-          {announcementsLoading && announcements.length === 0
+          {announcementsLoading && announcements?.length === 0
             ? Array.from({ length: 4 }).map((_, key) => (
                 <StudentCard key={`skeleton-${key}`} student={{}} isLoading />
               ))
-            : announcements.map((student: any, key: number) => (
+            : announcements?.map((student: any, key: number) => (
                 <StudentCard
                   key={student.id || key}
                   student={student}

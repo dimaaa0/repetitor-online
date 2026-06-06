@@ -81,18 +81,27 @@ export const StudentAnnouncementProvider = ({
     staleTime: 5 * 60 * 1000,
   });
 
-  // Шаг 3: Переводы и форматирование строк происходят «на лету» в UI-слое
   const announcements = useMemo(() => {
-    if (!rawAnnouncements) return EMPTY_ARRAY;
+    return rawAnnouncements?.map((ad) => {
+      const processSubjects = (key: string) => {
+        if (typeof key !== "string") return key;
+        return key
+          .split(",")
+          .map((s) => s.trim())
+          .map((s) => (tSubjects.has(s) ? tSubjects(s) : s))
+          .join(", ");
+      };
 
-    return rawAnnouncements.map((ad) => ({
-      ...ad,
-      // Переводим здесь, используя подготовленный subjectKey
-      subject: tSubjects.has(ad.subjectKey)
-        ? tSubjects(ad.subjectKey)
-        : ad.subjectKey,
-      price: ad.priceRaw + " UZS",
-    }));
+      return {
+        id: ad.id,
+        name: ad.name,
+        surname: ad.surname,
+        avatar: ad.avatar,
+        subject: processSubjects(ad.subjectKey),
+        description: ad.description,
+        price: ad.priceRaw + " UZS",
+      };
+    });
   }, [rawAnnouncements, tSubjects]); // tSubjects в зависимостях перерисует язык мгновенно
 
   return (
