@@ -1,8 +1,47 @@
 "use client";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { createClient } from "../utils/supabase/client";
+import { useTranslations } from "next-intl";
 
 const StudentAnnouncementContext = createContext<any>(null);
+
+interface RawAdItem {
+  id: string;
+  title: string;
+  subject: string; // Из базы приходит строго 'subject'
+  description: string;
+  price: number;
+  created_at: string;
+  profiles?: {
+    id: string;
+    name: string;
+    surname: string;
+    avatar_url: string;
+    is_banned: boolean;
+  } | null;
+}
+
+// Шаг 1: Чистая функция БЕЗ хуков. Только нормализация структуры.
+const transformStudentAds = (data: RawAdItem[]) => {
+  if (!data) return [];
+  return data
+    .filter((ad) => !ad.profiles?.is_banned)
+    .map((ad) => ({
+      id: ad.id,
+      title: ad.title,
+      subjectKey: ad.subject, // Запоминаем сырое значение как ключ для будущего перевода
+      description: ad.description,
+      priceRaw: ad.price,
+      postedAt: ad.created_at,
+      user_id: ad.profiles?.id,
+      name: ad.profiles?.name,
+      surname: ad.profiles?.surname,
+      avatar: ad.profiles?.avatar_url,
+    }));
+};
+
+const EMPTY_ARRAY: any[] = [];
 
 export const StudentAnnouncementProvider = ({
   children,
@@ -10,37 +49,17 @@ export const StudentAnnouncementProvider = ({
   children: React.ReactNode;
 }) => {
   const supabase = createClient();
+  // Хук вызывается строго внутри компонента-провайдера!
+  const tSubjects = useTranslations("subjects_list");
 
-  // Храним данные объявления здесь, чтобы они были доступны везде
-  const [announcements, setAnnouncements] = useState<any[]>([]);
-  const [originalAnnouncements, setOriginalAnnouncements] = useState<any[]>([]);
-  const [announcementsLoading, setAnnouncementsLoading] = useState(true);
-
-  // Функция для загрузки данных (можно вызвать при логине или загрузке страницы)
-  const fetchAnnouncement = async () => {
-    setAnnouncementsLoading(true);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (user) {
-      const { data, error } = await supabase
-        .from("student_ads")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!error) setAnnouncements(data);
-    }
-    setAnnouncementsLoading(false);
-  };
-
-  // Загружаем данные один раз при монтировании провайдера
-  useEffect(() => {
-  const fetchAllAnnouncements = async () => {
-    setAnnouncementsLoading(true);
-    
-    const { data, error } = await supabase.from("student_ads").select(`
+  const {
+    data: rawAnnouncements,
+    isLoading: announcementsLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["student-announcements"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("student_ads").select(`
           id,
           title,
           subject,
@@ -55,53 +74,34 @@ export const StudentAnnouncementProvider = ({
             is_banned
           )
         `);
+      if (error) throw new Error(error.message);
+      return (data as unknown as RawAdItem[]) || [];
+    },
+    select: transformStudentAds,
+    staleTime: 5 * 60 * 1000,
+  });
 
-    if (error) {
-      console.error("Ошибка загрузки:", error);
-    } else {
-      // Используем reduce вместо map, чтобы одновременно фильтровать и форматировать
-      const formattedData = data.reduce((acc: any[], ad: any) => {
-        // ЕСЛИ профиль забанен — просто пропускаем это объявление
-        if (ad.profiles?.is_banned === true) {
-          return acc; 
-        }
+  // Шаг 3: Переводы и форматирование строк происходят «на лету» в UI-слое
+  const announcements = useMemo(() => {
+    if (!rawAnnouncements) return EMPTY_ARRAY;
 
-        // Иначе — форматируем и добавляем в итоговый массив
-        acc.push({
-          id: ad.id,
-          title: ad.title,
-          name: ad.profiles?.name,
-          surname: ad.profiles?.surname,
-          avatar: ad.profiles?.avatar_url,
-          subject: ad.subject,
-          description: ad.description,
-          price: ad.price + " UZS",
-          likes: 0,
-          postedAt: ad.created_at,
-          user_id: ad.profiles?.id,
-          is_banned: ad.profiles?.is_banned
-        });
-
-        return acc;
-      }, []); // Начальное значение — пустой массив
-
-      setAnnouncements(formattedData);
-      setOriginalAnnouncements(formattedData);
-    }
-    setAnnouncementsLoading(false);
-  };
-
-  fetchAllAnnouncements();
-}, []);
+    return rawAnnouncements.map((ad) => ({
+      ...ad,
+      // Переводим здесь, используя подготовленный subjectKey
+      subject: tSubjects.has(ad.subjectKey)
+        ? tSubjects(ad.subjectKey)
+        : ad.subjectKey,
+      price: ad.priceRaw + " UZS",
+    }));
+  }, [rawAnnouncements, tSubjects]); // tSubjects в зависимостях перерисует язык мгновенно
 
   return (
     <StudentAnnouncementContext.Provider
       value={{
         announcements,
-        setAnnouncements,
-        refreshAnnouncements: fetchAnnouncement,
         announcementsLoading,
-        originalAnnouncements,
+        refreshAnnouncements: refetch,
+        rawAnnouncements: rawAnnouncements || EMPTY_ARRAY,
       }}
     >
       {children}
@@ -109,6 +109,5 @@ export const StudentAnnouncementProvider = ({
   );
 };
 
-// Хук для удобного использования
 export const useStudentAnnouncement = () =>
   useContext(StudentAnnouncementContext);

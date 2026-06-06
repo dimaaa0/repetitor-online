@@ -32,8 +32,13 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
   const locale = useLocale();
   const t = useTranslations("TeacherCard");
   const [imgLoaded, setImgLoaded] = useState(false);
+  const tSubjects = useTranslations("subjects_list");
 
   const { openModal } = useModal();
+
+  const getTranslation = (key: string) => {
+    return tSubjects.has(key) ? tSubjects(key) : key;
+  };
 
   const [alert, setAlert] = useState<{
     type: "success" | "error" | "info";
@@ -197,7 +202,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
             {teacher.name ?? t("default_teacher")} {teacher.surname ?? ""}
           </h3>
           <p className="text-blue-600 text-sm font-semibold mt-1 inline-block bg-blue-50 px-2 py-0.5 rounded-md">
-            {teacher.subject ?? t("subject_not_specified")}
+            {getTranslation(teacher.subject ?? t("subject_not_specified"))}
           </p>
         </div>
       </div>

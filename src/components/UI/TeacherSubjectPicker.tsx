@@ -9,15 +9,16 @@ const SubjectPicker = () => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const tSubjects = useTranslations("subjects_list");
+
+  const getTranslation = (key: string) => {
+    return tSubjects.has(key) ? tSubjects(key) : key;
+  };
 
   const supabase = createClient();
-
   const t = useTranslations("profiles");
-
   const { user, loading, refreshUser } = useUser();
-
   const [subjects, setSubjects] = useState<string[]>([]);
-
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -38,8 +39,11 @@ const SubjectPicker = () => {
 
   const filteredSubjects = useMemo(() => {
     return subjects
-      .filter((s) => !selectedSubjects.includes(s))
-      .filter((s) => s.toLowerCase().includes(query.toLowerCase()));
+      .filter((key) => !selectedSubjects.includes(key))
+      .filter((key) => {
+        const translatedName = getTranslation(key).toLowerCase();
+        return translatedName.includes(query.toLowerCase());
+      });
   }, [subjects, query, selectedSubjects]);
 
   const addSubjectLocal = (subject: string) => {
@@ -85,8 +89,6 @@ const SubjectPicker = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
-
   return (
     <div className="flex-1 space-y-4" ref={containerRef}>
       <div className="relative">
@@ -95,8 +97,9 @@ const SubjectPicker = () => {
         </label>
 
         <div
-          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
-            }`}
+          className={`min-h-[64px] w-full bg-gray-100 hover:bg-blue-50 border-2 transition-all rounded-2xl p-2 flex flex-wrap gap-2 items-center ${
+            isOpen ? "border-blue-400 bg-white shadow-sm" : "border-transparent"
+          }`}
           onClick={() => setIsOpen(true)}
         >
           {selectedSubjects.map((subject) => (
@@ -104,7 +107,7 @@ const SubjectPicker = () => {
               key={subject}
               className="flex items-center gap-1.5 bg-blue-600 text-white pl-3 pr-2 py-1.5 rounded-xl text-sm font-bold animate-in zoom-in-95 duration-200"
             >
-              {subject}
+              {getTranslation(subject)}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -139,7 +142,9 @@ const SubjectPicker = () => {
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
             placeholder={
-              selectedSubjects.length === 0 ? t("placeholder_write_or_select") : ""
+              selectedSubjects.length === 0
+                ? t("placeholder_write_or_select")
+                : ""
             }
             className="flex-1   min-w-[150px] bg-transparent border-none focus:ring-0 outline-none text-blue-700 font-bold placeholder:text-blue-300 px-2"
           />
@@ -170,7 +175,7 @@ const SubjectPicker = () => {
                   }}
                   className="w-full text-left px-4 py-3 text-blue-700 hover:bg-blue-50 rounded-xl transition-colors font-semibold flex items-center justify-between group"
                 >
-                  {subject}
+                  {getTranslation(subject)}
                 </button>
               ))}
 

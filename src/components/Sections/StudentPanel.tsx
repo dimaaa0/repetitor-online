@@ -22,6 +22,7 @@ const StudentPanel = () => {
   const supabase = createClient();
 
   const t = useTranslations("profiles");
+  const tSubjects = useTranslations("subjects_list");
 
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
@@ -38,6 +39,16 @@ const StudentPanel = () => {
     setAlert({ type, message });
     setTimeout(() => setAlert(null), 3000);
   };
+
+  // const [translatedSubjects, setTranslatedSubjects] = useState<string[]>([]);
+  // useEffect(() => {
+  //   const tempArray: string[] = [];
+  //   for (let i = 0; i < selectedSubjects.length; i++) {
+  //     const translation = getTranslation(selectedSubjects[i]);
+  //     tempArray.push(translation);
+  //   }
+  //   setTranslatedSubjects(tempArray);
+  // }, [selectedSubjects]);
 
   const checkEmptyFields = (
     title: string,
@@ -278,7 +289,7 @@ const StudentPanel = () => {
     <div>
       <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100">
         {alert && (
-          <div className="fixed top-6 left-0 right-0 z-[9999] flex justify-center px-4 pointer-events-none">
+          <div className="fixed top-10 left-0 right-0 z-[9999] flex justify-center px-4 pointer-events-none">
             <div
               className={`
                 pointer-events-auto

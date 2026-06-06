@@ -1,6 +1,14 @@
 "use client";
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
+import { useQuery } from "@tanstack/react-query";
 import { createClient } from "../utils/supabase/client";
+import { useTranslations } from "next-intl";
 
 const TutorAnnouncementContext = createContext<any>(null);
 
@@ -9,73 +17,83 @@ export const TutorAnnouncementProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  const tSubjects = useTranslations("subjects_list");
   const supabase = createClient();
 
-  const [announcements, setAnnouncements] = useState<any[]>([]);
-  const [originalAnnouncements, setOriginalAnnouncements] = useState<any[]>([]);
-  const [announcementsLoading, setAnnouncementsLoading] = useState(true);
+  // Вместо хранения отфильтрованного массива храним только активные фильтры
+  // Например, id выбранного предмета, или null, если фильтр не применен
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchTeachers = async () => {
-      setAnnouncementsLoading(true);
+  const { data: rawAnnouncements = [], isLoading: announcementsLoading } =
+    useQuery({
+      queryKey: ["tutor-announcements"],
+      queryFn: async () => {
+        const { data, error } = await supabase.from("ads").select(`
+          id,
+          subject,
+          description,
+          price,
+          profiles:user_id (
+            name,
+            surname,
+            avatar_url,
+            is_subscribed
+          ),
+          ads_likes (count) 
+        `);
 
-      // 1. Добавляем запрос количества из связанной таблицы ads_likes
-      const { data, error } = await supabase.from("ads").select(`
-            id,
-            subject,
-            description,
-            price,
-            profiles:user_id (
-              name,
-              surname,
-              avatar_url,
-              is_subscribed
-            ),
-            ads_likes (count) 
-          `);
-
-      if (error) {
-        console.error("Ошибка загрузки:", error.message);
-      } else {
-        const formattedData = data
-          .map((ad: any) => ({
+        if (error) throw new Error(error.message);
+        return data || [];
+      },
+      // В select делаем ТОЛЬКО нормализацию структуры БД. Без переводов!
+      // Оборачиваем в useCallback, чтобы ссылка не менялась и кэш React Query работал идеально
+      select: useCallback((data: any[]) => {
+        return data
+          .filter((ad) => ad.profiles?.is_subscribed === true)
+          .map((ad) => ({
             id: ad.id,
             name: ad.profiles?.name,
             surname: ad.profiles?.surname,
             avatar: ad.profiles?.avatar_url,
-            subject: ad.subject,
+            subjectKey: ad.subject, // Сохраняем сырой КЛЮЧ для перевода
             description: ad.description,
-            price: ad.price + " UZS",
+            priceRaw: ad.price, // Оставляем числом (пригодится для сортировки по цене)
             likes: ad.ads_likes?.[0]?.count || 0,
-            is_subscribed: ad.profiles?.is_subscribed || false,
-          }))
-          // Оставляем только тех, у кого подписка true
-          .filter((ad) => ad.is_subscribed === true);
+          }));
+      }, []),
+      staleTime: 1000 * 60,
+    });
 
-        setAnnouncements(formattedData);
+  // 1. Сначала фильтруем СЫРЫЕ данные (по ссылке из кэша)
+  const filteredRawAnnouncements = useMemo(() => {
+    if (!selectedSubject) return rawAnnouncements;
+    return rawAnnouncements.filter((ad) => ad.subjectKey === selectedSubject);
+  }, [rawAnnouncements, selectedSubject]);
 
-        // setAnnouncements(formattedData);
-        setOriginalAnnouncements(formattedData);
-      }
-      setAnnouncementsLoading(false);
-    };
-
-    fetchTeachers();
-  }, []);
-
-  useEffect(() => {
-    for (let i = 0; i < announcements.length; i++) {
-      const element = announcements[i];
-    }
-  }, [announcements]);
+  // 2. И только теперь ПЕРЕВОДИМ и форматируем итоговый список.
+  // Этот useMemo сработает мгновенно при смене языка (tSubjects) без запросов в БД!
+  const announcements = useMemo(() => {
+    return filteredRawAnnouncements.map((ad) => ({
+      id: ad.id,
+      name: ad.name,
+      surname: ad.surname,
+      avatar: ad.avatar,
+      subject: tSubjects.has(ad.subjectKey)
+        ? tSubjects(ad.subjectKey)
+        : ad.subjectKey,
+      description: ad.description,
+      price: ad.priceRaw + " UZS", // Форматирование строки переехало сюда
+      likes: ad.likes,
+    }));
+  }, [filteredRawAnnouncements, tSubjects]);
 
   return (
     <TutorAnnouncementContext.Provider
       value={{
-        announcements,
-        setAnnouncements,
+        announcements, // Компоненты получают актуальные переведенные и отфильтрованные данные
         announcementsLoading,
-        originalAnnouncements,
+        setSubjectFilter: setSelectedSubject, // Передаем функцию изменения фильтра кнопкам
+        activeSubject: selectedSubject,
       }}
     >
       {children}

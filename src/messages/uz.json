@@ -12,9 +12,9 @@
       "heading": "Bu qanday ishlaydi",
       "step1Title": "Ro'yxatdan o'ting",
       "step1Desc": "O'quvchi yoki o'qituvchi profilini yarating",
-      "step2Title": "Dars jadvalini ko'rsating",
+      "step2Title": "Dars jadvalini tanlang",
       "step2Desc": "Bo'sh vaqtlaringizni qo'shing",
-      "step3Title": "Mos keluvchilarni toping",
+      "step3Title": "Mos odamlarni toping",
       "step3Desc": "Tizim dars jadvaliga qarab o'qituvchi yoki o'quvchilarni tanlab beradi",
       "step4Title": "Ta'limni boshlang",
       "step4Desc": "Bog'laning va hoziroq darslarni boshlang"
@@ -22,7 +22,7 @@
     "CTA": {
       "heading": "Bilimlar sari yo'l olishga tayyormisiz?",
       "subtitle": "Professionallar va maqsad sari intiluvchan o'quvchilar hamjamiyatiga qo'shiling. Sizning ideal repetitoringiz bor-yo'g'i bir klik masofasida.",
-      "loginBtn": "Hisobga kirish"
+      "loginBtn": "Akkaunt kirish"
     }
   },
   "Footer": {
@@ -167,7 +167,7 @@
   },
   "RegistrationModal": {
     "title_signin": "Xush kelibsiz",
-    "title_signup": "Hisob yaratish",
+    "title_signup": "Akkaunt yaratish",
     "desc_signin": "O'qishni davom ettirish uchun tizimga kiring",
     "desc_signup": "Repetitorlar jamoasiga qo'shiling",
     "label_role_who": "Siz kimsiz?",

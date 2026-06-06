@@ -32,6 +32,12 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
   const [subjects, setSubjects] = useState<string[]>([]);
   const filterRef = useRef<HTMLDivElement>(null);
 
+  const tSubjects = useTranslations("subjects_list");
+
+  const getTranslation = (key: string) => {
+    return tSubjects.has(key) ? tSubjects(key) : key;
+  };
+
   const debouncedFilters = useDebounce(filters, 300);
 
   // 1. Загрузка списка предметов для выпадающего списка
@@ -47,14 +53,24 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
     fetchSubjects();
   }, []);
 
+  const [translatedSubjects, setTranslatedSubjects] = useState<string[]>([]);
+  useEffect(() => {
+    const tempArray: string[] = [];
+    for (let i = 0; i < subjects.length; i++) {
+      const translation = getTranslation(subjects[i]);
+      tempArray.push(translation);
+    }
+    setTranslatedSubjects(tempArray);
+  }, [subjects]);
+
   // 2. Логика фильтрации и сортировки (Вынесена в useMemo для производительности)
   const filteredResult = useMemo(() => {
     let result = originalAnnouncements.filter((ad: any) => {
       const matchSubject = debouncedFilters.subject
         ? ad.subject
-          ?.toLowerCase()
-          .trim()
-          .includes(debouncedFilters.subject.toLowerCase().trim())
+            ?.toLowerCase()
+            .trim()
+            .includes(debouncedFilters.subject.toLowerCase().trim())
         : true;
       const matchPrice = parsePrice(ad.price) <= debouncedFilters.maxPrice;
       return matchSubject && matchPrice;
@@ -139,23 +155,25 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
       ref={filterRef}
       className="bg-white absolute right-0 top-14 z-10 p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-xl w-[calc(100vw-1rem)] sm:w-72 max-w-sm transition-all duration-300"
     >
-      <h3 className="text-base sm:text-lg font-bold mb-4">{t('title_filters')}</h3>
+      <h3 className="text-base sm:text-lg font-bold mb-4">
+        {t("title_filters")}
+      </h3>
 
       {/* Выбор предмета */}
       <div className="mb-4 sm:mb-6">
         <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-          {t('label_subject')}
+          {t("label_subject")}
         </label>
         <input
           list="subjects-list"
           type="text"
-          placeholder={t('placeholder_search_or_type')}
+          placeholder={t("placeholder_search_or_type")}
           className="w-full p-2 sm:p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm transition-all"
           value={filters.subject}
           onChange={(e) => updateFilter("subject", e.target.value)}
         />
         <datalist id="subjects-list">
-          {subjects.map((sub) => (
+          {translatedSubjects.map((sub) => (
             <option key={sub} value={sub} />
           ))}
         </datalist>
@@ -164,7 +182,7 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
       {/* Ползунок цены */}
       <div className="mb-4 sm:mb-6">
         <label className="flex justify-between text-xs sm:text-sm font-medium text-gray-700 mb-2">
-          <span>{t('label_price_to')}</span>
+          <span>{t("label_price_to")}</span>
           <span className="font-bold text-blue-600">
             {filters.maxPrice.toLocaleString()} UZS
           </span>
@@ -179,8 +197,8 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
           onChange={(e) => updateFilter("maxPrice", Number(e.target.value))}
         />
         <div className="flex justify-between text-[10px] text-gray-400 mt-1">
-          <span>{t('price_min')}</span>
-          <span>{t('price_max')}</span>
+          <span>{t("price_min")}</span>
+          <span>{t("price_max")}</span>
         </div>
       </div>
 
@@ -190,12 +208,12 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
           {
             id: "sortAscPrice",
             key: "sortAscPrice" as const,
-            label: t('sort_cheaper_first'),
+            label: t("sort_cheaper_first"),
           },
           {
             id: "sortDescPrice",
             key: "sortDescPrice" as const,
-            label: t('sort_expensive_first'),
+            label: t("sort_expensive_first"),
           },
         ].map(({ id, key, label }) => (
           <div key={id} className="flex items-center">
@@ -222,20 +240,20 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
           onClick={handleApplyFilters}
           className="w-full py-2.5 bg-blue-500 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-blue-600 transition-all active:scale-95 shadow-md shadow-blue-100"
         >
-          {t('btn_apply')}
+          {t("btn_apply")}
         </button>
         <button
           onClick={handleReset}
           className="w-full py-2.5 text-xs sm:text-sm font-medium text-red-500 bg-red-50 rounded-xl border border-red-100 hover:bg-red-100 transition-all active:scale-95"
         >
-          {t('btn_reset')}
+          {t("btn_reset")}
         </button>
       </div>
 
       {/* Счетчик результатов в реальном времени */}
       <div className="mt-4 pt-4 border-t border-gray-50 flex justify-center">
         <p className="text-xs sm:text-sm font-medium text-gray-500">
-          {t('found_lessons', { count: filteredResult.length })}
+          {t("found_lessons", { count: filteredResult.length })}
         </p>
       </div>
     </div>

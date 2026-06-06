@@ -10,9 +10,9 @@ import { TeacherSubjectProvider } from "../../context/TeacherSubjectContext";
 import { StudentSubjectProvider } from "../../context/StudentSubjectContext";
 import { StudentAnnouncementProvider } from "../../context/StudentAnnouncementContext";
 import { TutorAnnouncementProvider } from "../../context/TeacherAnnouncementContext";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
 // Убрали неиспользуемый импорт React
 import ScheduleReminder from "../../components/UI/ScheduleReminder";
 
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
 
 export default async function LocaleLayout({
   children,
-  params
+  params,
 }: {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
 
-  if (!['ru', 'uz', 'en'].includes(locale)) {
+  if (!["ru", "uz", "en"].includes(locale)) {
     notFound();
   }
 
@@ -53,9 +53,7 @@ export default async function LocaleLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {/* 1. Сначала самый главный инфраструктурный кэш */}
         <QueryProvider>
-          {/* 2. Затем локализация — теперь переводы доступны во всех контекстах ниже! */}
           <NextIntlClientProvider messages={messages}>
             <UserProvider>
               <TeacherSubjectProvider>
@@ -63,18 +61,10 @@ export default async function LocaleLayout({
                   <TutorAnnouncementProvider>
                     <StudentAnnouncementProvider>
                       <ModalProvider>
-                        
                         <Header />
-                        
-                        {/* Теперь у напоминалки есть доступ и к UserContext, и к локализации */}
                         <ScheduleReminder />
-
-                        <main className="flex-grow">
-                          {children}
-                        </main>
-                        
+                        <main className="flex-grow">{children}</main>
                         <Footer />
-
                       </ModalProvider>
                     </StudentAnnouncementProvider>
                   </TutorAnnouncementProvider>
