@@ -15,7 +15,8 @@ const Footer: React.FC = () => {
             href="https://t.me/dimaaa_o"
             target="_blank"
             className="p-[2px] h-[38px] w-[38px] flex items-center justify-center bg-slate-50 text-slate-600 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all shadow-sm"
-            title="Telegram"
+            title={t('telegramAriaLabel')}
+            aria-label={t('telegramAriaLabel')}
           >
             <Send className="w-5 h-5" strokeWidth={1.5} />
           </a>

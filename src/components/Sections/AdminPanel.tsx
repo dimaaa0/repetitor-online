@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { createClient } from "../../../src/utils/supabase/client";
 import { useUser } from "../../context/UserContext";
 import {
@@ -39,6 +40,8 @@ interface Stats {
 
 const AdminPanel = () => {
   const supabase = createClient();
+  const t = useTranslations("AdminPanel");
+  const locale = useLocale();
   const [months, setMonths] = useState(1);
   const [targetId, setTargetId] = useState("");
   const { user } = useUser();
@@ -184,16 +187,6 @@ const AdminPanel = () => {
     fetchTransactions();
   }, []);
 
-  const getMonthWord = (number: any) => {
-    const cases = [2, 0, 1, 1, 1, 2];
-    const titles = ["мес.", "мес.", "мес."]; // Для краткости как в макете
-    return titles[
-      number % 100 > 4 && number % 100 < 20
-        ? 2
-        : cases[number % 10 < 5 ? number % 10 : 5]
-    ];
-  };
-
   const fetchRevenue = async (dateString: any) => {
     setIsLoading(true);
 
@@ -226,16 +219,16 @@ const AdminPanel = () => {
   };
 
   const handleActivate = async () => {
-    if (!targetId) return showAlert("error", "Введите ID репетитора");
+    if (!targetId) return showAlert("error", t("error_enter_teacher_id"));
     const { error } = await supabase.rpc("activate_custom_sub", {
       target_user_id: targetId,
       months_to_add: months,
     });
 
     if (error) {
-      showAlert("error", "Ошибка: " + error.message);
+      showAlert("error", t("error_activation", { message: error.message }));
     } else {
-      showAlert("success", `Успешно активировано!`);
+      showAlert("success", t("success_activated"));
       setTargetId("");
     }
   };
@@ -244,17 +237,17 @@ const AdminPanel = () => {
   const [reason, setReason] = useState("");
 
   const handleBan = async (uuid: string) => {
-    if (!uuid) return showAlert("error", "Введите UUID пользователя");
+    if (!uuid) return showAlert("error", t("error_enter_uuid"));
 
     const { error } = await supabase.from("ban_history").insert({
       user_uuid: uuid,
-      reason: reason || "Без указания причины",
+      reason: reason || t("noReasonProvided"),
     });
 
     if (error) {
-      showAlert("error", "Ошибка при блокировке: " + error.message);
+      showAlert("error", t("error_blocking", { message: error.message }));
     } else {
-      showAlert("success", "Пользователь успешно заблокирован");
+      showAlert("success", t("success_user_blocked"));
       setUuid("");
       setReason("");
     }
@@ -304,10 +297,10 @@ const AdminPanel = () => {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-800">
-                    Активация подписки
+                    {t("subscriptionActivation")}
                   </h2>
                   <p className="text-sm text-gray-400">
-                    Ручное продление доступа для репетиторов
+                    {t("subscriptionSubtitle")}
                   </p>
                 </div>
               </div>
@@ -315,7 +308,7 @@ const AdminPanel = () => {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1">
-                    Идентификатор пользователя
+                    {t("labelUserId")}
                   </label>
                   <div className="relative">
                     <User
@@ -324,7 +317,7 @@ const AdminPanel = () => {
                     />
                     <input
                       type="text"
-                      placeholder="Введите UUID репетитора..."
+                      placeholder={t("placeholderTeacherUuid")}
                       value={targetId}
                       onChange={(e) => setTargetId(e.target.value)}
                       className="w-full pl-12 pr-4 py-4 border border-gray-100 rounded-[20px] bg-gray-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none text-gray-700 font-mono text-sm"
@@ -335,7 +328,7 @@ const AdminPanel = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1">
-                      Период доступа
+                      {t("labelAccessPeriod")}
                     </label>
                     <div className="relative">
                       <Calendar
@@ -353,7 +346,7 @@ const AdminPanel = () => {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1">
-                      Сумма к оплате
+                      {t("labelAmount")}
                     </label>
                     <div className="py-4 px-6 bg-blue-50 text-blue-700 rounded-[20px] border border-blue-100 flex items-center justify-between">
                       <span className="font-bold text-lg">
@@ -371,7 +364,7 @@ const AdminPanel = () => {
                   className="w-full py-5 bg-gray-900 cursor-pointer text-white font-bold rounded-[22px] hover:bg-blue-600 transition-all shadow-xl hover:shadow-blue-500/25 active:scale-[0.98] mt-4 flex items-center justify-center gap-2"
                 >
                   <ShieldCheck size={20} />
-                  Подтвердить транзакцию
+                  {t("confirmTransaction")}
                 </button>
               </div>
             </section>
@@ -398,7 +391,7 @@ const AdminPanel = () => {
               </div>
 
               <p className="text-gray-400 text-sm font-medium">
-                Доход за месяц
+                {t("monthlyRevenue")}
               </p>
               <div className="flex items-baseline gap-2 mt-1">
                 <h3 className="text-3xl font-black text-gray-900">
@@ -409,16 +402,18 @@ const AdminPanel = () => {
 
               <div className="mt-6 space-y-3">
                 <div className="flex justify-between text-[10px] uppercase tracking-widest font-black">
-                  <span className="text-gray-300">Цель: 482,000 UZS</span>
+                  <span className="text-gray-300">
+                    {t("goal", { amount: "1,000,000 UZS" })}
+                  </span>
                   <span className="text-blue-600">
-                    {Math.min(Math.round((revenue / 482000) * 100), 100)}%
+                    {Math.min(Math.round((revenue / 1000000) * 100), 100)}%
                   </span>
                 </div>
                 <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-blue-600 rounded-full transition-all duration-700 ease-out"
                     style={{
-                      width: `${Math.min((revenue / 482000) * 100, 100)}%`,
+                      width: `${Math.min((revenue / 1000000) * 100, 100)}%`,
                     }}
                   />
                 </div>
@@ -428,14 +423,15 @@ const AdminPanel = () => {
             {/* Детализация по периодам */}
             <div className="bg-white border border-gray-100 rounded-[32px] p-6 shadow-sm">
               <h3 className="font-bold text-gray-800 mb-5 flex items-center gap-2">
-                <Users size={18} className="text-blue-500" /> Статистика спроса
+                <Users size={18} className="text-blue-500" />{" "}
+                {t("demandStatistics")}
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {/* Карточка 1: Процент подписчиков */}
                 <div className="bg-gray-50/50 border border-gray-100 rounded-[24px] p-6">
                   <p className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">
-                    Пользователей с подпиской сейчас
+                    {t("subscribedUsersLabel")}
                   </p>
                   <div className="flex items-baseline gap-1">
                     <h3 className="text-2xl font-black text-gray-900">
@@ -447,14 +443,14 @@ const AdminPanel = () => {
                 {/* Карточка 2: Новые пользователи */}
                 <div className="bg-gray-50/50 border border-gray-100 rounded-[24px] p-6">
                   <p className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">
-                    Новых покупателей
+                    {t("newCustomersLabel")}
                   </p>
                   <div className="flex items-baseline gap-2">
                     <h3 className="text-2xl font-black text-gray-900">
                       +{stats.newPayers}
                     </h3>
                     <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">
-                      First Pay
+                      {t("firstPayBadge")}
                     </span>
                   </div>
                 </div>
@@ -463,7 +459,7 @@ const AdminPanel = () => {
               {/* Список последних действий скроллируемый */}
               <div className="mt-8">
                 <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
-                  История транзакций
+                  {t("transactionHistory")}
                 </h4>
                 <div className="space-y-4 max-h-[400px]  overflow-y-auto no-scrollbar pr-2">
                   {transactions.map((tx: any) => (
@@ -474,16 +470,16 @@ const AdminPanel = () => {
                       <div className="flex items-center gap-4">
                         {/* Иконка или инициалы пользователя */}
                         <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-[10px] font-bold text-gray-400 uppercase">
-                          {tx.profiles?.name?.[0] || "ID"}
+                          {tx.profiles?.name?.[0] || t("idAbbreviation")}
                         </div>
 
                         <div>
                           <h4 className="text-sm font-bold text-gray-900">
-                            Подписка: {tx.months_paid}{" "}
-                            {getMonthWord(tx.months_paid)}
+                            {t("subscriptionLabel")}:{" "}
+                            {t("months", { count: tx.months_paid })}
                           </h4>
                           <p className="text-[11px] text-gray-400 font-medium">
-                            {new Date(tx.paid_at).toLocaleString("ru-RU", {
+                            {new Date(tx.paid_at).toLocaleString(locale, {
                               day: "numeric",
                               month: "long",
                               hour: "2-digit",
@@ -516,7 +512,7 @@ const AdminPanel = () => {
         <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center gap-2">
           <ShieldAlert size={18} className="text-red-500" />
           <span className="font-semibold text-slate-700 text-sm uppercase tracking-wider">
-            Управление доступом
+            {t("accessControl")}
           </span>
         </div>
 
@@ -524,7 +520,7 @@ const AdminPanel = () => {
           {/* Поле ввода UUID */}
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1 ml-1">
-              UUID ПОЛЬЗОВАТЕЛЯ
+              {t("userUuidLabel")}
             </label>
             <div className="relative">
               <input
@@ -542,13 +538,13 @@ const AdminPanel = () => {
 
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1 ml-1">
-              ПРИЧИНА (ОПЦИОНАЛЬНО)
+              {t("banReasonLabel")}
             </label>
             <textarea
               rows={2}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Нарушение правил сообщества..."
+              placeholder={t("banReasonPlaceholder")}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-slate-400 outline-none transition-all resize-none"
             />
           </div>
@@ -562,7 +558,7 @@ const AdminPanel = () => {
                 `}
           >
             <Lock size={16} />
-            Заблокировать доступ
+            {t("blockAccess")}
           </button>
         </div>
       </div>

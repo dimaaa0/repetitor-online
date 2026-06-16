@@ -1,10 +1,19 @@
-import createNextIntlPlugin from 'next-intl/plugin';
+import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Твои текущие настройки проекта (например, supabase, images и т.д.) если они есть
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "wlojxqlspxqficpyppby.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);

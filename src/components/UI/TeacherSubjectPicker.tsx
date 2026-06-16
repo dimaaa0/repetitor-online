@@ -12,8 +12,24 @@ const SubjectPicker = () => {
   const tSubjects = useTranslations("subjects_list");
 
   const getTranslation = (key: string) => {
-    return tSubjects.has(key) ? tSubjects(key) : key;
-  };
+  if (!tSubjects.has(key)) return key;
+
+  try {
+    // Используем .raw(), чтобы получить чистые данные из JSON (строку или объект)
+    const rawValue = tSubjects.raw(key);
+
+    // Если это узбекский вариант (объект, у которого есть поле name)
+    if (rawValue && typeof rawValue === "object" && "name" in rawValue) {
+      return rawValue.name; // Возвращаем только "matematika"
+    }
+
+    // Если это русский или английский (где в JSON сразу лежит строка)
+    return tSubjects(key);
+  } catch (e) {
+    // Фолбек на случай, если .raw() выдаст ошибку
+    return tSubjects(key);
+  }
+};
 
   const supabase = createClient();
   const t = useTranslations("profiles");

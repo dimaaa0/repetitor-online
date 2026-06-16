@@ -2,8 +2,11 @@
 import { useState } from "react";
 import { createClient } from "../../../../utils/supabase/client"; // проверь путь к своему клиенту
 import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function ResetPasswordPage() {
+  const t = useTranslations("ResetPassword");
+  const locale = useLocale();
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
@@ -18,10 +21,10 @@ export default function ResetPasswordPage() {
     });
 
     if (error) {
-      alert("Ошибка обновления: " + error.message);
+      alert(t("errorUpdate") + error.message);
     } else {
-      alert("Пароль успешно изменен!");
-      router.push("/"); // перекидываем на главную после успеха
+      alert(t("success"));
+      router.push(`/${locale}`); // перекидываем на главную после успеха
     }
     setLoading(false);
   };
@@ -33,7 +36,7 @@ export default function ResetPasswordPage() {
         <form onSubmit={handleUpdatePassword} className="space-y-4">
           <input
             type="password"
-            placeholder="Введите новый пароль"
+            placeholder={t("placeholder")}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -43,7 +46,7 @@ export default function ResetPasswordPage() {
             disabled={loading}
             className="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-blue-600 transition-all"
           >
-            {loading ? "Обновление..." : "СОХРАНИТЬ ПАРОЛЬ"}
+            {loading ? t("updating") : t("updateButton")}
           </button>
         </form>
       </div>

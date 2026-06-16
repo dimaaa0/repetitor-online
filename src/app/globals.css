@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 @layer base {
   * {
     margin: 0;
@@ -16,15 +15,11 @@
   }
 
   body {
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-      "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     background-color: white;
     color: black;
-
   }
-
 
   .container {
     max-width: 1200px;
@@ -98,11 +93,9 @@
 }
 
 @layer base {
-
   /* Скрываем полосу для всех браузеров */
   html,
   body {
-
     /* Для Chrome, Safari и Opera */
     &::-webkit-scrollbar {
       display: none;

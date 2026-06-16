@@ -1,15 +1,31 @@
 "use client";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "../utils/supabase/client";
 import { useTranslations } from "next-intl";
 
 const StudentAnnouncementContext = createContext<any>(null);
 
+interface Filters {
+  subject: string;
+  maxPrice: number;
+  sortByLikes: boolean;
+  sortAscPrice: boolean;
+  sortDescPrice: boolean;
+}
+
+const initialFilters: Filters = {
+  subject: "",
+  maxPrice: 500000,
+  sortByLikes: false,
+  sortAscPrice: false,
+  sortDescPrice: false,
+};
+
 interface RawAdItem {
   id: string;
   title: string;
-  subject: string; // Из базы приходит строго 'subject'
+  subject: string;
   description: string;
   price: number;
   created_at: string;
@@ -22,7 +38,12 @@ interface RawAdItem {
   } | null;
 }
 
-// Шаг 1: Чистая функция БЕЗ хуков. Только нормализация структуры.
+const parsePrice = (priceStr: any): number => {
+  if (typeof priceStr === "number") return priceStr;
+  if (!priceStr) return 0;
+  return parseInt(priceStr.toString().replace(/\D/g, ""), 10) || 0;
+};
+
 const transformStudentAds = (data: RawAdItem[]) => {
   if (!data) return [];
   return data
@@ -30,7 +51,7 @@ const transformStudentAds = (data: RawAdItem[]) => {
     .map((ad) => ({
       id: ad.id,
       title: ad.title,
-      subjectKey: ad.subject, // Запоминаем сырое значение как ключ для будущего перевода
+      subjectKey: ad.subject,
       description: ad.description,
       priceRaw: ad.price,
       postedAt: ad.created_at,
@@ -49,8 +70,10 @@ export const StudentAnnouncementProvider = ({
   children: React.ReactNode;
 }) => {
   const supabase = createClient();
-  // Хук вызывается строго внутри компонента-провайдера!
   const tSubjects = useTranslations("subjects_list");
+
+  // Храним примененные фильтры в контексте
+  const [globalFilters, setGlobalFilters] = useState<Filters>(initialFilters);
 
   const {
     data: rawAnnouncements,
@@ -81,36 +104,100 @@ export const StudentAnnouncementProvider = ({
     staleTime: 5 * 60 * 1000,
   });
 
+  // 1. Фильтруем сырые данные на основе глобальных фильтров
+  const filteredRawAnnouncements = useMemo(() => {
+    let result = [...(rawAnnouncements || [])];
+
+    // Фильтрация по цене
+    result = result.filter(
+      (ad) => parsePrice(ad.priceRaw) <= globalFilters.maxPrice,
+    );
+
+    // Фильтрация по предметам
+    if (globalFilters.subject) {
+      const userSearch = globalFilters.subject.toLowerCase().trim();
+
+      result = result.filter((ad) => {
+        if (!ad.subjectKey) return false;
+        return ad.subjectKey
+          .split(",")
+          .map((s: string) => s.trim())
+          .some((key: string) => {
+            const systemKeyMatches = key.toLowerCase().includes(userSearch);
+            const translatedMatches = tSubjects.has(key)
+              ? tSubjects(key).toLowerCase().includes(userSearch)
+              : key.toLowerCase().includes(userSearch);
+            return systemKeyMatches || translatedMatches;
+          });
+      });
+    }
+
+    // Сортировка
+    if (globalFilters.sortAscPrice) {
+      result.sort((a, b) => parsePrice(a.priceRaw) - parsePrice(b.priceRaw));
+    } else if (globalFilters.sortDescPrice) {
+      result.sort((a, b) => parsePrice(b.priceRaw) - parsePrice(a.priceRaw));
+    }
+
+    return result;
+  }, [rawAnnouncements, globalFilters, tSubjects]);
+
+  // 2. Форматируем отфильтрованный список для вывода в карточки UI
   const announcements = useMemo(() => {
-    return rawAnnouncements?.map((ad) => {
+    return filteredRawAnnouncements.map((ad) => {
       const processSubjects = (key: string) => {
         if (typeof key !== "string") return key;
         return key
           .split(",")
           .map((s) => s.trim())
-          .map((s) => (tSubjects.has(s) ? tSubjects(s) : s))
+          .map((s) => {
+            if (!tSubjects.has(s)) return s;
+
+            try {
+              // Получаем "сырые" данные (это может быть и строка, и объект)
+              const rawValue = tSubjects.raw(s);
+
+              // Если это объект узбекского языка, берем поле name
+              if (
+                rawValue &&
+                typeof rawValue === "object" &&
+                "name" in rawValue
+              ) {
+                return rawValue.name;
+              }
+
+              // Для русского/английского возвращаем обычный перевод строки
+              return tSubjects(s);
+            } catch (e) {
+              return s; // фолбек на случай непредвиденной ошибки
+            }
+          })
           .join(", ");
       };
 
       return {
         id: ad.id,
+        title: ad.title,
         name: ad.name,
         surname: ad.surname,
         avatar: ad.avatar,
         subject: processSubjects(ad.subjectKey),
         description: ad.description,
-        price: ad.priceRaw + " UZS",
+        postedAt: ad.postedAt,
+        price: parsePrice(ad.priceRaw).toLocaleString() + " UZS",
       };
     });
-  }, [rawAnnouncements, tSubjects]); // tSubjects в зависимостях перерисует язык мгновенно
+  }, [filteredRawAnnouncements, tSubjects]);
 
   return (
     <StudentAnnouncementContext.Provider
       value={{
-        announcements,
+        announcements, // Этот массив автоматически будет отфильтрован
         announcementsLoading,
         refreshAnnouncements: refetch,
-        rawAnnouncements: rawAnnouncements || EMPTY_ARRAY,
+        originalAnnouncements: rawAnnouncements || EMPTY_ARRAY, // Нужен для живого счетчика в панели
+        globalFilters,
+        setGlobalFilters,
       }}
     >
       {children}

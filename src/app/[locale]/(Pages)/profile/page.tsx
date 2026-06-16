@@ -253,11 +253,11 @@ const Profile = () => {
   let panel;
 
   if (user.role === "Tutor") {
-    panel = <TeacherPanel />;
+    panel = <TeacherPanel  />;
   } else if (user.role === "Admin") {
     panel = <AdminPanel />;
   } else {
-    panel = <StudentPanel />;
+    panel = <StudentPanel showAlert={showAlert}/>;
   }
   return (
     <div className="bg-gray-50 py-6 px-0 sm:px-4 lg:px-8">

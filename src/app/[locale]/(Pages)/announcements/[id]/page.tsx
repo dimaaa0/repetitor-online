@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import FreeTimeBar from "../../../../../components/UI/FreeTimeBar";
+import { getTranslations } from "next-intl/server";
 
 interface StudentProfilePageProps {
   params: Promise<{ id: string }>;
@@ -54,6 +55,42 @@ export default async function StudentProfilePage({
     .eq("id", adData.user_id)
     .single();
 
+  const t = await getTranslations("StudentProfile");
+  const tSubjects = await getTranslations("subjects_list");
+
+  const getTranslation = (
+    subjectsData: string | string[] | undefined | null,
+  ): string[] => {
+    if (!subjectsData) return [];
+
+    // 1. Приводим любые входные данные к единому массиву строк
+    const keysArray = Array.isArray(subjectsData)
+      ? subjectsData
+      : subjectsData.split(",").map((s) => s.trim());
+
+    // 2. Переводим каждый элемент массива
+    return keysArray.map((rawKey) => {
+      // Чистим от префикса "subjects_list.", если он прилетел из базы (как на скрине)
+      const key = rawKey.replace("subjects_list.", "");
+
+      if (!tSubjects.has(key)) return key;
+
+      try {
+        const rawValue = tSubjects.raw(key);
+
+        // Если это узбекский объект — забираем только name
+        if (rawValue && typeof rawValue === "object" && "name" in rawValue) {
+          return rawValue.name;
+        }
+
+        // Для RU/EN возвращаем обычную строку
+        return tSubjects(key);
+      } catch (e) {
+        return key; // фолбек
+      }
+    });
+  };
+
   return (
     <div className="min-h-screen bg-slate-50/50 p-4 md:p-8 font-sans">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -93,7 +130,7 @@ export default async function StudentProfilePage({
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
                 <div className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-bold border border-blue-100">
                   <BookOpen size={16} className="mr-2" />
-                  {student.subject}
+                  {getTranslation(student.subject).join(", ")}
                 </div>
               </div>
             </div>
@@ -106,7 +143,7 @@ export default async function StudentProfilePage({
                 <BookOpen size={24} />
               </div>
               <h3 className="text-xl font-bold text-slate-800">
-                Детали поиска
+                {t("detailsHeading")}
               </h3>
             </div>
             <p className="text-slate-600 hyphens-auto lang-ru break-words text-justify leading-[1.8] text-lg">
@@ -120,7 +157,7 @@ export default async function StudentProfilePage({
           <div className=" sticky top-24 bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100">
             <div className="mb-6">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
-                Бюджет в час
+                {t("lessonBudget")}
               </p>
               <div className="flex items-baseline gap-2">
                 <span className="text-4xl font-black text-slate-800">
@@ -136,7 +173,7 @@ export default async function StudentProfilePage({
               <div className="bg-blue-50/50 p-5 md:p-6 rounded-2xl md:rounded-[2rem] border border-blue-100/50 relative overflow-hidden group">
                 <div className="relative z-10">
                   <p className="text-slate-700 font-semibold leading-relaxed break-words text-sm md:text-base">
-                    {student.contacts || "Способы связи не указаны"}
+                    {student.contacts || t("noContacts")}
                   </p>
                 </div>
                 <Globe className="absolute -bottom-4 -right-4 w-20 h-20 text-blue-100 opacity-40 group-hover:rotate-12 transition-transform" />

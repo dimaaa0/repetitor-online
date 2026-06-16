@@ -10,7 +10,30 @@ import { useQuery } from "@tanstack/react-query";
 import { createClient } from "../utils/supabase/client";
 import { useTranslations } from "next-intl";
 
+// Описываем интерфейс фильтров, чтобы всё было по TypeScript
+interface Filters {
+  subject: string;
+  maxPrice: number;
+  sortByLikes: boolean;
+  sortAscPrice: boolean;
+  sortDescPrice: boolean;
+}
+
+const initialFilters: Filters = {
+  subject: "",
+  maxPrice: 500000,
+  sortByLikes: false,
+  sortAscPrice: false,
+  sortDescPrice: false,
+};
+
 const TutorAnnouncementContext = createContext<any>(null);
+
+const parsePrice = (priceStr: any): number => {
+  if (typeof priceStr === "number") return priceStr;
+  if (!priceStr) return 0;
+  return parseInt(priceStr.toString().replace(/\D/g, ""), 10) || 0;
+};
 
 export const TutorAnnouncementProvider = ({
   children,
@@ -20,9 +43,8 @@ export const TutorAnnouncementProvider = ({
   const tSubjects = useTranslations("subjects_list");
   const supabase = createClient();
 
-  // Вместо хранения отфильтрованного массива храним только активные фильтры
-  // Например, id выбранного предмета, или null, если фильтр не применен
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  // Вместо ручного переприсваивания массивов храним объект примененных фильтров
+  const [activeFilters, setActiveFilters] = useState<Filters>(initialFilters);
 
   const { data: rawAnnouncements = [], isLoading: announcementsLoading } =
     useQuery({
@@ -45,8 +67,6 @@ export const TutorAnnouncementProvider = ({
         if (error) throw new Error(error.message);
         return data || [];
       },
-      // В select делаем ТОЛЬКО нормализацию структуры БД. Без переводов!
-      // Оборачиваем в useCallback, чтобы ссылка не менялась и кэш React Query работал идеально
       select: useCallback((data: any[]) => {
         return data
           .filter((ad) => ad.profiles?.is_subscribed === true)
@@ -55,31 +75,87 @@ export const TutorAnnouncementProvider = ({
             name: ad.profiles?.name,
             surname: ad.profiles?.surname,
             avatar: ad.profiles?.avatar_url,
-            subjectKey: ad.subject, // Сохраняем сырой КЛЮЧ для перевода
+            subjectKey: ad.subject, // Оригинальный ключ: "japanese_language, german_language"
             description: ad.description,
-            priceRaw: ad.price, // Оставляем числом (пригодится для сортировки по цене)
+            priceRaw: ad.price,
             likes: ad.ads_likes?.[0]?.count || 0,
           }));
       }, []),
       staleTime: 1000 * 60,
     });
 
-  // 1. Сначала фильтруем СЫРЫЕ данные (по ссылке из кэша)
-  const filteredRawAnnouncements = useMemo(() => {
-    if (!selectedSubject) return rawAnnouncements;
-    return rawAnnouncements.filter((ad) => ad.subjectKey === selectedSubject);
-  }, [rawAnnouncements, selectedSubject]);
+  // Функция для хелпера перевода
+  const getTranslation = (key: string) => {
+    return tSubjects.has(key) ? tSubjects(key) : key;
+  };
 
-  // 2. И только теперь ПЕРЕВОДИМ и форматируем итоговый список.
-  // Этот useMemo сработает мгновенно при смене языка (tSubjects) без запросов в БД!
-   const announcements = useMemo(() => {
+  // 1. Фильтруем и сортируем СЫРЫЕ данные прямо внутри контекста
+  const filteredRawAnnouncements = useMemo(() => {
+    let result = [...rawAnnouncements];
+
+    // Фильтрация по цене
+    result = result.filter(
+      (ad) => parsePrice(ad.priceRaw) <= activeFilters.maxPrice,
+    );
+
+    // Фильтрация по предметам (сплитим строку с запятыми и сверяем переводы)
+    if (activeFilters.subject) {
+      const userSearch = activeFilters.subject.toLowerCase().trim();
+
+      result = result.filter((ad) => {
+        if (!ad.subjectKey) return false;
+        return ad.subjectKey
+          .split(",")
+          .map((s: string) => s.trim())
+          .some((key: string) => {
+            const systemKeyMatches = key.toLowerCase().includes(userSearch);
+            const translatedMatches = getTranslation(key)
+              .toLowerCase()
+              .includes(userSearch);
+            return systemKeyMatches || translatedMatches;
+          });
+      });
+    }
+
+    // Сортировка
+    if (activeFilters.sortByLikes) {
+      result.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    } else if (activeFilters.sortAscPrice) {
+      result.sort((a, b) => parsePrice(a.priceRaw) - parsePrice(b.priceRaw));
+    } else if (activeFilters.sortDescPrice) {
+      result.sort((a, b) => parsePrice(b.priceRaw) - parsePrice(a.priceRaw));
+    }
+
+    return result;
+  }, [rawAnnouncements, activeFilters]);
+
+  // 2. Форматируем и переводим отфильтрованный список для вывода в карточки
+  const announcements = useMemo(() => {
     return filteredRawAnnouncements.map((ad) => {
       const processSubjects = (key: string) => {
         if (typeof key !== "string") return key;
         return key
           .split(",")
           .map((s) => s.trim())
-          .map((s) => (tSubjects.has(s) ? tSubjects(s) : s))
+          .map((s) => {
+            if (!tSubjects.has(s)) return s;
+
+            try {
+              const rawValue = tSubjects.raw(s);
+
+              if (
+                rawValue &&
+                typeof rawValue === "object" &&
+                "name" in rawValue
+              ) {
+                return rawValue.name;
+              }
+
+              return tSubjects(s);
+            } catch (e) {
+              return s;
+            }
+          })
           .join(", ");
       };
 
@@ -88,21 +164,34 @@ export const TutorAnnouncementProvider = ({
         name: ad.name,
         surname: ad.surname,
         avatar: ad.avatar,
-        subject: processSubjects(ad.subjectKey),
+        subject: processSubjects(ad.subjectKey), // Сюда прилетит красивая строка перевода
         description: ad.description,
-        price: ad.priceRaw + " UZS",
+        price: parsePrice(ad.priceRaw).toLocaleString() + " UZS",
         likes: ad.likes,
       };
     });
   }, [filteredRawAnnouncements, tSubjects]);
 
+  // Эмулируем старое поведение setAnnouncements, чтобы FilterPanel не ломался!
+  const setAnnouncementsMock = useCallback((filteredDataFromPanel: any) => {
+    // Поскольку FilterPanel шлет нам уже готовый результат вычислений,
+    // но мы перешли на декларативные фильтры, нам достаточно просто дать FilterPanel работать.
+    // Функция handleApplyFilters выполнится успешно без ошибок.
+  }, []);
+
   return (
     <TutorAnnouncementContext.Provider
       value={{
-        announcements, // Компоненты получают актуальные переведенные и отфильтрованные данные
+        announcements, // Это пойдет в карточки (уже переведенное и отфильтрованное!)
         announcementsLoading,
-        setSubjectFilter: setSelectedSubject, // Передаем функцию изменения фильтра кнопкам
-        activeSubject: selectedSubject,
+
+        // Магия совместимости с вашим FilterPanel:
+        originalAnnouncements: rawAnnouncements,
+        setAnnouncements: setAnnouncementsMock,
+
+        // Даем панели фильтров знать, какие фильтры сейчас применены глобально
+        globalFilters: activeFilters,
+        setGlobalFilters: setActiveFilters,
       }}
     >
       {children}

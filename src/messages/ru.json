@@ -35,6 +35,10 @@
     "navAds": "Объявления",
     "loginBtn": "Войти"
   },
+  "Layout": {
+    "title": "Поиск репетиторов и учеников в Узбекистане - Repetitor Online",
+    "description": "Платформа для образования в Узбекистане: найдите репетитора или свежие вакансии для учителей и преподавателей. Разместите резюме или объявление о поиске учеников. Все предметы и города Узбекистана."
+  },
   "PaymentInstructionsModal": {
     "title": "Активация подписки",
     "subtitle": "Оплатите доступ в 2 простых шага",
@@ -96,6 +100,7 @@
     "found_teachers": "Найдено уроков: {count}"
   },
   "profiles": {
+    "error_comment_too_long": "Слишком длинный текст",
     "role_student": "УЧЕНИК",
     "role_tutor": "УЧИТЕЛЬ",
     "btn_configure_profile": "Настроить профиль",
@@ -156,6 +161,18 @@
     "btn_add": "Добавить",
     "label_photo": "Фото",
     "error_file_too_large": "Файл слишком большой (макс. 2МБ)",
+    "error_select_subject": "Пожалуйста, выберите хотя бы один предмет",
+    "error_enter_price": "Пожалуйста, введите цену",
+    "error_enter_description": "Пожалуйста, введите описание (минимум 10 символов)",
+    "error_enter_contacts": "Пожалуйста, укажите ваши контакты",
+    "error_save_data": "Ошибка при сохранении данных",
+    "success_data_saved": "Все данные успешно сохранены!",
+    "error_title_too_short": "Пожалуйста, укажите, кого вы ищете (минимум 10 символов)",
+    "error_enter_budget": "Пожалуйста, введите бюджет",
+    "error_enter_goals_description": "Пожалуйста, опишите свои цели и пожелания (минимум 10 символов)",
+    "error_not_authorized": "Пользователь не авторизован",
+    "success_data_updated": "Данные успешно обновлены!",
+    "success_ad_published": "Объявление успешно опубликовано!",
     "alert_profile_updated": "Профиль обновлен успешно!",
     "alert_profile_update_error": "Ошибка при обновлении профиля",
     "user_not_found": "Пользователь не найден",
@@ -200,7 +217,121 @@
     "alert_email_already_registered": "Этот email уже зарегистрирован. Войдите в аккаунт.",
     "alert_check_email": "Проверьте почту для подтверждения!",
     "alert_enter_email": "Пожалуйста, введите email",
-    "alert_password_reset_sent": "Ссылка для сброса отправлена на почту!"
+    "alert_password_reset_sent": "Ссылка для сброса отправлена на почту!",
+    "errors": {
+      "subjectNameTooLong": "Слишком длинное название предмета",
+      "invalidLogin": "Неверная почта или пароль",
+      "userAlreadyRegistered": "Этот email уже занят",
+      "passwordTooShort": "Пароль должен быть не менее 6 символов",
+      "emailNotConfirmed": "Пожалуйста, подтвердите вашу почту",
+      "confirmationEmailFailure": "Не удалось отправить письмо подтверждения. Повторите попытку позже",
+      "userNotFound": "Пользователь с такой почтой не найден",
+      "passwordMustDiffer": "Новый пароль должен отличаться от старого",
+      "rateLimitExceeded": "Слишком много попыток. Подождите пару минут",
+      "emailRateLimitExceeded": "Мы уже отправили письмо. Подождите немного перед повторной попыткой",
+      "captchaFailed": "Ошибка проверки капчи. Попробуйте еще раз",
+      "invalidEmailAddress": "Некорректный адрес почты",
+      "anonymousSignInsDisabled": "Вход без регистрации отключен",
+      "connectionProblem": "Проблема с интернет-соединением",
+      "genericError": "Произошла ошибка. Попробуйте еще раз"
+    }
+  },
+  "CommentForm": {
+    "error_comment_too_long": "Слишком длинный текст",
+    "error_sign_in_to_comment": "Войдите, чтобы оставить отзыв",
+    "error_enter_comment_text": "Введите текст отзыва",
+    "error_already_commented": "Вы уже оставили отзыв к этому объявлению!",
+    "error_submit_comment": "Ошибка при отправке отзыва",
+    "success_comment_submitted": "Отзыв успешно отправлен",
+    "error_unexpected": "Произошла непредвиденная ошибка",
+    "title": "Оставить свой отзыв",
+    "placeholder": "Поделитесь вашим впечатлением от обучения...",
+    "btn_submit_comment": "Отправить отзыв",
+    "access_denied_title": "Доступ ограничен",
+    "access_denied_description": "Вы не можете оставить отзыв, так как ваш аккаунт заблокирован."
+  },
+  "AdminPanel": {
+    "subscriptionActivation": "Активация подписки",
+    "subscriptionSubtitle": "Ручное продление доступа для репетиторов",
+    "labelUserId": "Идентификатор пользователя",
+    "placeholderTeacherUuid": "Введите UUID репетитора...",
+    "labelAccessPeriod": "Период доступа",
+    "labelAmount": "Сумма к оплате",
+    "confirmTransaction": "Подтвердить транзакцию",
+    "monthlyRevenue": "Доход за месяц",
+    "goal": "Цель: {amount}",
+    "demandStatistics": "Статистика спроса",
+    "subscribedUsersLabel": "Пользователей с подпиской сейчас",
+    "newCustomersLabel": "Новых покупателей",
+    "firstPayBadge": "First Pay",
+    "transactionHistory": "История транзакций",
+    "subscriptionLabel": "Подписка",
+    "months": "{count, plural, one {# мес.} few {# мес.} many {# мес.} other {# мес.}}",
+    "idAbbreviation": "ID",
+    "accessControl": "Управление доступом",
+    "userUuidLabel": "UUID ПОЛЬЗОВАТЕЛЯ",
+    "banReasonLabel": "ПРИЧИНА (ОПЦИОНАЛЬНО)",
+    "banReasonPlaceholder": "Нарушение правил сообщества...",
+    "blockAccess": "Заблокировать доступ",
+    "noReasonProvided": "Без указания причины",
+    "error_enter_teacher_id": "Введите ID репетитора",
+    "error_activation": "Ошибка: {message}",
+    "success_activated": "Успешно активировано!",
+    "error_enter_uuid": "Введите UUID пользователя",
+    "error_blocking": "Ошибка при блокировке: {message}",
+    "success_user_blocked": "Пользователь успешно заблокирован"
+  },
+  "CommentsList": {
+    "error_update_comment": "Ошибка при обновлении.",
+    "success_comment_updated": "Отзыв обновлен",
+    "error_delete_comment": "Не удалось удалить комментарий",
+    "success_deleted": "Удалено",
+    "empty_comments": "Отзывов пока нет. Будьте первым!",
+    "you_title": "Вы",
+    "Delete": "Удалить",
+    "Cancel": "Отмена",
+    "DeleteConfirmationMessage": "Вы уверены, что хотите удалить этот отзыв? Это действие нельзя будет отменить.",
+    "ConfirmDeletion": "Подтвердите удаление",
+    "copyIdHint": "Нажмите, чтобы скопировать ID"
+  },
+  "NotFound": {
+    "studentTitle": "Ученик не найден",
+    "teacherTitle": "Преподаватель не найден",
+    "studentDescription": "К сожалению, профиль этого ученика был удален или ссылка содержит ошибку. Вернитесь к списку, чтобы подобрать другого наставника.",
+    "teacherDescription": "К сожалению, профиль этого учителя был удален или ссылка содержит ошибку. Вернитесь к списку, чтобы подобрать другого наставника.",
+    "allStudentsButton": "Ко всем ученикам",
+    "allTeachersButton": "Ко всем учителям"
+  },
+  "ResetPassword": {
+    "title": "Новый пароль",
+    "placeholder": "Введите новый пароль",
+    "updateButton": "СОХРАНИТЬ ПАРОЛЬ",
+    "updating": "Обновление...",
+    "success": "Пароль успешно изменен!",
+    "errorUpdate": "Ошибка обновления: "
+  },
+  "StudentProfile": {
+    "detailsHeading": "Детали поиска",
+    "lessonBudget": "Бюджет за урок",
+    "noContacts": "Способы связи не указаны"
+  },
+  "TeacherProfile": {
+    "default_teacher": "Преподаватель",
+    "no_description": "Описание пока недоступно.",
+    "no_contacts": "Контакты не указаны.",
+    "reviews_count": "{count, plural, one {# отзыв} few {# отзыва} many {# отзывов} other {# отзывов}}",
+    "metaTitle": "{name} - Репетитор по {subjectTranslated} | Repetitor Online",
+    "metaDescription": "Ищете репетитора по {subjectTranslated}? Смотрите профиль, контакты и расписание {name}.",
+    "lesson_price": "Стоимость за урок",
+    "contacts": "Контакты",
+    "free_time": "Свободное время",
+    "teacherNotFoundTitle": "Преподаватель не найден",
+    "about_teacher": "О преподавателе",
+    "student_reviews": "Отзывы учеников",
+    "leave_a_review": "Оставить свой отзыв",
+    "placeholder": "Поделитесь вашим впечатлением от обучения...",
+    "submit_review": "Отправить отзыв",
+    "likes_count": "лайков"
   },
   "howToBecomeTeacherModal": {
     "link_become_tutor": "Как стать учителем?",
@@ -218,34 +349,93 @@
   },
   "subjects_list": {
     "math": "Математика",
+    "math_dative": "математике",
+
     "russian_language": "Русский язык",
+    "russian_language_dative": "русскому языку",
+
     "physics": "Физика",
+    "physics_dative": "физике",
+
     "chemistry": "Химия",
+    "chemistry_dative": "химии",
+
     "biology": "Биология",
+    "biology_dative": "биологии",
+
     "history": "История",
+    "history_dative": "истории",
+
     "geography": "География",
+    "geography_dative": "географии",
+
     "social_studies": "Обществознание",
+    "social_studies_dative": "обществознанию",
+
     "literature": "Литература",
+    "literature_dative": "литературе",
+
     "informatics": "Информатика",
+    "informatics_dative": "информатике",
+
     "english_language": "Английский язык",
+    "english_language_dative": "английскому языку",
+
     "chinese_language": "Китайский язык",
+    "chinese_language_dative": "китайскому языку",
+
     "korean_language": "Корейский язык",
+    "korean_language_dative": "корейскому языку",
+
     "japanese_language": "Японский язык",
+    "japanese_language_dative": "японскому языку",
+
     "arabic_language": "Арабский язык",
+    "arabic_language_dative": "арабскому языку",
+
     "german_language": "Немецкий язык",
+    "german_language_dative": "немецкому языку",
+
     "french_language": "Французский язык",
+    "french_language_dative": "французскому языку",
+
     "spanish_language": "Испанский язык",
+    "spanish_language_dative": "испанскому языку",
+
     "italian_language": "Итальянский язык",
+    "italian_language_dative": "итальянскому языку",
+
     "portuguese_language": "Португальский язык",
+    "portuguese_language_dative": "португальскому языку",
+
     "turkish_language": "Турецкий язык",
+    "turkish_language_dative": "турецкому языку",
+
     "greek_language": "Греческий язык",
+    "greek_language_dative": "греческому языку",
+
     "economics": "Экономика",
+    "economics_dative": "экономике",
+
     "guitar_playing": "Игра на гитаре",
+    "guitar_playing_dative": "игре на гитаре",
+
     "piano_playing": "Игра на фортепиано",
+    "piano_playing_dative": "игре на фортепиано",
+
     "violin_playing": "Игра на скрипке",
+    "violin_playing_dative": "игре на скрипке",
+
     "drum_playing": "Игра на барабанах",
+    "drum_playing_dative": "игре на барабанах",
+
     "vocals": "Вокал",
+    "vocals_dative": "вокалу",
+
     "ogp": "ОГП",
-    "drawing": "Рисование"
+    "ogp_dative": "ОГП",
+
+    "drawing": "Рисование",
+    "drawing_dative": "рисованию"
   }
 }

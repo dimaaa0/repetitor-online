@@ -4,7 +4,11 @@ import { useUser } from "../../context/UserContext";
 import { createClient } from "../../utils/supabase/client";
 import { useTranslations } from "next-intl";
 
-const SubjectPicker = () => {
+const SubjectPicker = ({
+  showAlert,
+}: {
+  showAlert: (type: "success" | "error" | "info", message: string) => void;
+}) => {
   const { selectedSubjects, addSubject, removeSubject } = useSubject();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -12,10 +16,27 @@ const SubjectPicker = () => {
   const tSubjects = useTranslations("subjects_list");
 
   const getTranslation = (key: string) => {
-    return tSubjects.has(key) ? tSubjects(key) : key;
+    if (!tSubjects.has(key)) return key;
+
+    try {
+      // Используем .raw(), чтобы получить чистые данные из JSON (строку или объект)
+      const rawValue = tSubjects.raw(key);
+
+      // Если это узбекский вариант (объект, у которого есть поле name)
+      if (rawValue && typeof rawValue === "object" && "name" in rawValue) {
+        return rawValue.name; // Возвращаем только "matematika"
+      }
+
+      // Если это русский или английский (где в JSON сразу лежит строка)
+      return tSubjects(key);
+    } catch (e) {
+      // Фолбек на случай, если .raw() выдаст ошибку
+      return tSubjects(key);
+    }
   };
 
   const supabase = createClient();
+  const tErrors = useTranslations("RegistrationModal");
   const t = useTranslations("profiles");
   const { user, loading, refreshUser } = useUser();
   const [subjects, setSubjects] = useState<string[]>([]);
@@ -46,8 +67,17 @@ const SubjectPicker = () => {
       });
   }, [subjects, query, selectedSubjects]);
 
+  const subjectLengthChecker = (subject: string) => {
+    if (subject.length >= 20) {
+      showAlert("error", tErrors("errors.subjectNameTooLong"));
+      return true;
+    }
+    return false;
+  };
+
   const addSubjectLocal = (subject: string) => {
     const trimmed = subject.trim();
+    if (subjectLengthChecker(trimmed)) return;
     if (trimmed && !selectedSubjects.includes(trimmed)) {
       addSubject(trimmed);
     }
@@ -88,7 +118,6 @@ const SubjectPicker = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
 
   return (
     <div className="flex-1 space-y-4" ref={containerRef}>

@@ -1,8 +1,8 @@
+"use client";
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { createClient } from "../../utils/supabase/client";
 import { useStudentAnnouncement } from "../../context/StudentAnnouncementContext";
-import { useDebounce } from "../../app/functions/useDebounce";
 
 const supabase = createClient();
 
@@ -28,19 +28,42 @@ const parsePrice = (priceStr: any): number => {
 
 const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
   const t = useTranslations("StudentFilter");
-  const { setAnnouncements, originalAnnouncements } = useStudentAnnouncement();
+  const tSubjects = useTranslations("subjects_list");
+
+  // Достаем новые методы управления из обновленного контекста
+  const { setGlobalFilters, globalFilters, originalAnnouncements } =
+    useStudentAnnouncement();
   const [subjects, setSubjects] = useState<string[]>([]);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  const tSubjects = useTranslations("subjects_list");
-
   const getTranslation = (key: string) => {
-    return tSubjects.has(key) ? tSubjects(key) : key;
+    if (!tSubjects.has(key)) return key;
+
+    try {
+      // Используем .raw(), чтобы получить чистые данные из JSON (строку или объект)
+      const rawValue = tSubjects.raw(key);
+
+      // Если это узбекский вариант (объект, у которого есть поле name)
+      if (rawValue && typeof rawValue === "object" && "name" in rawValue) {
+        return rawValue.name; // Возвращаем только "matematika"
+      }
+
+      // Если это русский или английский (где в JSON сразу лежит строка)
+      return tSubjects(key);
+    } catch (e) {
+      // Фолбек на случай, если .raw() выдаст ошибку
+      return tSubjects(key);
+    }
   };
 
-  const debouncedFilters = useDebounce(filters, 300);
+  // Синхронизируем локальные фильтры с уже примененными в системе при открытии
+  useEffect(() => {
+    if (globalFilters) {
+      setFilters(globalFilters);
+    }
+  }, [globalFilters, setFilters]);
 
-  // 1. Загрузка списка предметов для выпадающего списка
+  // Загрузка списка предметов для datalist
   useEffect(() => {
     const fetchSubjects = async () => {
       const { data, error } = await supabase.from("subjects").select("subject");
@@ -53,45 +76,38 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
     fetchSubjects();
   }, []);
 
-  const [translatedSubjects, setTranslatedSubjects] = useState<string[]>([]);
-  useEffect(() => {
-    const tempArray: string[] = [];
-    for (let i = 0; i < subjects.length; i++) {
-      const translation = getTranslation(subjects[i]);
-      tempArray.push(translation);
-    }
-    setTranslatedSubjects(tempArray);
+  const translatedSubjects = useMemo(() => {
+    return subjects.map((sub) => getTranslation(sub));
   }, [subjects]);
 
-  // 2. Логика фильтрации и сортировки (Вынесена в useMemo для производительности)
-  const filteredResult = useMemo(() => {
+  const previewCount = useMemo(() => {
+    if (!originalAnnouncements) return 0;
+
     let result = originalAnnouncements.filter((ad: any) => {
-      const matchSubject = debouncedFilters.subject
-        ? ad.subject
-            ?.toLowerCase()
-            .trim()
-            .includes(debouncedFilters.subject.toLowerCase().trim())
-        : true;
-      const matchPrice = parsePrice(ad.price) <= debouncedFilters.maxPrice;
-      return matchSubject && matchPrice;
+      const matchPrice = parsePrice(ad.priceRaw) <= filters.maxPrice;
+
+      if (filters.subject) {
+        const userSearch = filters.subject.toLowerCase().trim();
+        if (!ad.subjectKey) return false;
+
+        return ad.subjectKey
+          .split(",")
+          .map((s: string) => s.trim())
+          .some((key: string) => {
+            const systemKeyMatches = key.toLowerCase().includes(userSearch);
+            const translatedMatches = tSubjects.has(key)
+              ? tSubjects(key).toLowerCase().includes(userSearch)
+              : key.toLowerCase().includes(userSearch);
+            return systemKeyMatches || translatedMatches;
+          });
+      }
+      return matchPrice;
     });
 
-    if (debouncedFilters.sortByLikes) {
-      result = [...result].sort((a: any, b: any) => b.likes - a.likes);
-    } else if (debouncedFilters.sortAscPrice) {
-      result = [...result].sort(
-        (a: any, b: any) => parsePrice(a.price) - parsePrice(b.price),
-      );
-    } else if (debouncedFilters.sortDescPrice) {
-      result = [...result].sort(
-        (a: any, b: any) => parsePrice(b.price) - parsePrice(a.price),
-      );
-    }
+    return result.length;
+  }, [filters, originalAnnouncements, tSubjects]);
 
-    return result;
-  }, [debouncedFilters, originalAnnouncements]);
-
-  // 3. Закрытие панели при клике вне её
+  // Закрытие панели при клике вне её
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
@@ -106,25 +122,14 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
     setFilters((prev) => {
       const newFilters = { ...prev, [key]: value };
 
-      // Если включаем "Сначала дешевле", выключаем "Сначала дороже"
       if (key === "sortAscPrice" && value === true) {
         newFilters.sortDescPrice = false;
-      }
-
-      // Если включаем "Сначала дороже", выключаем "Сначала дешевле"
-      if (key === "sortDescPrice" && value === true) {
-        newFilters.sortAscPrice = false;
-      }
-
-      // Дополнительно: если включаем любую сортировку по цене,
-      // можно выключать сортировку по лайкам (если хочешь только один активный тип)
-      if (
-        (key === "sortAscPrice" || key === "sortDescPrice") &&
-        value === true
-      ) {
         newFilters.sortByLikes = false;
       }
-
+      if (key === "sortDescPrice" && value === true) {
+        newFilters.sortAscPrice = false;
+        newFilters.sortByLikes = false;
+      }
       if (key === "sortByLikes" && value === true) {
         newFilters.sortAscPrice = false;
         newFilters.sortDescPrice = false;
@@ -135,19 +140,24 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
   };
 
   const handleApplyFilters = () => {
-    setAnnouncements(filteredResult);
-    onClose?.();
+    if (typeof setGlobalFilters === "function") {
+      setGlobalFilters(filters); // Отправляем стейт в контекст, главный экран обновится
+      onClose?.();
+    }
   };
 
   const handleReset = () => {
-    setFilters({
+    const defaultFilters = {
       subject: "",
       maxPrice: 500000,
       sortByLikes: false,
       sortAscPrice: false,
       sortDescPrice: false,
-    });
-    setAnnouncements(originalAnnouncements);
+    };
+    setFilters(defaultFilters);
+    if (typeof setGlobalFilters === "function") {
+      setGlobalFilters(defaultFilters);
+    }
   };
 
   return (
@@ -202,7 +212,7 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
         </div>
       </div>
 
-      {/* Сортировка (Чекбоксы) */}
+      {/* Сортировка */}
       <div className="space-y-2 mb-6">
         {[
           {
@@ -253,7 +263,7 @@ const FilterPanel = ({ filters, setFilters, onClose }: FilterPanelProps) => {
       {/* Счетчик результатов в реальном времени */}
       <div className="mt-4 pt-4 border-t border-gray-50 flex justify-center">
         <p className="text-xs sm:text-sm font-medium text-gray-500">
-          {t("found_lessons", { count: filteredResult.length })}
+          {t("found_lessons", { count: previewCount })}
         </p>
       </div>
     </div>

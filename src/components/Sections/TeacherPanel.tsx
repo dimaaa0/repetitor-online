@@ -87,19 +87,19 @@ const TeacherPanel = () => {
     contacts: string,
   ) {
     if (subjects.length === 0) {
-      showAlert("error", "Пожалуйста, выберите хотя бы один предмет");
+      showAlert("error", t("error_select_subject"));
       return false;
     }
     if (!price) {
-      showAlert("error", "Пожалуйста, введите цену");
+      showAlert("error", t("error_enter_price"));
       return false;
     }
     if (!description || description.trim().length < 10) {
-      showAlert("error", "Пожалуйста, введите описание (минимум 10 символов)");
+      showAlert("error", t("error_enter_description"));
       return false;
     }
     if (!contacts) {
-      showAlert("error", "Пожалуйста, укажите ваши контакты ");
+      showAlert("error", t("error_enter_contacts"));
       return false;
     }
     return true;
@@ -200,10 +200,10 @@ const TeacherPanel = () => {
     ]);
 
     if (adRes.error || profileRes.error) {
-      showAlert("error", "Ошибка при сохранении данных");
+      showAlert("error", t("error_save_data"));
     } else {
       setHasAd(true);
-      showAlert("success", "Все данные успешно сохранены!");
+      showAlert("success", t("success_data_saved"));
     }
 
     setIsPublishing(false);

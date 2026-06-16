@@ -75,7 +75,6 @@ export default function scheduleReminder() {
     }
   };
 
-
   if (!showReminder) return null;
 
   return (

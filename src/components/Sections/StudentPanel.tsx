@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "../../utils/supabase/client";
 import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/StudentSubjectContext";
 import StudentSubjectPicker from "../UI/StudentSubjectPicker";
-import { Check, CircleUser, Loader2, Search, XCircle } from "lucide-react";
+import { Check, Loader2, XCircle } from "lucide-react";
 import Planner from "../../components/UI/Planner";
 import { useTranslations } from "next-intl";
 
@@ -22,7 +22,6 @@ const StudentPanel = () => {
   const supabase = createClient();
 
   const t = useTranslations("profiles");
-  const tSubjects = useTranslations("subjects_list");
 
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
@@ -40,16 +39,6 @@ const StudentPanel = () => {
     setTimeout(() => setAlert(null), 3000);
   };
 
-  // const [translatedSubjects, setTranslatedSubjects] = useState<string[]>([]);
-  // useEffect(() => {
-  //   const tempArray: string[] = [];
-  //   for (let i = 0; i < selectedSubjects.length; i++) {
-  //     const translation = getTranslation(selectedSubjects[i]);
-  //     tempArray.push(translation);
-  //   }
-  //   setTranslatedSubjects(tempArray);
-  // }, [selectedSubjects]);
-
   const checkEmptyFields = (
     title: string,
     selectedSubjects: string[],
@@ -58,29 +47,23 @@ const StudentPanel = () => {
     contacts: string,
   ) => {
     if (!title || title.trim().length < 10) {
-      showAlert(
-        "error",
-        "Пожалуйста, укажите, кого вы ищете (минимум 10 символов)",
-      );
+      showAlert("error", t("error_title_too_short"));
       return false;
     }
     if (selectedSubjects.length === 0) {
-      showAlert("error", "Пожалуйста, выберите хотя бы один предмет");
+      showAlert("error", t("error_select_subject"));
       return false;
     }
     if (!price) {
-      showAlert("error", "Пожалуйста, введите бюджет");
+      showAlert("error", t("error_enter_budget"));
       return false;
     }
     if (!description || description.trim().length < 10) {
-      showAlert(
-        "error",
-        "Пожалуйста, опишите свои цели и пожелания (минимум 10 символов)",
-      );
+      showAlert("error", t("error_enter_goals_description"));
       return false;
     }
     if (!contacts) {
-      showAlert("error", "Пожалуйста, укажите ваши контакты ");
+      showAlert("error", t("error_enter_contacts"));
       return false;
     }
     return true;
@@ -203,7 +186,7 @@ const StudentPanel = () => {
   const handlePublishAd = async () => {
     // 1. Проверяем авторизацию сразу, чтобы избежать падения на user.id
     if (!user?.id) {
-      showAlert("error", "Пользователь не авторизован");
+      showAlert("error", t("error_not_authorized"));
       return;
     }
 
@@ -245,14 +228,12 @@ const StudentPanel = () => {
       setHasAd(true);
       showAlert(
         "success",
-        hasAd
-          ? "Данные успешно обновлены!"
-          : "Объявление успешно опубликовано!",
+        hasAd ? t("success_data_updated") : t("success_ad_published"),
       );
     } catch (error: any) {
       // 7. Ловим любую ошибку из Supabase и выводим её пользователю
       console.error("Ошибка при публикации:", error);
-      showAlert("error", error.message || "Ошибка при сохранении данных");
+      showAlert("error", error.message || t("error_save_data"));
     } finally {
       setIsPublishing(false);
     }
@@ -284,6 +265,22 @@ const StudentPanel = () => {
 
     fetchInitialSchedule();
   }, [user?.id, supabase]);
+
+  const [tooManySymbols, setTooManySymbols] = useState(false);
+
+  useEffect(() => {
+    if (title.length > 500 || description.length > 1000) {
+      setTooManySymbols(true);
+    } else {
+      setTooManySymbols(false);
+    }
+  }, [title, description]);
+
+  useEffect(() => {
+    if (tooManySymbols) {
+      showAlert("error", t("error_comment_too_long"));
+    }
+  }, [tooManySymbols]);
 
   return (
     <div>
@@ -364,7 +361,7 @@ const StudentPanel = () => {
           </div>
         </div>
 
-        <StudentSubjectPicker />
+        <StudentSubjectPicker showAlert={showAlert} />
 
         <div>
           <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
@@ -432,7 +429,7 @@ const StudentPanel = () => {
             // Ваш исходный UI кнопки для обычного пользователя
             <button
               onClick={handlePublishAd}
-              disabled={isPublishing}
+              disabled={isPublishing || tooManySymbols}
               className="w-full bg-blue-600 cursor-pointer hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-[20px] font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.97] flex items-center justify-center gap-2"
             >
               {isPublishing ? (

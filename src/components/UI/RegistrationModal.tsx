@@ -15,6 +15,7 @@ import { useModal } from "../../context/ModalContext";
 import { createClient } from "../../utils/supabase/client";
 import { Session, AuthChangeEvent } from "@supabase/supabase-js";
 import getFriendlyError from "../../app/functions/errorTranslator";
+import PrivacyPolicyPage from "../UI/PrivatePolicy";
 
 export default function SignInForm() {
   const supabase = createClient();
@@ -29,6 +30,7 @@ export default function SignInForm() {
   const [surname, setSurname] = useState("");
   const [role, setRole] = useState("Student");
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isAgreed, setIsAgreed] = useState(false);
 
   const [alert, setAlert] = useState<{
     type: "success" | "error" | "info";
@@ -73,7 +75,7 @@ export default function SignInForm() {
       showAlert("success", t("alert_welcome_back"));
       closeModal();
     } catch (error: any) {
-      const errorMessage = getFriendlyError(error.message);
+      const errorMessage = getFriendlyError(error.message, t);
       showAlert("error", errorMessage);
     } finally {
       setLoading(false);
@@ -84,7 +86,7 @@ export default function SignInForm() {
     if (isOpen) {
       // 1. Переносим пользователя на самый верх
       window.scrollTo({ top: 0, behavior: "smooth" });
-      
+
       // 2. Блокируем скролл основного контента
       document.body.style.overflow = "hidden";
     } else {
@@ -128,33 +130,15 @@ export default function SignInForm() {
       if (error) throw error;
 
       if (data.user && data.user.identities?.length === 0) {
-        showAlert(
-          "error",
-          t("alert_email_already_registered"),
-        );
+        showAlert("error", t("alert_email_already_registered"));
         setIsLogin(true);
         return;
       }
 
-      // if (data.user?.id) {
-      //   const { error: profileError } = await supabase
-      //     .from("profiles")
-      //     .insert({
-      //       id: data.user.id,
-      //       name: name,
-      //       surname: surname,
-      //       role: role,
-      //     });
-
-      //   if (profileError) {
-      //     console.error("Ошибка при создании профиля:", profileError, profileError.details, profileError.message);
-      //   }
-      // }
-
       showAlert("success", t("alert_check_email"));
       setIsLogin(true);
     } catch (error: any) {
-      const errorMessage = getFriendlyError(error.message);
+      const errorMessage = getFriendlyError(error.message, t);
       showAlert("error", errorMessage);
     } finally {
       setLoading(false);
@@ -185,6 +169,8 @@ export default function SignInForm() {
     setLoading(false);
   };
 
+  const [privatePolicy, setPrivatePolicy] = useState(false);
+
   if (!isOpen) return null;
 
   return (
@@ -210,12 +196,13 @@ export default function SignInForm() {
           </div>
         </div>
       )}
+      {privatePolicy && (
+        <PrivacyPolicyPage setPrivatePolicy={setPrivatePolicy} />
+      )}
       <div
         className="w-full max-w-[440px] bg-white rounded-[2rem] shadow-2xl border border-slate-100 relative overflow-hidden flex flex-col transition-all"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Декоративный элемент сверху */}
-
         <button
           className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all z-10"
           onClick={closeModal}
@@ -297,6 +284,7 @@ export default function SignInForm() {
                     />
                   </div>
                 </div>
+                <div className="flex items-start gap-2.5 mb-5 px-1"></div>
               </div>
             )}
 
@@ -350,24 +338,73 @@ export default function SignInForm() {
                 />
               </div>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-blue-600 shadow-xl shadow-slate-200 hover:shadow-blue-100 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-70 cursor-pointer mt-4"
-            >
-              {loading ? (
-                <Loader2 className="animate-spin" size={20} />
-              ) : (
-                <>
-                  {isLogin ? t("btn_login") : t("btn_create_account")}
-                  <ArrowRight
-                    size={18}
-                    className="group-hover:translate-x-1 transition-transform"
-                  />
-                </>
-              )}
-            </button>
+            {isLogin ? (
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full bg-slate-900 text-white font-black py-4 rounded-2xl ${isAgreed ? "hover:bg-blue-600 cursor-pointer" : ""} shadow-xl shadow-slate-200 hover:shadow-blue-100 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-70  mt-4`}
+              >
+                {loading ? (
+                  <Loader2 className="animate-spin" size={20} />
+                ) : (
+                  <>
+                    {t("btn_login")}
+                    <ArrowRight
+                      size={18}
+                      className={`${isAgreed && "group-hover:translate-x-1"} transition-transform`}
+                    />
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={loading || !isAgreed}
+                className={`w-full bg-slate-900 text-white font-black py-4 rounded-2xl ${isAgreed ? "hover:bg-blue-600 cursor-pointer" : ""} shadow-xl shadow-slate-200 hover:shadow-blue-100 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-70  mt-4`}
+              >
+                {loading ? (
+                  <Loader2 className="animate-spin" size={20} />
+                ) : (
+                  <>
+                    {t("btn_create_account")}
+                    <ArrowRight
+                      size={18}
+                      className={`${isAgreed && "group-hover:translate-x-1"} transition-transform`}
+                    />
+                  </>
+                )}
+              </button>
+            )}
+            {!isLogin && (
+              <div className="flex items-start gap-2.5 mb-5 px-1">
+                <input
+                  id="privacy"
+                  type="checkbox"
+                  checked={isAgreed}
+                  onChange={(e) => setIsAgreed(e.target.checked)}
+                  className="w-4 h-4 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer transition-colors"
+                  required
+                />
+                <label
+                  htmlFor="privacy"
+                  className="text-xs text-gray-500 leading-snug cursor-pointer select-none"
+                >
+                  Я принимаю условия{" "}
+                  <span
+                    className="text-blue-600 hover:underline font-medium transition-all cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault(); // Стопаем стандартный клик лейбла, чтобы чекбокс не прыгал
+                      e.stopPropagation(); // Изолируем событие
+                      setPrivatePolicy(true);
+                      console.log("Открываем политику");
+                    }}
+                  >
+                    Политики конфиденциальности
+                  </span>{" "}
+                  и даю согласие на обработку персональных данных.
+                </label>
+              </div>
+            )}
           </form>
 
           <div className="mt-8 text-center pt-6 border-t border-slate-50">

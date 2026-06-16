@@ -20,7 +20,6 @@ const TutorsPageWithAnimation = () => {
   });
 
   const [openFilter, setOpenFilter] = useState(false);
-  const [showNotify, setShowNotify] = useState(false);
 
   const toggleFilter = () => setOpenFilter(!openFilter);
 

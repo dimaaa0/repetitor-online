@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ModalProvider } from "../../context/ModalContext";
 import "../globals.css";
-import Header from "../../components/Layout/Header";
-import Footer from "../../components/Layout/Footer";
 import { UserProvider } from "../../context/UserContext";
 import QueryProvider from "../../providers/QueryProvider";
 import { TeacherSubjectProvider } from "../../context/TeacherSubjectContext";
@@ -11,10 +9,9 @@ import { StudentSubjectProvider } from "../../context/StudentSubjectContext";
 import { StudentAnnouncementProvider } from "../../context/StudentAnnouncementContext";
 import { TutorAnnouncementProvider } from "../../context/TeacherAnnouncementContext";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-// Убрали неиспользуемый импорт React
-import ScheduleReminder from "../../components/UI/ScheduleReminder";
+import LocaleShell from "../../components/Layout/LocaleShell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,11 +23,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Поиск репетиторов и учеников в Узбекистане - Repetitor Online",
-  description:
-    "Платформа для образования в Узбекистане: найдите репетитора или свежие вакансии для учителей и преподавателей. Разместите резюме или объявление о поиске учеников. Все предметы и города Узбекистана.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>; // 1. Меняем тип на Promise
+}): Promise<Metadata> {
+  const { locale } = await params; // 2. Добавляем await здесь
+  const t = await getTranslations("Layout");
+
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default async function LocaleLayout({
   children,
@@ -61,10 +66,7 @@ export default async function LocaleLayout({
                   <TutorAnnouncementProvider>
                     <StudentAnnouncementProvider>
                       <ModalProvider>
-                        <Header />
-                        <ScheduleReminder />
-                        <main className="flex-grow">{children}</main>
-                        <Footer />
+                        <LocaleShell>{children}</LocaleShell>
                       </ModalProvider>
                     </StudentAnnouncementProvider>
                   </TutorAnnouncementProvider>

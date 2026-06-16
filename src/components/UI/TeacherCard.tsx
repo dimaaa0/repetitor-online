@@ -37,7 +37,19 @@ const TeacherCard: React.FC<TeacherCardProps> = ({
   const { openModal } = useModal();
 
   const getTranslation = (key: string) => {
-    return tSubjects.has(key) ? tSubjects(key) : key;
+    if (!tSubjects.has(key)) return key;
+
+    try {
+      const rawValue = tSubjects.raw(key);
+
+      if (rawValue && typeof rawValue === "object" && "name" in rawValue) {
+        return rawValue.name;
+      }
+
+      return tSubjects(key);
+    } catch (e) {
+      return tSubjects(key);
+    }
   };
 
   const [alert, setAlert] = useState<{

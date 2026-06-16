@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "../../../../../../utils/supabase/client"; // Укажите ваш путь к клиенту
 import { Check, Pencil, X, Save, Trash2, XCircle } from "lucide-react";
 import { useUser } from "../../../../../../context/UserContext";
@@ -32,6 +33,7 @@ export default function CommentsList({
   const [isSaving, setIsSaving] = useState(false);
 
   const { user } = useUser();
+  const t = useTranslations("CommentsList");
 
   const sortedComments = [...comments].sort((a, b) => {
     if (a.user_id === user?.id) return -1;
@@ -71,11 +73,11 @@ export default function CommentsList({
     const { error } = await query;
 
     if (error) {
-      showAlert("error", "Ошибка при обновлении.");
+      showAlert("error", t("error_update_comment"));
       setIsSaving(false);
     } else {
       setTimeout(() => {
-        showAlert("success", "Отзыв обновлен");
+        showAlert("success", t("success_comment_updated"));
         setTimeout(() => window.location.reload(), 500);
       }, 2000);
     }
@@ -112,9 +114,9 @@ export default function CommentsList({
 
     if (error) {
       console.error("Error deleting:", error);
-      showAlert("error", "Не удалось удалить комментарий");
+      showAlert("error", t("error_delete_comment"));
     } else {
-      showAlert("success", "Удалено");
+      showAlert("success", t("success_deleted"));
       setTimeout(() => window.location.reload(), 2000);
     }
   };
@@ -122,7 +124,7 @@ export default function CommentsList({
   if (comments.length === 0) {
     return (
       <p className="text-slate-400 italic text-center py-10">
-        Отзывов пока нет. Будьте первым!
+        {t("empty_comments")}
       </p>
     );
   }
@@ -162,17 +164,16 @@ export default function CommentsList({
       {openConfirmModal && (
         <div className="fixed inset-0 h-full z-[9999] flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-lg p-6 w-full max-w-sm mx-4">
-            <h3 className="text-lg font-bold mb-4">Подтвердите удаление</h3>
+            <h3 className="text-lg font-bold mb-4">{t("ConfirmDeletion")}</h3>
             <p className="text-slate-600 mb-6">
-              Вы уверены, что хотите удалить этот отзыв? Это действие нельзя
-              будет отменить.
+              {t("DeleteConfirmationMessage")}
             </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={closeDeleteConfirm}
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-slate-500 font-semibold"
               >
-                Отмена
+                {t("Cancel")}
               </button>
               <button
                 onClick={() => {
@@ -181,7 +182,7 @@ export default function CommentsList({
                 }}
                 className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-semibold"
               >
-                Удалить
+                {t("Delete")}
               </button>
             </div>
           </div>
@@ -221,7 +222,7 @@ export default function CommentsList({
                     </h4>
                     {isMyComment && (
                       <span className="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded-md font-bold">
-                        Вы
+                       {t("you_title")}
                       </span>
                     )}
                   </div>
@@ -249,7 +250,7 @@ export default function CommentsList({
                     navigator.clipboard.writeText(comment.user_id);
                     // Опционально: можно добавить здесь toast-уведомление
                   }}
-                  title="Нажмите, чтобы скопировать ID"
+                  title={t("copyIdHint")}
                   className="cursor-pointer active:scale-95 transition-transform bot-0 text-[11px] sm:text-[12px] bg-gray-100 hover:bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-md font-bold"
                 >
                   {comment.user_id}
@@ -264,7 +265,7 @@ export default function CommentsList({
                   onChange={(e) => setEditContent(e.target.value)}
                   className="w-full min-h-[180px] p-2 rounded-lg border hyphens-auto text-justify border-blue-200 bg-white text-[15px] outline-none"
                 />
-                <div className="flex flex-col-reverse sm:flex-row justify-end gap-1.5">
+                <div className="flex flex-row justify-end gap-1.5">
                   <button
                     onClick={() => setEditingId(null)}
                     className="py-2 mr-2 text-[11px] bg-gray-100 hover:bg-gray-200 duration-300 p-2 px-4 rounded-lg cursor-pointer font-semibold text-slate-500"
