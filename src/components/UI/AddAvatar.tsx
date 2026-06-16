@@ -21,7 +21,7 @@ const AddAvatar = ({ uploadAvatar }: AddAvatarProps) => {
     }
   };
 
-    const t = useTranslations("profiles");
+  const t = useTranslations("profiles");
 
   return (
     <div className="flex items-start gap-6 flex-col sm:flex-row">
@@ -29,7 +29,7 @@ const AddAvatar = ({ uploadAvatar }: AddAvatarProps) => {
         {/* Скрытый настоящий инпут */}
         <input
           type="file"
-          accept="image/*"
+          accept="image/jpeg, image/png, image/webp, image/avif"
           ref={fileInputRef}
           onChange={handleFileChange}
           className="hidden"

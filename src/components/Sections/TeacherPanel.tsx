@@ -387,7 +387,6 @@ const TeacherPanel = () => {
               </div>
             </div>
 
-            {/* Кнопка вызова модалки */}
             {!isSubscribed ? (
               <div className="mb-0 group">
                 <button
@@ -449,7 +448,7 @@ const TeacherPanel = () => {
 
       <div className="space-y-8 bg-white py-6 mt-6 px-4 sm:px-8 rounded-[32px] shadow-md border border-gray-100 w-full max-w-full overflow-hidden block">
         <h1 className="text-[14px] font-black text-gray-500 uppercase tracking-[0.1em] mb-8 flex items-center gap-2">
-          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> 
+          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
           {t("title_your_advertisement")}
         </h1>
 

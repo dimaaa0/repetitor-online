@@ -75,7 +75,10 @@ export default function SignInForm() {
       showAlert("success", t("alert_welcome_back"));
       closeModal();
     } catch (error: any) {
-      const errorMessage = getFriendlyError(error.message, t);
+        const errorMessage = getFriendlyError(
+          error.message,
+          t as unknown as (id: string, values?: Record<string, unknown>) => string,
+        );
       showAlert("error", errorMessage);
     } finally {
       setLoading(false);
@@ -138,7 +141,10 @@ export default function SignInForm() {
       showAlert("success", t("alert_check_email"));
       setIsLogin(true);
     } catch (error: any) {
-      const errorMessage = getFriendlyError(error.message, t);
+      const errorMessage = getFriendlyError(
+        error.message,
+        t as unknown as (id: string, values?: Record<string, unknown>) => string,
+      );
       showAlert("error", errorMessage);
     } finally {
       setLoading(false);
@@ -174,10 +180,10 @@ export default function SignInForm() {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute min-h-screen inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+    <div className="absolute min-h-screen inset-0 z-9999 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
       {/* Кастомное уведомление */}
       {alert && (
-        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[10000] animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-10000 animate-in fade-in slide-in-from-top-4 duration-300">
           <div
             className={`px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 font-bold text-sm
     ${
@@ -200,7 +206,7 @@ export default function SignInForm() {
         <PrivacyPolicyPage setPrivatePolicy={setPrivatePolicy} />
       )}
       <div
-        className="w-full max-w-[440px] bg-white rounded-[2rem] shadow-2xl border border-slate-100 relative overflow-hidden flex flex-col transition-all"
+        className="w-full max-w-110 bg-white rounded-4xl shadow-2xl border border-slate-100 relative overflow-hidden flex flex-col transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         <button

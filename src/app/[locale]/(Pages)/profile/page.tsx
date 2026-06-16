@@ -253,17 +253,17 @@ const Profile = () => {
   let panel;
 
   if (user.role === "Tutor") {
-    panel = <TeacherPanel  />;
+    panel = <TeacherPanel />;
   } else if (user.role === "Admin") {
     panel = <AdminPanel />;
   } else {
-    panel = <StudentPanel showAlert={showAlert}/>;
+    panel = <StudentPanel showAlert={showAlert} />;
   }
   return (
     <div className="bg-gray-50 py-6 px-0 sm:px-4 lg:px-8">
-      <div className="max-w-[1250px] px-2 sm:px-6 mx-auto">
+      <div className="max-w-312.5 px-2 sm:px-6 mx-auto">
         {alert && (
-          <div className="fixed top-6 left-0 right-0 z-[9999] flex justify-center px-4 pointer-events-none">
+          <div className="fixed top-6 left-0 right-0 z-9999 flex justify-center px-4 pointer-events-none">
             <div
               className={`
         pointer-events-auto
@@ -296,7 +296,7 @@ const Profile = () => {
             onClick={() => {
               setConfirmation(false);
             }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-9999 flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm"
           >
             <div
               onClick={(e) => e.stopPropagation()}
@@ -323,7 +323,7 @@ const Profile = () => {
                   className="w-full sm:w-1/2 px-4 py-2.5 bg-[#C92222] text-white text-sm font-medium rounded-xl 
                    hover:bg-[#b01e1e] active:scale-[0.97] transition-all shadow-md shadow-red-200 cursor-pointer"
                 >
-                  {t("btn_confirm")} 
+                  {t("btn_confirm")}
                 </button>
 
                 <button
@@ -333,7 +333,7 @@ const Profile = () => {
                   className="w-full sm:w-1/2 px-4 py-2.5 bg-gray-50 text-gray-700 text-sm font-medium rounded-xl 
                    hover:bg-gray-100 active:scale-[0.97] transition-all cursor-pointer border border-gray-200"
                 >
-                  {t("btn_cancel")} 
+                  {t("btn_cancel")}
                 </button>
               </div>
             </div>
@@ -364,7 +364,7 @@ const Profile = () => {
                   </div>
                 )}
               </div>
-              {user.role === "Tutor" && isEditing && (
+              {user.role === "Tutor" && isEditing && user.is_subscribed && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-2xl animate-in fade-in zoom-in duration-200">
                   <AddAvatar uploadAvatar={handleFileSelect} />
                 </div>
@@ -383,7 +383,7 @@ const Profile = () => {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full focus:bg-blue-50 transition-colors"
-                      placeholder={t("label_first_name")} 
+                      placeholder={t("label_first_name")}
                     />
                     <input
                       type="text"
@@ -392,7 +392,7 @@ const Profile = () => {
                         setFormData({ ...formData, surname: e.target.value })
                       }
                       className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-blue-50/30 px-2 py-1 rounded-t-md w-full focus:bg-blue-50 transition-colors"
-                      placeholder={t("label_last_name")} 
+                      placeholder={t("label_last_name")}
                     />
                   </div>
                   <div className="flex justify-center sm:justify-start my-1">
@@ -407,9 +407,13 @@ const Profile = () => {
                     : "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                 }`}
                     >
-                      <span className="mr-2 italic opacity-70">{t("label_role")} </span>
+                      <span className="mr-2 italic opacity-70">
+                        {t("label_role")}{" "}
+                      </span>
                       <span className="uppercase">
-                        {formData.role === "Tutor" ? t("role_tutor") : t("role_student") }
+                        {formData.role === "Tutor"
+                          ? t("role_tutor")
+                          : t("role_student")}
                       </span>
                     </button>
                   </div>
@@ -441,8 +445,8 @@ const Profile = () => {
                       : user.role === "Admin"
                         ? t("role_admin")
                         : user.role === "Tutor"
-                          ? t("role_tutor") 
-                          : t("role_student") }
+                          ? t("role_tutor")
+                          : t("role_student")}
                   </span>
                 </div>
               )}
@@ -502,7 +506,7 @@ const Profile = () => {
              border border-red-400 bg-transparent text-red-500 hover:bg-red-400 hover:text-white hover:border-red-400 cursor-pointer"
           >
             <LogOut className="h-5 w-5" />
-            {t("btn_logout")} 
+            {t("btn_logout")}
           </button>
         </div>
       </div>

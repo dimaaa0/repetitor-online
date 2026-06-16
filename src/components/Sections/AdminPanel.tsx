@@ -256,7 +256,7 @@ const AdminPanel = () => {
   return (
     <div className="min-h-screen bg-gray-50/50 py-2 ">
       {alert && (
-        <div className="fixed top-6 left-0 right-0 z-[9999] flex justify-center px-4 pointer-events-none">
+        <div className="fixed top-6 left-0 right-0 z-9999 flex justify-center px-4 pointer-events-none">
           <div
             className={`
         pointer-events-auto
@@ -284,13 +284,13 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
-      <div className="max-w-[1250px] mx-auto ">
+      <div className="max-w-312.5 mx-auto ">
         {/* Шапка панели */}
 
         <div className="grid w-full  gap-6">
           {/* ЛЕВАЯ КОЛОНКА: Форма активации */}
           <div className=" space-y-8">
-            <section className="bg-white border border-gray-100 rounded-[32px] p-6 md:p-10 shadow-xl shadow-blue-900/5">
+            <section className="bg-white border border-gray-100 rounded-4xl p-6 md:p-10 shadow-xl shadow-blue-900/5">
               <div className="flex items-center gap-4 mb-8">
                 <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-600/30">
                   <CreditCard size={28} />
@@ -373,7 +373,7 @@ const AdminPanel = () => {
           {/* ПРАВАЯ КОЛОНКА: Аналитика и Отчетность */}
           <div className="space-y-6">
             {/* Основной виджет дохода */}
-            <div className="bg-white border border-gray-100 rounded-[32px] p-6 shadow-xl shadow-blue-900/5">
+            <div className="bg-white border border-gray-100 rounded-4xl p-6 shadow-xl shadow-blue-900/5">
               <div className="flex items-center justify-between mb-6">
                 <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
                   <Activity
@@ -421,7 +421,7 @@ const AdminPanel = () => {
             </div>
 
             {/* Детализация по периодам */}
-            <div className="bg-white border border-gray-100 rounded-[32px] p-6 shadow-sm">
+            <div className="bg-white border border-gray-100 rounded-4xl p-6 shadow-sm">
               <h3 className="font-bold text-gray-800 mb-5 flex items-center gap-2">
                 <Users size={18} className="text-blue-500" />{" "}
                 {t("demandStatistics")}
@@ -429,7 +429,7 @@ const AdminPanel = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {/* Карточка 1: Процент подписчиков */}
-                <div className="bg-gray-50/50 border border-gray-100 rounded-[24px] p-6">
+                <div className="bg-gray-50/50 border border-gray-100 rounded-3xl p-6">
                   <p className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">
                     {t("subscribedUsersLabel")}
                   </p>
@@ -441,7 +441,7 @@ const AdminPanel = () => {
                 </div>
 
                 {/* Карточка 2: Новые пользователи */}
-                <div className="bg-gray-50/50 border border-gray-100 rounded-[24px] p-6">
+                <div className="bg-gray-50/50 border border-gray-100 rounded-3xl p-6">
                   <p className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">
                     {t("newCustomersLabel")}
                   </p>
@@ -461,7 +461,7 @@ const AdminPanel = () => {
                 <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
                   {t("transactionHistory")}
                 </h4>
-                <div className="space-y-4 max-h-[400px]  overflow-y-auto no-scrollbar pr-2">
+                <div className="space-y-4 max-h-100  overflow-y-auto no-scrollbar pr-2">
                   {transactions.map((tx: any) => (
                     <div
                       key={tx.id}

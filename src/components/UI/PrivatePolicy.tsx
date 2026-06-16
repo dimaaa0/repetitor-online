@@ -9,7 +9,7 @@ export default function PrivacyPolicyPage({
   setPrivatePolicy,
 }: PrivacyPolicyPageProps) {
   return (
-    <div className="fixed inset-0 z-[9999] overflow-y-auto bg-gray-50 text-gray-800 font-sans antialiased selection:bg-blue-100">
+    <div className="fixed inset-0 z-9999 overflow-y-auto bg-gray-50 text-gray-800 font-sans antialiased selection:bg-blue-100">
       <main className="max-w-3xl mx-auto px-6 py-12 relative">
         
         <article className="bg-white border border-gray-200/60 rounded-2xl shadow-sm p-8 sm:p-10 relative">
@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage({
 
               <div className="grid sm:grid-cols-2 gap-3 pt-1">
                 <div className="p-4 bg-gray-50 border border-gray-100 rounded-xl">
-                  <h3 className="font-bold text-gray-900 text-sm mb-1 text-blue-600">
+                  <h3 className="font-bold text-sm mb-1 text-blue-600">
                     Если вы Репетитор:
                   </h3>
                   <p className="text-xs text-gray-500">
@@ -49,7 +49,7 @@ export default function PrivacyPolicyPage({
                   </p>
                 </div>
                 <div className="p-4 bg-gray-50 border border-gray-100 rounded-xl">
-                  <h3 className="font-bold text-gray-900 text-sm mb-1 text-green-600">
+                  <h3 className="font-bold text-sm mb-1 text-green-600">
                     Если вы Ученик:
                   </h3>
                   <p className="text-xs text-gray-500">

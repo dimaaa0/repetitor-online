@@ -78,8 +78,8 @@ export default function scheduleReminder() {
   if (!showReminder) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] max-w-md p-2 z-[9999] animate-fadeIn sm:left-auto sm:right-6 sm:translate-x-0">
-      <div className="w-full relative bg-white border border-slate-100 text-slate-800 py-5 px-6 rounded-[24px] flex flex-col gap-4 shadow-2xl shadow-slate-200/80">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] max-w-md p-2 z-9999 animate-fadeIn sm:left-auto sm:right-6 sm:translate-x-0">
+      <div className="w-full relative bg-white border border-slate-100 text-slate-800 py-5 px-6 rounded-3xl flex flex-col gap-4 shadow-2xl shadow-slate-200/80">
         {/* Иконка и текст */}
         <div className="flex items-start gap-3.5">
           <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600 shrink-0">
