@@ -402,7 +402,6 @@ export default function SignInForm() {
                       e.preventDefault(); // Стопаем стандартный клик лейбла, чтобы чекбокс не прыгал
                       e.stopPropagation(); // Изолируем событие
                       setPrivatePolicy(true);
-                      console.log("Открываем политику");
                     }}
                   >
                     {t("privacy_agreement_link")}
