@@ -51,6 +51,47 @@
     "loading": "yuklanmoqda...",
     "btn_okay": "Tushunarli"
   },
+  "PrivatePolicy": {
+    "close": "Yopish",
+    "closeDocument": "Hujjatni yopish",
+    "sections": {
+      "collection": {
+        "title": "Biz nimalarni to'playmiz va nima uchun?",
+        "intro": "Biz faqat sayt ishlashi uchun zarur bo'lgan ma'lumotlarni olamiz. Ortiqcha hech narsa yo'q:",
+        "tutorTitle": "Agar siz Repetitor bo'lsangiz:",
+        "tutorDesc": "Ism, familiya, telefon raqami yoki email (o'quvchilar bog'lanishi uchun), rasm (ixtiyoriy), tajriba haqida ma'lumot va dars jadvalingiz.",
+        "studentTitle": "Agar siz O'quvchi bo'lsangiz:",
+        "studentDesc": "Ismingiz, bog'lanish uchun telefon raqami yoki email, shuningdek kuchaytirmoqchi bo'lgan fanlaringiz.",
+        "noteLabel": "Texnik jihat:",
+        "note": "Hisobga kirish uchun biz ishonchli Supabase tizimidan foydalanamiz. U parollaringizni shifrlaydi, shuning uchun hatto bizning o'zimiz ham ularni bilmaymiz va ko'rmaymiz."
+      },
+      "usage": {
+        "title": "Biz bu ma'lumotlardan qanday foydalanamiz?",
+        "intro": "Bu juda aniq. Ma'lumotlar quyidagilar uchun kerak bo'ladi:",
+        "itemOne": "Sizga shaxsiy kabinet yaratish uchun.",
+        "itemTwo": "O'quvchi va repetitor bir-birini topishiga yordam berish uchun."
+      },
+      "sharing": {
+        "title": "Biz ma'lumotlarni boshqalar bilan ulashamizmi?",
+        "paragraphOne": "Yo'q. Biz telefon raqamingiz yoki emailingizni spam yoki reklama uchun hech kimga sotmaymiz va bermaymiz.",
+        "paragraphTwo": "Ularni faqat platforma ichidagi foydalanuvchilar ko'rishi mumkin (masalan, o'quvchi darsga yozilish uchun repetitor profilini ko'radi). Faqat O'zbekiston Respublikasi qonunlari rasmiy ravishda talab qilsa, bundan mustasno."
+      },
+      "security": {
+        "title": "Xavfsizlik va cookie fayllar",
+        "paragraphOne": "Bizning sayt HTTPS himoyalangan protokoli orqali ishlaydi — bu telefoningiz/kompyuteringiz va server o'rtasidagi barcha trafik shifrlanganini anglatadi.",
+        "paragraphTwo": "Biz cookie fayllardan ham foydalanamiz. Bular sayt allaqachon tizimga kirganingizni eslab qolishiga yordam beradigan kichik matn fayllaridir. Ularsiz har safar yangi sahifaga o'tganingizda parolni qayta kiritishingizga to'g'ri kelardi."
+      },
+      "rights": {
+        "title": "Siz ma'lumotlaringizni to'liq boshqarasiz",
+        "paragraphOne": "Siz o'z ma'lumotlaringizning to'liq egasisiz. Profil sozlamalarida istalgan payt ismingizni, telefoningizni yoki rasmingizni o'zgartira olasiz. Agar hisobingizni butunlay o'chirishga qaror qilsangiz, bizga yozing va bazadagi barcha ma'lumotlarni izsiz o'chiramiz."
+      },
+      "contact": {
+        "title": "Savollaringiz qoldimi?",
+        "intro": "Agar biror narsa tushunarsiz bo'lsa yoki profilingizni o'chirmoqchi bo'lsangiz, bizga Telegram orqali yozing — aloqadamiz:",
+        "telegramLabel": "Bog'lanish uchun Telegram:"
+      }
+    }
+  },
   "TeacherAnnouncements": {
     "Search": {
       "title": "O'qituvchi",
@@ -217,6 +258,9 @@
     "alert_check_email": "Tasdiqlash uchun elektron pochta manzilingizni tekshiring!",
     "alert_enter_email": "Iltimos, email kiriting",
     "alert_password_reset_sent": "Parol tiklash havolasi elektron pochtangizga yuborildi!",
+    "privacy_agreement_start": "Men quyidagi shartlarni qabul qilaman",
+    "privacy_agreement_link": "Maxfiylik siyosati",
+    "privacy_agreement_end": "va shaxsiy ma'lumotlarni qayta ishlashga rozilik beraman.",
     "errors": {
       "subjectNameTooLong": "Fan nomi juda uzun",
       "invalidLogin": "Noto'g'ri email yoki parol",

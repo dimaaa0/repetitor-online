@@ -395,7 +395,7 @@ export default function SignInForm() {
                   htmlFor="privacy"
                   className="text-xs text-gray-500 leading-snug cursor-pointer select-none"
                 >
-                  Я принимаю условия{" "}
+                  {t("privacy_agreement_start")} {" "}
                   <span
                     className="text-blue-600 hover:underline font-medium transition-all cursor-pointer"
                     onClick={(e) => {
@@ -405,9 +405,9 @@ export default function SignInForm() {
                       console.log("Открываем политику");
                     }}
                   >
-                    Политики конфиденциальности
+                    {t("privacy_agreement_link")}
                   </span>{" "}
-                  и даю согласие на обработку персональных данных.
+                  {t("privacy_agreement_end")}
                 </label>
               </div>
             )}

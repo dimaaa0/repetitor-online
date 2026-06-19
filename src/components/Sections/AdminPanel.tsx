@@ -86,28 +86,21 @@ const AdminPanel = () => {
       return;
     }
 
-    // --- ЛОГИКА ОБРАБОТКИ ---
-
-    // Карта для поиска самых первых оплат в истории
     const firstPaymentMap: any = {};
-    // Сет для уникальных пользователей именно В ЭТОМ месяце
     const currentMonthUniqueUsers = new Set();
 
     allPayments.forEach((payment) => {
       const payDate = new Date(payment.paid_at);
 
-      // Запоминаем самую первую оплату пользователя (для "Новых покупателей")
       if (!firstPaymentMap[payment.user_id]) {
         firstPaymentMap[payment.user_id] = payDate;
       }
 
-      // Если эта оплата была в выбранном месяце, добавляем в уникальные (для "С подпиской")
       if (payDate >= startOfMonth && payDate <= endOfMonth) {
         currentMonthUniqueUsers.add(payment.user_id);
       }
     });
 
-    // Фильтруем карту первых оплат, оставляя только те, что случились в этом месяце
     const newPayersCount = Object.values(firstPaymentMap).filter(
       (date: any) => date >= startOfMonth && date <= endOfMonth,
     ).length;
@@ -252,6 +245,8 @@ const AdminPanel = () => {
       setReason("");
     }
   };
+
+  if (user.role !== "Admin") return null;
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-2 ">

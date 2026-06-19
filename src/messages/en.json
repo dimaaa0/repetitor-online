@@ -51,6 +51,47 @@
     "loading": "loading...",
     "btn_okay": "Got it"
   },
+  "PrivatePolicy": {
+    "close": "Close",
+    "closeDocument": "Close document",
+    "sections": {
+      "collection": {
+        "title": "What do we collect and why?",
+        "intro": "We only collect the data without which the site simply cannot work. Nothing extra:",
+        "tutorTitle": "If you are a Tutor:",
+        "tutorDesc": "First name, last name, phone number or email (so students can contact you), photo (optional), experience details, and your lesson schedule.",
+        "studentTitle": "If you are a Student:",
+        "studentDesc": "Your name, phone number or email for contact, and the subjects you want to improve in.",
+        "noteLabel": "Technical note:",
+        "note": "For account login we use the reliable Supabase system. It encrypts your passwords so even we do not know or see them."
+      },
+      "usage": {
+        "title": "How do we use this data?",
+        "intro": "It is very straightforward. We need the data to:",
+        "itemOne": "Create your personal account.",
+        "itemTwo": "Help students and tutors find each other."
+      },
+      "sharing": {
+        "title": "Do we share data with anyone else?",
+        "paragraphOne": "No. We do not sell or share your phone number or email for spam or advertising.",
+        "paragraphTwo": "Only users inside the platform can see it (for example, a student can view a tutor's profile to book a lesson). The only exception is when the laws of the Republic of Uzbekistan officially require it."
+      },
+      "security": {
+        "title": "Security and cookies",
+        "paragraphOne": "Our site uses HTTPS, which means all traffic between your phone/computer and the server is encrypted.",
+        "paragraphTwo": "We also use cookies. These are tiny text files that help the site remember that you are already signed in. Without them, you would have to enter your password again every time you move to a new page."
+      },
+      "rights": {
+        "title": "You fully control your data",
+        "paragraphOne": "You are the rightful owner of your information. At any time in profile settings you can change your name, phone number, or photo. If you decide to delete your account completely, contact us and we will remove all data from the database without a trace."
+      },
+      "contact": {
+        "title": "Still have questions?",
+        "intro": "If anything is unclear or you want to delete your profile, just message us on Telegram - we are here:",
+        "telegramLabel": "Telegram contact:"
+      }
+    }
+  },
   "TeacherAnnouncements": {
     "Search": {
       "title": "Find a",
@@ -236,6 +277,9 @@
     "alert_check_email": "Check your email for confirmation!",
     "alert_enter_email": "Please enter email",
     "alert_password_reset_sent": "Password reset link sent to your email!",
+    "privacy_agreement_start": "I accept the terms of",
+    "privacy_agreement_link": "Privacy Policy",
+    "privacy_agreement_end": "and consent to the processing of personal data.",
     "errors": {
       "subjectNameTooLong": "Subject name is too long",
       "invalidLogin": "Invalid email or password",
