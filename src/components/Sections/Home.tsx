@@ -7,7 +7,7 @@ import { useUser } from "../../context/UserContext";
 import BecomeTeacherModal from "../UI/BecomeTeacherModal";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useLocale } from 'next-intl';
+import { useLocale } from "next-intl";
 
 export default function HomePage() {
   const { openModal } = useModal();
@@ -71,7 +71,7 @@ export default function HomePage() {
               onClick={() => setBecomeTeacher(!becomeTeacher)}
               className="px-4 py-4 cursor-pointer border-2 w-[250px] border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all"
             >
-              {tHero("becomeTeacher")} 
+              {tHero("becomeTeacher")}
             </button>
           </div>
         </div>
@@ -142,9 +142,7 @@ export default function HomePage() {
               <h2 className="text-4xl font-bold mb-6 text-slate-900">
                 {tCta("heading")}
               </h2>
-              <p className="text-gray-600 mb-10 text-lg">
-                {tCta("subtitle")}
-              </p>
+              <p className="text-gray-600 mb-10 text-lg">{tCta("subtitle")}</p>
               <button
                 className="inline-block px-12 py-5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 cursor-pointer transition-all shadow-2xl hover:shadow-blue-200 active:scale-95"
                 onClick={openModal}

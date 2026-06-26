@@ -472,6 +472,113 @@ const TeacherPanel = () => {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="">
+            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
+              Ваш город
+            </label>
+            <div className="relative">
+              <select name="town">
+                <optgroup label="Ташкент и область">
+                  <option value="tashkent">Ташкент</option>
+                  <option value="chirchik">Чирчик</option>
+                  <option value="olmaliq">Алмалык</option>
+                  <option value="angren">Ангрен</option>
+                  <option value="bekabad">Бекабад</option>
+                  <option value="yangiyul">Янгиюль</option>
+                  <option value="ahangaran">Ахангаран</option>
+                </optgroup>
+
+                <optgroup label="Самаркандская область">
+                  <option value="samarkand">Самарканд</option>
+                  <option value="kattakurgan">Каттакурган</option>
+                  <option value="urgut">Ургут</option>
+                </optgroup>
+
+                <optgroup label="Ферганская область">
+                  <option value="fergana">Фергана</option>
+                  <option value="kokand">Коканд</option>
+                  <option value="margilan">Маргилан</option>
+                  <option value="kuvasoy">Кувасай</option>
+                  <option value="rishtan">Риштан</option>
+                </optgroup>
+
+                <optgroup label="Андижанская область">
+                  <option value="andijan">Андижан</option>
+                  <option value="asaka">Асака</option>
+                  <option value="shahrixon">Шахрихан</option>
+                  <option value="khanabad">Ханабад</option>
+                </optgroup>
+
+                <optgroup label="Наманганская область">
+                  <option value="namangan">Наманган</option>
+                  <option value="chust">Чуст</option>
+                  <option value="kosonsoy">Касансай</option>
+                </optgroup>
+
+                <optgroup label="Бухарская область">
+                  <option value="bukhara">Бухара</option>
+                  <option value="kagan">Каган</option>
+                  <option value="gijduvan">Гиждуван</option>
+                </optgroup>
+
+                <optgroup label="Навоийская область">
+                  <option value="navoiy">Навои</option>
+                  <option value="zarafshan">Зарафшан</option>
+                  <option value="uchkuduk">Учкудук</option>
+                </optgroup>
+
+                <optgroup label="Кашкадарьинская область">
+                  <option value="karshi">Карши</option>
+                  <option value="shahrisabz">Шахрисабз</option>
+                  <option value="kitab">Китаб</option>
+                </optgroup>
+
+                <optgroup label="Сурхандарьинская область">
+                  <option value="termez">Термез</option>
+                  <option value="denau">Денау</option>
+                </optgroup>
+
+                <optgroup label="Джизакская область">
+                  <option value="jizzakh">Джизак</option>
+                </optgroup>
+
+                <optgroup label="Сырдарьинская область">
+                  <option value="gulistan">Гулистан</option>
+                  <option value="yangiyer">Янгиер</option>
+                </optgroup>
+
+                <optgroup label="Хорезмская область">
+                  <option value="urgench">Ургенч</option>
+                  <option value="khiva">Хива</option>
+                </optgroup>
+
+                <optgroup label="Республика Каракалпакстан">
+                  <option value="nukus">Нукус</option>
+                  <option value="kungrad">Кунград</option>
+                  <option value="turtkul">Турткуль</option>
+                  <option value="hodjeyli">Ходжейли</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="">
+            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
+              Формат занятий
+            </label>
+            <div className="relative">
+              <select name="typeOfLessons" id="typeOfLessons">
+                <option value="online"> Онлайн </option>
+                <option value="offline"> Офлайн </option>
+                <option value="hybrid"> Онлайн / Офлайн </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         <SubjectPicker />
 
         <div>
