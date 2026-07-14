@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import PaymentInstructionsModal from "../UI/PaymentInstructionsModal";
 import SubscriptionSkeleton from "../UI/SubscriptionSkeleton";
 import Planner from "../UI/Planner";
+import LessonTypeSelect from "../UI/lessonTypeOptions";
 import { useUser } from "../../context/UserContext";
 import { useSubject } from "../../context/TeacherSubjectContext";
 import { useTranslations } from "next-intl";
@@ -111,7 +112,7 @@ const TeacherPanel = () => {
 
       const { data, error } = await supabase
         .from("ads")
-        .select("*")
+        .select("price, description, contacts, subject")
         .eq("user_id", user.id)
         .single();
 
@@ -564,20 +565,7 @@ const TeacherPanel = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="">
-            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 block ml-1">
-              Формат занятий
-            </label>
-            <div className="relative">
-              <select name="typeOfLessons" id="typeOfLessons">
-                <option value="online"> Онлайн </option>
-                <option value="offline"> Офлайн </option>
-                <option value="hybrid"> Онлайн / Офлайн </option>
-              </select>
-            </div>
-          </div>
-        </div>
+        <LessonTypeSelect />
 
         <SubjectPicker />
 

@@ -32,7 +32,6 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: "Нет данных о платежах." });
     }
 
-    // 2. Получаем пользователей из Auth системы Supabase
     const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
     if (authError) throw authError;
 

@@ -34,7 +34,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, name, surname, role, avatar_url, is_subscribed, is_banned, availability, last_schedule_check")
         .eq("id", authUser.id)
         .single();
 

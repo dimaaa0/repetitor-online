@@ -1,21 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Wallet, BookOpen, MessageCircle, Filter } from "lucide-react";
-import { createClient } from "../../../../utils/supabase/client";
+import { useState } from "react";
+import {Filter } from "lucide-react";
 import StudentCard from "@/src/components/UI/StudentCard";
 import FilterPanel from "../../../../components/UI/StudentFilter";
 import { useStudentAnnouncement } from "../../../../context/StudentAnnouncementContext";
-import { useUser } from "@/src/context/UserContext";
 import BecomeTeacherModal from "@/src/components/UI/BecomeTeacherModal";
 import { useTranslations } from "next-intl";
 
 const Announcements = () => {
-  const [dataLoading, setDataLoading] = useState(false);
-  const [students, setStudents] = useState<any[]>([]);
-  const { user, loading } = useUser();
   const { announcements, announcementsLoading } = useStudentAnnouncement();
-  const supabase = createClient();
 
   const t = useTranslations("TeacherAnnouncements.Search");
 

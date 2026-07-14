@@ -1,6 +1,6 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
+import { useLocale } from "next-intl";
 import {
   X,
   Mail,
@@ -18,6 +18,7 @@ import getFriendlyError from "../../app/functions/errorTranslator";
 import PrivacyPolicyPage from "../UI/PrivatePolicy";
 
 export default function SignInForm() {
+  const locale = useLocale();
   const supabase = createClient();
   const { isOpen, closeModal } = useModal();
   const t = useTranslations("RegistrationModal");
@@ -75,10 +76,13 @@ export default function SignInForm() {
       showAlert("success", t("alert_welcome_back"));
       closeModal();
     } catch (error: any) {
-        const errorMessage = getFriendlyError(
-          error.message,
-          t as unknown as (id: string, values?: Record<string, unknown>) => string,
-        );
+      const errorMessage = getFriendlyError(
+        error.message,
+        t as unknown as (
+          id: string,
+          values?: Record<string, unknown>,
+        ) => string,
+      );
       showAlert("error", errorMessage);
     } finally {
       setLoading(false);
@@ -143,7 +147,10 @@ export default function SignInForm() {
     } catch (error: any) {
       const errorMessage = getFriendlyError(
         error.message,
-        t as unknown as (id: string, values?: Record<string, unknown>) => string,
+        t as unknown as (
+          id: string,
+          values?: Record<string, unknown>,
+        ) => string,
       );
       showAlert("error", errorMessage);
     } finally {
@@ -164,7 +171,7 @@ export default function SignInForm() {
 
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:3000/reset-password",
+      redirectTo: `${window.location.origin}/${locale}/reset-password`,
     });
 
     if (error) {
@@ -395,7 +402,7 @@ export default function SignInForm() {
                   htmlFor="privacy"
                   className="text-xs text-gray-500 leading-snug cursor-pointer select-none"
                 >
-                  {t("privacy_agreement_start")} {" "}
+                  {t("privacy_agreement_start")}{" "}
                   <span
                     className="text-blue-600 hover:underline font-medium transition-all cursor-pointer"
                     onClick={(e) => {

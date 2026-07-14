@@ -8,6 +8,7 @@ import TeacherPanel from "@/src/components/Sections/TeacherPanel";
 import StudentPanel from "@/src/components/Sections/StudentPanel";
 import AdminPanel from "@/src/components/Sections/AdminPanel";
 import { useTranslations } from "next-intl";
+import ChangePassword from "../../../../components/UI/changePassword"
 
 import { useUser } from "../../../../context/UserContext";
 import { useSubject } from "../../../../context/TeacherSubjectContext";
@@ -50,14 +51,6 @@ const Profile = () => {
     message: string;
   } | null>(null);
 
-  const [subjects, setSubjects] = useState<string[]>([]); // Локальное состояние для отображения выбранных предметов
-  const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
-
-  const [isPublishing, setIsPublishing] = useState(false);
-
-  const [hasAd, setHasAd] = useState(false);
-
   const [confirmation, setConfirmation] = useState(false);
 
   const roleStyles: any = {
@@ -73,21 +66,9 @@ const Profile = () => {
 
       const { data, error } = await supabase
         .from("ads")
-        .select("*")
+        .select("subject")
         .eq("user_id", user.id)
         .single();
-
-      if (data) {
-        //* Заполняем поля данными из базы
-        setHasAd(true);
-        setPrice(data.price.toLocaleString());
-        setDescription(data.description || "");
-        setSubjects(
-          data.subject
-            ? data.subject.split(", ").map((s: string) => s.trim())
-            : [],
-        );
-      }
 
       if (data && data.subject) {
         // Превращаем строку из базы в массив
@@ -107,10 +88,6 @@ const Profile = () => {
 
     fetchAd();
   }, [user, supabase]);
-
-  useEffect(() => {
-    setSubjects(selectedSubjects);
-  }, [selectedSubjects]);
 
   //* Синхронизация данных формы с пользователем
   useEffect(() => {
@@ -494,6 +471,8 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
+        <ChangePassword />
 
         <div>{panel}</div>
 

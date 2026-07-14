@@ -159,7 +159,7 @@ const StudentPanel = () => {
 
       const { data, error } = await supabase
         .from("student_ads")
-        .select("*")
+        .select("title, price, description, contacts, subject")
         .eq("user_id", user.id)
         .single();
 
